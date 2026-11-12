@@ -265,3 +265,23 @@ test('every passport page fits on a phone screen', async ({ page }, info) => {
   await expect(shown(page).locator('.visa__endorse')).toBeVisible()
   expect(await check('hannah-kowalski', 4), 'recording made the book grow').toBeLessThanOrEqual(before + 0.5)
 })
+
+// Pinched in on a phone, a sideways drag pans across the page instead of
+// turning it. Chrome only, since it needs real touch input.
+test('a pinched-in page pans instead of turning', async ({ page, browserName }, info) => {
+  test.skip(!info.project.name.startsWith('phone') || browserName !== 'chromium', 'real touch input needs Chrome')
+  await page.goto('./#/passport/hannah-kowalski?page=3')
+  await expect(shown(page).locator('.page').first()).toBeVisible()
+  const cdp = await page.context().newCDPSession(page)
+  await cdp.send('Input.synthesizePinchGesture', { x: 195, y: 400, scaleFactor: 1.8, relativeSpeed: 600, gestureSourceType: 'touch' })
+  await expect(page.locator('.passport')).toHaveClass(/is-zoomed/)
+  const left = await page.evaluate(() => window.visualViewport!.offsetLeft)
+  const touch = (type: 'touchStart' | 'touchMove' | 'touchEnd', x = 0, y = 0) =>
+    cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y }] })
+  await touch('touchStart', 300, 300)
+  for (let i = 1; i <= 10; i++) await touch('touchMove', 300 - i * 20, 302)
+  await touch('touchEnd')
+  await expect.poll(() => page.evaluate(() => window.visualViewport!.offsetLeft)).toBeGreaterThan(left + 20)
+  await page.waitForTimeout(400)
+  await expect(page).toHaveURL(/page=3$/)
+})

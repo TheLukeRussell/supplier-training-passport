@@ -22,6 +22,8 @@
   touch-action: pan-y pinch-zoom;
   transition: transform var(--dur-turn) var(--ease-in-out);
 }
+/* Pinched in, a drag pans the zoomed view any way it goes instead. */
+.passport.is-zoomed .book { touch-action: pan-x pan-y pinch-zoom; }
 
 .book--spread {
   /* Leave room either side for the turn buttons. */
