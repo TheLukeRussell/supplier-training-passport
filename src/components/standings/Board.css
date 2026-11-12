@@ -128,8 +128,8 @@
   overflow-wrap: anywhere;
 }
 .board-empty__text { color: var(--color-board-muted); }
-.board-empty__action { margin-top: var(--space-xs); background: var(--color-board-signal); color: var(--color-board-signal-ink); border-color: transparent; }
-@media (hover: hover) { .board-empty__action:hover { background: var(--color-ink); color: var(--color-board); } }
+/* The standard black button. Ember stays for first place and for you. */
+.board-empty__action { margin-top: var(--space-xs); }
 
 /* Tablets: still a table, so the cells tighten up to keep all eight
    columns inside the sheet. */
@@ -149,8 +149,10 @@
     display: grid;
     /* Fixed shares, so the columns line up from row to row. Values never
        split ("10 of 11" stays together); on the narrowest phones the label
-       wraps above its value instead of running into the next column. */
-    grid-template-columns: 3rem minmax(0, 1fr) minmax(0, 1.3fr) auto;
+       wraps above its value instead of running into the next column. The
+       last column is fixed too, wide enough for "Unranked" and "100%", so
+       a wide rate or status can't nudge one row's middle columns over. */
+    grid-template-columns: 3rem minmax(0, 1fr) minmax(0, 1.3fr) 4rem;
     grid-template-areas:
       "rank rep rep rate"
       "rank team stamps status"

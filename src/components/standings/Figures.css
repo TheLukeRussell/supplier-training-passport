@@ -35,10 +35,11 @@
 }
 .figures__unit { color: var(--color-ink-2); }
 
+/* Phones: one figure per row, the label over the number, so a long unit
+   like "across ranked Central reps" has the whole width to sit on one line. */
 @media (max-width: 40rem) {
   .figures { grid-template-columns: minmax(0, 1fr); }
-  .figures__item { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-md); padding: var(--space-xs) 0; border-left: 0; border-top: 1px solid var(--color-rule); }
+  .figures__item { display: flex; flex-direction: column; align-items: flex-start; gap: 0; padding: var(--space-xs) 0; border-left: 0; border-top: 1px solid var(--color-rule); }
   .figures__item:first-child { border-top: 0; }
-  .figures__item dd { text-align: right; }
   .figures__value { font-size: var(--text-3xl); }
 }
