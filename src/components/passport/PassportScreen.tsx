@@ -14,7 +14,9 @@ import { Book } from './Book'
 import { Cover } from './Cover'
 import { DataPage } from './DataPage'
 import { NotesPage } from './NotesPage'
+import { PassportPicker } from './PassportPicker'
 import { SlotDetail } from './SlotDetail'
+import { isPinchZoomed, usePinchZoom } from './usePinchZoom'
 import { useTilt } from './useTilt'
 import { VisaPage } from './VisaPage'
 import './PassportScreen.css'
@@ -31,6 +33,7 @@ export function PassportScreen() {
   const [params, setParams] = useSearchParams()
   const spread = useSpread()
   const reduced = useReducedMotion()
+  const zoomed = usePinchZoom()
   const [detail, setDetail] = useState<Training | null>(null)
   const swipe = useRef<{ x: number; y: number; id: number } | null>(null)
   const swiped = useRef(false)
@@ -147,6 +150,8 @@ export function PassportScreen() {
       return
     }
     if (!start || start.id !== event.pointerId) return
+    // Pinched in, a sideways drag is someone panning across a stamp.
+    if (isPinchZoomed()) return
     const dx = event.clientX - start.x
     const dy = event.clientY - start.y
     if (Math.abs(dx) < SWIPE_PX || Math.abs(dx) < Math.abs(dy) * 1.5) return
@@ -155,8 +160,9 @@ export function PassportScreen() {
   }
 
   return (
-    <div className={`passport container${spread && (view === 0 || view === last) ? ' is-closed' : ''}`}>
+    <div className={`passport container${spread && (view === 0 || view === last) ? ' is-closed' : ''}${zoomed ? ' is-zoomed' : ''}`}>
       <h1 className="visually-hidden">{rep.name}’s passport</h1>
+      <PassportPicker model={model} rep={rep} page={page} />
       <div
         ref={tiltRef}
         className="passport__stage"

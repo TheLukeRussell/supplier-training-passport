@@ -1,7 +1,8 @@
 /* Top bar. A light surface, because the colour logo only goes on light
-   backgrounds. Logo, a hairline, then the program name. On phones that pair
-   gets the first row and the tabs share the second with Demo, which keeps
-   the bar short enough for a passport page to fit under it. */
+   backgrounds. Logo, a hairline, then the program name. On tall phones that
+   pair gets the first row and the tabs share the second with Demo. On short
+   phones it's all one row without the name, which keeps the bar short
+   enough for a passport page to fit under it. */
 
 .topbar {
   border-bottom: 1px solid var(--color-rule);
@@ -100,6 +101,22 @@
 @media (max-width: 22.5rem) {
   .topbar__home { flex-direction: column; align-items: flex-start; gap: var(--space-2xs); }
   .topbar__product { margin: 0; padding: 0; border: 0; }
+}
+
+/* Short phones, which is most of them once Safari's bars are counted: one
+   row, so a whole passport page fits under it. The program name steps out
+   (the passport says it on its cover), the logo drops to 96px, still over
+   the brand's 90px minimum, and the tabs tighten. If Demo can't fit beside
+   them, as on the smallest phones or when it reads Hide demo, it wraps to
+   a row of its own. */
+@media (max-width: 47.99rem) and (max-height: 840px) {
+  .topbar__inner { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--space-xs); padding-block: var(--space-2xs); }
+  .topbar__home { margin-right: auto; padding-block: 0; }
+  .topbar__logo { width: 96px; }
+  .topbar__product { display: none; }
+  .topbar__tabs { gap: var(--space-3xs); }
+  .topbar__tab { flex: none; padding: 0 var(--space-xs); font-size: var(--text-sm); }
+  .topbar__demo { margin-left: auto; padding: 0 var(--space-xs); font-size: var(--text-sm); }
 }
 
 @media (prefers-reduced-motion: reduce) {

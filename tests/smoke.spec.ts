@@ -345,15 +345,17 @@ test('the passport can be picked up and tilted', async ({ page, browserName }, i
 
 // Phones only. Every page of two passports (the default rep and the new hire)
 // fits on its paper, the paper fits on the screen under the top bar, and the
-// turn buttons are on screen. Recording today mustn't make the book grow.
+// turn buttons are on screen without covering any of it. Recording today
+// mustn't make the book grow. On a phone too short for all that, an iPhone
+// SE, the bar sits under the page instead of over it.
 test('every passport page fits on a phone screen', async ({ page }, info) => {
   test.skip(!info.project.name.startsWith('phone'), 'phones only')
 
-  const check = async (rep: string, p: number) => {
+  const measure = async (rep: string, p: number) => {
     await page.goto(`./#/passport/${rep}${p ? `?page=${p}` : ''}`)
     await expect(shown(page).locator('.page').first()).toBeVisible()
     await page.evaluate(() => document.fonts.ready)
-    const r = await page.evaluate(() => {
+    return page.evaluate(() => {
       const sheet = document.querySelector('.book__slot .page')!
       const box = sheet.getBoundingClientRect()
       const spill = [...sheet.querySelectorAll('*')]
@@ -361,11 +363,15 @@ test('every passport page fits on a phone screen', async ({ page }, info) => {
         .filter(({ b }) => b.height > 0 && b.bottom > box.bottom + 1)
         .map(({ el }) => el.className.toString())
       const controls = document.querySelector('.passport__controls')!.getBoundingClientRect()
-      return { spill, bottom: box.bottom, vh: window.innerHeight, controls: controls.bottom, book: document.querySelector('.book')!.getBoundingClientRect().height }
+      return { spill, bottom: box.bottom, vh: window.innerHeight, controls: controls.bottom, controlsTop: controls.top, book: document.querySelector('.book')!.getBoundingClientRect().height }
     })
+  }
+  const check = async (rep: string, p: number) => {
+    const r = await measure(rep, p)
     expect(r.spill, `${rep} page ${p}: content runs past the bottom of the page`).toEqual([])
     expect(r.bottom, `${rep} page ${p}: the page runs past the bottom of the screen`).toBeLessThanOrEqual(r.vh)
     expect(r.controls, `${rep} page ${p}: the turn buttons are off screen`).toBeLessThanOrEqual(r.vh + 1)
+    expect(r.controlsTop, `${rep} page ${p}: the turn buttons cover the foot of the page`).toBeGreaterThanOrEqual(r.bottom - 0.5)
     return r.book
   }
 
@@ -373,10 +379,121 @@ test('every passport page fits on a phone screen', async ({ page }, info) => {
     for (const p of [0, 1, 2, 3, 4, 5, 6, 7]) await check(rep, p)
   }
 
+  const size = page.viewportSize()!
+  await page.setViewportSize({ width: 375, height: 667 })
+  for (const p of [0, 2, 4, 7]) {
+    const r = await measure('hannah-kowalski', p)
+    expect(r.controlsTop, `iPhone SE page ${p}: the turn buttons cover the foot of the page`).toBeGreaterThanOrEqual(r.bottom - 0.5)
+  }
+  await page.setViewportSize(size)
+
   const before = await check('hannah-kowalski', 4)
   await page.getByRole('button', { name: 'Demo' }).click()
   await page.getByRole('button', { name: 'Record today’s attendance' }).click()
   await page.getByRole('button', { name: 'Hide demo' }).click()
   await expect(shown(page).locator('.visa__endorse')).toBeVisible()
   expect(await check('hannah-kowalski', 4), 'recording made the book grow').toBeLessThanOrEqual(before + 0.5)
+})
+
+// Laptops and projectors. On a short wide window the book scales down so the
+// picker, the whole spread with its page numbers, the label and both arrows
+// fit with no scrolling. Under the scale a click still opens the cover, the
+// arrows still turn, and a recorded stamp still lands on today's slot.
+test('a spread fits a short laptop or projector screen', async ({ page }, info) => {
+  test.skip(info.project.name.startsWith('phone'), 'wide screens only')
+
+  const fits = async (label: string) => {
+    await page.evaluate(() => document.fonts.ready)
+    const r = await page.evaluate(() => {
+      const box = (el: Element | null) => el?.getBoundingClientRect()
+      const bottoms = [...document.querySelectorAll('.book__slot .page, .book__slot .page__folio, .passport__where')].map((el) => box(el)!.bottom)
+      const arrows = [...document.querySelectorAll('.passport__turn')].map((el) => box(el)!)
+      return {
+        vh: window.innerHeight,
+        scroll: document.documentElement.scrollHeight - window.innerHeight,
+        lowest: Math.max(...bottoms),
+        picker: box(document.getElementById('passport-of'))!.top,
+        arrows: arrows.every((b) => b.top >= 0 && b.bottom <= window.innerHeight && b.left >= 0 && b.right <= window.innerWidth),
+      }
+    })
+    expect(r.lowest, `${label}: the spread or its label runs off the bottom`).toBeLessThanOrEqual(r.vh)
+    expect(r.scroll, `${label}: the page scrolls`).toBeLessThanOrEqual(0)
+    expect(r.picker, `${label}: the picker is off the top`).toBeGreaterThanOrEqual(0)
+    expect(r.arrows, `${label}: an arrow is off screen`).toBe(true)
+  }
+
+  for (const [width, height] of [[1280, 720], [1280, 610], [1366, 768], [1536, 730], [1440, 790], [1536, 864]]) {
+    await page.setViewportSize({ width, height })
+    for (const p of [0, 2, 5, 7]) {
+      await page.goto(`./#/passport/hannah-kowalski${p ? `?page=${p}` : ''}`)
+      await expect(shown(page).locator('.page').first()).toBeVisible()
+      await expect(page.locator('.book.is-turning')).toHaveCount(0)
+      await fits(`${width}x${height} page ${p}`)
+    }
+  }
+
+  await page.setViewportSize({ width: 1280, height: 720 })
+  await page.goto('./')
+  const cover = shown(page).locator('.cover')
+  const c = (await cover.boundingBox())!
+  await page.mouse.click(c.x + c.width / 2, c.y + c.height * 0.3)
+  await expect(page).toHaveURL(/page=2/)
+  await expect(page.locator('.book.is-turning')).toHaveCount(0)
+  await next(page).click()
+  await expect(where(page)).toHaveText('Pages 3 and 4 of 6')
+  await page.getByRole('button', { name: 'Demo', exact: true }).click()
+  await page.getByRole('button', { name: 'Record today’s attendance' }).click()
+  await expect(page.getByRole('button', { name: /^Pioneer, Thu, Jun 17, virtual\. Attended/ })).toBeVisible()
+  await expect(shown(page).locator('.visa__endorse')).toContainText('Stamped')
+})
+
+// The Passport of picker opens anyone's passport on the page you're on. It
+// doesn't change who you are: the Passport tab and View as still point at you.
+test('the picker opens another rep on the same page', async ({ page }, info) => {
+  const phone = info.project.name.startsWith('phone')
+  await page.goto('./#/passport/hannah-kowalski?page=3')
+  const picker = page.getByLabel('Passport of')
+  await expect(picker).toHaveValue('hannah-kowalski')
+  await expect(picker.locator('optgroup')).toHaveCount(4)
+  await expect(picker.locator('option')).toHaveCount(30)
+  const before = await where(page).textContent()
+
+  await picker.selectOption('jordan-hale')
+  await expect(page).toHaveURL(/#\/passport\/jordan-hale\?page=3$/)
+  await expect(picker).toHaveValue('jordan-hale')
+  await expect(where(page)).toHaveText(before!)
+  await expect(page.locator('.book.is-turning')).toHaveCount(0)
+  await expect(shown(page).getByText(/January to March/i).first()).toBeVisible()
+
+  await expect(page.getByRole('link', { name: 'Passport', exact: true })).toHaveAttribute('href', '#/passport/hannah-kowalski')
+  await page.getByRole('button', { name: 'Demo', exact: true }).click()
+  await expect(page.locator('#view-as')).toHaveValue('hannah-kowalski')
+
+  // On a phone it lives in the page bar, so it adds no height.
+  if (phone) {
+    const bar = (await page.locator('.passport__controls').boundingBox())!
+    const box = (await picker.boundingBox())!
+    expect(box.y).toBeGreaterThanOrEqual(bar.y)
+    expect(box.y + box.height).toBeLessThanOrEqual(bar.y + bar.height)
+  }
+})
+
+// Pinched in on a phone, a sideways drag pans across the page instead of
+// turning it. Chrome only, since it needs real touch input.
+test('a pinched-in page pans instead of turning', async ({ page, browserName }, info) => {
+  test.skip(!info.project.name.startsWith('phone') || browserName !== 'chromium', 'real touch input needs Chrome')
+  await page.goto('./#/passport/hannah-kowalski?page=3')
+  await expect(shown(page).locator('.page').first()).toBeVisible()
+  const cdp = await page.context().newCDPSession(page)
+  await cdp.send('Input.synthesizePinchGesture', { x: 195, y: 400, scaleFactor: 1.8, relativeSpeed: 600, gestureSourceType: 'touch' })
+  await expect(page.locator('.passport')).toHaveClass(/is-zoomed/)
+  const left = await page.evaluate(() => window.visualViewport!.offsetLeft)
+  const touch = (type: 'touchStart' | 'touchMove' | 'touchEnd', x = 0, y = 0) =>
+    cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y }] })
+  await touch('touchStart', 300, 300)
+  for (let i = 1; i <= 10; i++) await touch('touchMove', 300 - i * 20, 302)
+  await touch('touchEnd')
+  await expect.poll(() => page.evaluate(() => window.visualViewport!.offsetLeft)).toBeGreaterThan(left + 20)
+  await page.waitForTimeout(400)
+  await expect(page).toHaveURL(/page=3$/)
 })
