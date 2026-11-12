@@ -80,15 +80,21 @@
    cover's band sits. Its middle (--lam-mid along the gradient) is half a
    page in at rest and moves 0.7 of a page (--lam-travel) per unit of tilt
    left and right, 0.3 up and down, the same way the cover ramp moves, so
-   both read as one light. */
+   both read as one light.
+   Safari throws away a layer that slides right out of view and paints it
+   again when it comes back, which cost a slow frame every time. So the
+   move stops (--lam-min, --lam-max) with a 2px sliver of the box still on
+   the paper. By then the band is past the edge and the sliver is clear. */
 .laminate__light {
   --lam-mid: 50%;
   --lam-travel: 100%;
+  --lam-min: calc(-100% + 2px);
+  --lam-max: calc(100% - 2px);
   position: absolute;
   inset: 0;
   background-image: linear-gradient(105deg, transparent calc(var(--lam-mid) - 26cqi), var(--color-foil) calc(var(--lam-mid) - 5cqi) calc(var(--lam-mid) + 5cqi), transparent calc(var(--lam-mid) + 26cqi));
   opacity: calc(var(--shine, 0) * var(--lam-peak));
-  transform: translateX(calc((var(--tilt-x, 0) * -0.7 + var(--tilt-y, 0) * -0.3) * var(--lam-travel)));
+  transform: translateX(clamp(var(--lam-min), calc((var(--tilt-x, 0) * -0.7 + var(--tilt-y, 0) * -0.3) * var(--lam-travel)), var(--lam-max)));
 }
 
 /* On a spread the inside cover and the data page lie side by side, and one
@@ -110,11 +116,17 @@
   --lam-page: calc(100cqi + 2 * var(--space-lg) + 2px);
   --lam-mid: calc(var(--lam-page) * 0.664);
   --lam-travel: calc(2 * var(--lam-page));
+  --lam-min: calc(-150% - 1px);
+  --lam-max: calc(50% - 5px);
   left: calc(50% + 3px);
   right: auto;
   width: 100%;
 }
-.book--spread .book__slot--right .laminate__light { left: calc(-50% - 3px); }
+.book--spread .book__slot--right .laminate__light {
+  --lam-min: calc(-50% + 5px);
+  --lam-max: calc(150% + 1px);
+  left: calc(-50% - 3px);
+}
 
 /* Held or turning, the band gets its own layer, so moving it is just the
    compositor sliding a picture under the sheet. Never in the sizer. */
@@ -126,14 +138,14 @@
    you. The front of the leaf early, its back (or a phone page swinging back
    in) late. It's no brighter than a held page at full shine. */
 @keyframes laminate-glint-early {
-  0% { transform: translateX(-100%); opacity: 0; }
+  0% { transform: translateX(var(--lam-min)); opacity: 0; }
   15%, 35% { opacity: var(--lam-peak); }
-  50%, 100% { transform: translateX(100%); opacity: 0; }
+  50%, 100% { transform: translateX(var(--lam-max)); opacity: 0; }
 }
 @keyframes laminate-glint-late {
-  0%, 50% { transform: translateX(-100%); opacity: 0; }
+  0%, 50% { transform: translateX(var(--lam-min)); opacity: 0; }
   65%, 85% { opacity: var(--lam-peak); }
-  100% { transform: translateX(100%); opacity: 0; }
+  100% { transform: translateX(var(--lam-max)); opacity: 0; }
 }
 .book__face .laminate__light { animation: laminate-glint-early var(--dur-turn) linear both; }
 .book__face--back .laminate__light,
