@@ -14,13 +14,22 @@
 }
 .figures__item:first-child { padding-left: 0; border-left: 0; }
 
-.figures__item dt { font-size: var(--text-sm); font-weight: 700; color: var(--color-ink-2); white-space: nowrap; }
+/* Labels are brand eyebrows: small, uppercase, tracked wide. */
+.figures__item dt {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--color-ink-2);
+  white-space: nowrap;
+}
 .figures__item dd { margin: 0; }
 
 .figures__value {
   font-family: var(--font-display);
   font-weight: var(--display-weight);
   font-size: var(--text-display-s);
+  letter-spacing: var(--tracking-display);
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }

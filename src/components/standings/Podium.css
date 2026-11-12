@@ -1,5 +1,5 @@
-/* The podium: three steps of different heights on the scoreboard.
-   First is in the middle and tallest, like a real one. */
+/* The podium: three steps of different heights standing on an Ink floor.
+   First is in the middle, tallest, and the one Ember block on the sheet. */
 
 .podium { display: grid; gap: var(--space-md); }
 
@@ -17,6 +17,7 @@
   gap: var(--space-sm);
   margin: 0;
   padding: 0;
+  border-bottom: 2px solid var(--color-ink);
   list-style: none;
 }
 
@@ -28,23 +29,27 @@
   min-width: 0;
   padding: var(--space-md);
   border-radius: var(--radius-card) var(--radius-card) 0 0;
-  background: var(--color-field-2);
+  background: var(--color-board-step);
+  color: var(--color-ink);
+  transition: background-color var(--dur-micro) var(--ease-out);
 }
 /* Position comes from the slot, height from the rank. */
 .podium__step--first { grid-column: 2; grid-row: 1; }
 .podium__step--second { grid-column: 1; grid-row: 1; }
 .podium__step--third { grid-column: 3; grid-row: 1; }
-.podium__step--tall { min-height: 236px; background: var(--color-field-3); }
+.podium__step--tall { min-height: 236px; background: var(--color-board-signal); color: var(--color-board-signal-ink); }
 .podium__step--mid { min-height: 204px; }
 .podium__step--short { min-height: 180px; }
+@media (hover: hover) { .podium__step:not(.podium__step--tall):hover { background: var(--color-board-hover); } }
 
+/* Plain Ink numerals. First gets its colour from the step, not the number. */
 .podium__rank {
   font-family: var(--font-display);
   font-weight: var(--display-weight);
   font-size: var(--text-display);
+  letter-spacing: var(--tracking-display);
   line-height: 0.9;
   font-variant-numeric: tabular-nums;
-  color: var(--color-board-signal);
 }
 
 /* The whole step is clickable; the name is the real link. */
@@ -60,26 +65,35 @@
 .podium__name:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 .podium__name:active { opacity: 0.85; }
 
-.podium__meta { font-size: var(--text-sm); color: var(--color-field-muted); }
+.podium__meta { font-size: var(--text-sm); color: var(--color-board-muted); }
 .podium__rate {
   margin-top: auto;
   font-family: var(--font-display);
   font-weight: var(--display-weight);
   font-size: var(--text-2xl);
+  letter-spacing: var(--tracking-display);
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
-.podium__stamps { font-family: var(--font-body); font-weight: 400; font-size: var(--text-sm); color: var(--color-field-muted); }
+.podium__stamps { font-family: var(--font-body); font-weight: 400; font-size: var(--text-sm); letter-spacing: 0; color: var(--color-board-muted); }
+/* On Ember everything is Ink: Stone drops under 4.5:1 there. */
+.podium__step--tall .podium__meta, .podium__step--tall .podium__stamps { color: var(--color-board-signal-ink); }
 
-.podium__note { font-size: var(--text-sm); color: var(--color-field-muted); }
+.podium__note { font-size: var(--text-sm); color: var(--color-board-muted); }
 
 @media (max-width: 40rem) {
   .podium__steps { gap: var(--space-2xs); }
-  .podium__step { padding: var(--space-sm); }
+  .podium__step { padding: var(--space-sm) var(--space-xs); }
   .podium__step--tall { min-height: 220px; }
   .podium__step--mid { min-height: 196px; }
   .podium__step--short { min-height: 172px; }
   .podium__rank { font-size: var(--text-display-s); }
   .podium__name { font-size: var(--text-md); }
   .podium__rate { font-size: var(--text-xl); }
+  /* "10 of 11" gets its own line instead of wrapping on a narrow step. */
+  .podium__stamps { display: block; margin-top: var(--space-3xs); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .podium__step { transition: none; }
 }

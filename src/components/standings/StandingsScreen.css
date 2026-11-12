@@ -1,13 +1,14 @@
 /* Standings layout: heading and a one-line explainer, the figures, the
-   filters, then the scoreboard, a Charcoal panel. */
+   filters, then the scoreboard, a white sheet like a page of the brand site. */
 
 .standings { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-lg); }
 
 .standings__head { display: grid; gap: var(--space-xs); }
+/* Page lead size from the brand's type scale, a step up from a section. */
 .standings__title {
-  font-size: var(--text-section);
+  font-size: var(--text-display-s);
   font-weight: var(--display-weight);
-  line-height: 1.02;
+  line-height: 1;
   text-transform: uppercase;
 }
 .standings__sub { max-width: 70ch; color: var(--color-ink-2); }
@@ -21,19 +22,33 @@
 }
 .standings__search { width: min(100%, 20rem); }
 
-/* The scoreboard: one Charcoal panel holding the podium and the board. */
+/* Team choices are the brand's outline button: Ink edge on white, filled
+   Ink when picked. */
+.standings__tools .seg label { border-color: var(--color-ink); background: var(--color-board); }
+@media (hover: hover) { .standings__tools .seg label:hover { background: var(--color-board-hover); } }
+.standings__tools .seg input:checked + label { background: var(--color-ink); color: var(--color-board); }
+.standings__search .input { background: var(--color-board); }
+@media (hover: hover) { .standings__search .input:hover { background: var(--color-board-hover); } }
+
+/* The scoreboard: one white sheet holding the podium and the board. */
 .scoreboard {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-lg);
-  padding: var(--space-lg);
-  border-radius: var(--radius-page);
-  background: var(--color-field);
-  color: var(--color-field-ink);
-  --color-focus: var(--color-board-signal);
+  gap: var(--space-xl);
+  padding: var(--space-xl) var(--space-lg) var(--space-lg);
+  border: var(--rule-hair) solid var(--color-board-rule);
+  border-radius: var(--radius-card);
+  background: var(--color-board);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-card);
+}
+
+@media (max-width: 60rem) {
+  .scoreboard { padding-inline: var(--space-md); }
 }
 
 @media (max-width: 40rem) {
+  .standings__title { font-size: var(--text-section); }
   .standings__search { width: 100%; }
-  .scoreboard { padding: var(--space-md) var(--space-sm); margin-inline: calc(-1 * var(--space-xs)); }
+  .scoreboard { gap: var(--space-lg); padding: var(--space-lg) var(--space-sm) var(--space-sm); margin-inline: calc(-1 * var(--space-xs)); }
 }

@@ -1,7 +1,7 @@
 /* Hallmark · this folder follows the build stamp in src/styles/app.css */
 /* The board. A real table on wide screens; on phones each row restacks into
-   a labelled block so nothing scrolls sideways. Below-the-line rows sit on a
-   darker band, and the line itself is a row of its own. */
+   a labelled block so nothing scrolls sideways. White sheet, Cloud hairlines,
+   a Fog band below the line, and the line itself is a row of its own. */
 
 .board-wrap { display: grid; gap: var(--space-sm); }
 
@@ -14,45 +14,48 @@
 
 .board {
   width: 100%;
-  border-collapse: collapse;
+  /* Separate, not collapsed, so the dashed cut line keeps an even beat
+     instead of restarting at every cell edge below it. */
+  border-collapse: separate;
+  border-spacing: 0;
   font-variant-numeric: tabular-nums;
 }
 
 .board thead th {
   padding: 0 var(--space-sm) var(--space-xs);
-  border-bottom: 1px solid var(--color-field-rule);
+  border-bottom: 2px solid var(--color-ink);
   font-size: var(--text-sm);
   font-weight: 700;
-  color: var(--color-field-muted);
+  color: var(--color-board-muted);
   text-align: left;
   white-space: nowrap;
 }
 
 .board__row {
   position: relative;
-  background: var(--color-field);
+  background: var(--color-board);
   transition: background-color var(--dur-micro) var(--ease-out);
 }
 .board__row > * {
   padding: var(--space-xs) var(--space-sm);
-  border-bottom: 1px solid var(--color-field-rule);
+  border-bottom: 1px solid var(--color-board-rule);
   text-align: left;
   vertical-align: middle;
 }
-.board__row.is-below, .board__row.is-unranked { background: var(--color-field-2); }
-.board__row.is-you { background: var(--color-field-3); }
-@media (hover: hover) { .board__row:hover { background: var(--color-field-3); } }
+.board__row.is-below, .board__row.is-unranked { background: var(--color-board-below); }
+@media (hover: hover) { .board__row:hover { background: var(--color-board-hover); } }
 
 .board__rank {
   width: 4.5rem;
   font-family: var(--font-display);
   font-weight: var(--display-weight);
   font-size: var(--text-2xl);
+  letter-spacing: var(--tracking-display);
   line-height: 1;
   white-space: nowrap;
 }
-.board__row.is-you .board__rank { color: var(--color-board-signal); }
-.board .tag--you { background: var(--color-board-signal); color: var(--color-board-signal-ink); }
+/* You: an Ember rank block plus the Ember tag. Both fills, Ink on top. */
+.board__row.is-you .board__rank { background: var(--color-board-signal); color: var(--color-board-signal-ink); }
 
 .board__rep { font-weight: 700; }
 .board__rep .tag { margin-left: var(--space-xs); }
@@ -69,33 +72,42 @@
   font-family: var(--font-display);
   font-weight: var(--display-weight);
   font-size: var(--text-xl);
+  letter-spacing: var(--tracking-display);
   line-height: 1;
 }
 
+/* Rep, rate and status carry the row. The rest steps back to Stone. */
+.board__team, .board__stamps, .board__streak { color: var(--color-board-muted); }
+
 .board__status { white-space: nowrap; }
-.board__row.is-below .board__status { color: var(--color-miss-on-field); font-weight: 700; }
+.board__row.is-below .board__status { color: var(--color-board-down); }
 /* A new hire with nothing held yet isn’t below anything, just not counted. */
-.board__row.is-unranked .board__status { color: var(--color-field-muted); }
+.board__row.is-unranked .board__status { color: var(--color-board-muted); }
 
 .move { display: inline-flex; align-items: center; gap: var(--space-2xs); white-space: nowrap; }
 .move svg { width: 12px; height: 12px; fill: currentColor; flex-shrink: 0; }
-.move--up { color: var(--color-up-on-field); font-weight: 700; }
-.move--down { color: var(--color-miss-on-field); font-weight: 700; }
-.move--same, .move--new { color: var(--color-field-muted); font-size: var(--text-sm); }
+.move--up { color: var(--color-board-up); font-weight: 700; }
+.move--down { color: var(--color-board-down); font-weight: 700; }
+.move--same, .move--new { color: var(--color-board-muted); font-size: var(--text-sm); }
 
-/* The cut line. */
+/* The cut line: an Ink tab standing on a dashed Ink rule. Everything above
+   the tab is in the club. */
 .board__cut td {
-  padding: var(--space-xs) 0;
-  border-bottom: 2px dashed var(--color-board-signal);
+  padding: var(--space-md) 0 0;
+  border-bottom: 2px dashed var(--color-board-line);
 }
 .board__cut-label {
+  /* Sits over the rule so tab and line read as one piece. */
+  position: relative;
   display: inline-block;
-  padding: var(--space-3xs) var(--space-xs);
-  border-radius: var(--radius-input);
-  background: var(--color-board-signal);
-  color: var(--color-board-signal-ink);
+  margin-bottom: -2px;
+  padding: var(--space-2xs) var(--space-sm);
+  border-radius: var(--radius-input) var(--radius-input) 0 0;
+  background: var(--color-board-line);
+  color: var(--color-board-line-ink);
   font-size: var(--text-sm);
   font-weight: 700;
+  vertical-align: bottom;
 }
 
 .board-empty {
@@ -115,9 +127,15 @@
   max-width: 100%;
   overflow-wrap: anywhere;
 }
-.board-empty__text { color: var(--color-field-muted); }
-.board-empty__action { margin-top: var(--space-xs); background: var(--color-board-signal); color: var(--color-board-signal-ink); border-color: var(--color-board-signal); }
-@media (hover: hover) { .board-empty__action:hover { background: var(--color-field-ink); } }
+.board-empty__text { color: var(--color-board-muted); }
+.board-empty__action { margin-top: var(--space-xs); background: var(--color-board-signal); color: var(--color-board-signal-ink); border-color: transparent; }
+@media (hover: hover) { .board-empty__action:hover { background: var(--color-ink); color: var(--color-board); } }
+
+/* Tablets: still a table, so the cells tighten up to keep all eight
+   columns inside the sheet. */
+@media (min-width: 48rem) and (max-width: 60rem) {
+  .board thead th, .board__row > * { padding-inline: var(--space-xs); }
+}
 
 /* Phones: one block per rep. Rank down the left, name and rate on top, the
    rest as small labelled pairs underneath. */
@@ -126,6 +144,7 @@
      them lays out past the edge of a phone. */
   .board thead, .board thead th { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   .board, .board tbody { display: block; }
+  .board { border-top: 2px solid var(--color-ink); }
   .board__row {
     display: grid;
     /* Fixed shares, so the columns line up from row to row. Values never
@@ -138,10 +157,12 @@
       "rank change streak streak";
     gap: var(--space-2xs) var(--space-xs);
     padding: var(--space-sm) var(--space-xs);
-    border-bottom: 1px solid var(--color-field-rule);
+    border-bottom: 1px solid var(--color-board-rule);
   }
   .board__row > * { padding: 0; border: 0; }
   .board__rank { grid-area: rank; width: auto; align-self: start; }
+  /* Your rank block runs the full height of the row, flush to the left. */
+  .board__row.is-you .board__rank { align-self: stretch; margin: calc(-1 * var(--space-sm)) 0 calc(-1 * var(--space-sm)) calc(-1 * var(--space-xs)); padding: var(--space-sm) var(--space-xs); }
   .board__rep { grid-area: rep; }
   .board__rate { grid-area: rate; text-align: right; }
   .board__team { grid-area: team; }
@@ -150,13 +171,16 @@
   .board__change { grid-area: change; }
   .board__streak { grid-area: streak; }
   .board__team, .board__stamps, .board__streak, .board__status, .board__change { font-size: var(--text-sm); }
+  /* Here the values are Ink and the little labels are the quiet part. */
+  .board__team, .board__stamps, .board__streak { color: inherit; }
   .board__val, .board__status, .board__change { white-space: nowrap; }
   .board__team::before, .board__stamps::before, .board__streak::before {
     content: attr(data-label) " ";
-    color: var(--color-field-muted);
+    color: var(--color-board-muted);
   }
   .board__cut { display: block; }
   .board__cut td { display: block; }
+  .board__cut-label { padding-inline: var(--space-xs); }
 }
 
 @media (prefers-reduced-motion: reduce) {

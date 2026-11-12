@@ -20,7 +20,7 @@
   /* Brand palette, by name. */
   --ss-ember: #F47920; --ss-rogue: #D71925; --ss-anchor: #999999; --ss-ink: #000000;
   --ss-royal: #2F296C; --ss-marine: #1FAAE1; --ss-jewel: #2EBDC0; --ss-cyber: #FBAF43;
-  --ss-charcoal: #333333; --ss-stone: #474749; --ss-steel: #96989C; --ss-cloud: #D6D6DB; --ss-fog: #EEEEEF; --ss-mist: #F7F7F8;
+  --ss-charcoal: #333333; --ss-stone: #474749; --ss-steel: #96989C; --ss-cloud: #D6D6DB; --ss-fog: #EEEEEF; --ss-mist: #F7F7F8; --ss-paper: #FFFFFF;
 
   /* Ground and pages: Fog behind, Mist for paper, Cloud for lines. */
   --color-paper: var(--ss-fog); --color-paper-2: #E5E5E8 /* derived, between Fog and Cloud */; --color-paper-3: var(--ss-cloud);
@@ -29,9 +29,9 @@
   --color-muted: #6B6C70 /* derived: Steel fails 4.5:1 for small text */;
   --color-rule: var(--ss-cloud);
 
-  /* The field: the scoreboard, the current tab and the data page's line box
-     sit on Charcoal, the brand's dark block, with Ember as the signal. Royal
-     is left out on purpose: Royal next to Ember reads as purple and orange. */
+  /* The field: the current tab and the data page's line box sit on
+     Charcoal, the brand's dark block, with Ember as the signal. Royal is
+     left out on purpose: Royal next to Ember reads as purple and orange. */
   --color-field: var(--ss-charcoal); --color-field-2: #262626 /* derived, darker */; --color-field-3: var(--ss-stone);
   --color-field-ink: var(--ss-mist); --color-field-muted: var(--ss-cloud); --color-field-rule: #5A5A5D /* derived */;
 
@@ -50,13 +50,19 @@
   --color-accent: var(--ss-ember); --color-accent-ink: var(--ss-ink);
   --color-focus: var(--ss-ink); --color-focus-on-field: var(--ss-ember);
 
-  /* Missed and below the line: Rogue on paper; on the dark board a light
-     Rogue, because full Rogue is too dark there. Moving up is Jewel. */
-  --color-miss: var(--ss-rogue); --color-miss-on-field: #F5A3A8 /* derived, light Rogue, 4.7:1 on Stone */; --color-up-on-field: #5FD3D5 /* derived, light Jewel, 5.2:1 on Stone */;
+  /* Missed and below the line: Rogue. */
+  --color-miss: var(--ss-rogue);
 
-  /* The standings board's signal is Marine, the brand's data colour, so the
-     scoreboard carries no orange at all. Text on Marine is Ink. */
-  --color-board-signal: var(--ss-marine); --color-board-signal-ink: var(--ss-ink);
+  /* Standings is a white sheet, like a page of the brand site: Ink type,
+     Cloud hairlines, a Fog band under the President's Club line. Ember is
+     the one signal, kept for first place and for you, and it's only ever a
+     fill with Ink on it, never a line. The line itself is Ink. */
+  --color-board: var(--ss-paper); --color-board-below: var(--ss-fog); --color-board-step: var(--ss-fog);
+  --color-board-hover: var(--color-paper-2); --color-board-rule: var(--ss-cloud); --color-board-muted: var(--ss-stone);
+  --color-board-signal: var(--ss-ember); --color-board-signal-ink: var(--ss-ink);
+  --color-board-line: var(--ss-ink); --color-board-line-ink: var(--ss-paper);
+  --color-board-up: var(--color-stamp-1) /* the stamps' deep Jewel, 5.1:1 on the hover grey */;
+  --color-board-down: #B5141F /* derived, Rogue darkened: full Rogue is 4.47:1 on Fog, this is 5.4:1 on the hover grey */;
   --color-error: var(--ss-rogue); --color-success: #1E7F82 /* derived from Jewel */;
 
   /* Stamp inks, one per supplier, see src/lib/stamps.ts. Ember, Marine and
@@ -73,7 +79,7 @@
   --display-weight: 700;
   --radius-card: 6px; --radius-page: 10px; --radius-input: 4px; --radius-pill: 999px; --rule-hair: 1px;
   --shadow-card: 0 1px 2px rgb(0 0 0 / 0.08);
-  --tracking-display: -0.02em;
+  --tracking-display: -0.02em; --tracking-eyebrow: 0.12em;
   --page-width: 480px;
   --control-height: 40px;
 }
