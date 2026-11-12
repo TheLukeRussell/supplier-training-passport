@@ -9,10 +9,10 @@
 
 .stamper {
   position: absolute;
-  left: calc(50% - 56px);
-  bottom: 42%;
+  left: calc(50% - 75px);
+  bottom: 4%;
   z-index: var(--z-raised);
-  width: 112px;
+  width: 150px;
   pointer-events: none;
   transform-origin: 50% 100%;
   animation: stamper-press var(--dur-press) both;
@@ -43,7 +43,7 @@
     animation-timing-function: var(--ease-out);
   }
   47% {
-    transform: translate(0, 3%) scale(1.04, 0.9);
+    transform: translate(0, 3%) scale(1.06, 0.84);
     animation-timing-function: var(--ease-out);
   }
   56% {

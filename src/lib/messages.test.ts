@@ -57,13 +57,15 @@ describe('standing and coverLine', () => {
 })
 
 describe('endorsement', () => {
+  // The real strings use non-breaking spaces inside the date and the count.
+  const plain = (text: string | null) => text?.replace(/\u00a0/g, ' ')
   it('writes up a fresh stamp', () => {
-    expect(endorsement(stats(9, 12, 12, { kind: 'above', onLine: true }), 'stamped', pioneer)).toBe(
+    expect(plain(endorsement(stats(9, 12, 12, { kind: 'above', onLine: true }), 'stamped', pioneer))).toBe(
       'Stamped 17 JUN 2027. 9 of 12, 75%. Right on the line.',
     )
   })
   it('writes up a miss too', () => {
-    expect(endorsement(stats(8, 12, 12, { kind: 'needs', n: 4 }), 'missed', pioneer)).toBe(
+    expect(plain(endorsement(stats(8, 12, 12, { kind: 'needs', n: 4 }), 'missed', pioneer))).toBe(
       'Missed 17 JUN 2027. 8 of 12, 66%. 4 from the line.',
     )
   })

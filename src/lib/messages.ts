@@ -7,6 +7,8 @@ import { stampDate } from './format'
 import type { Training } from './model'
 import { attendNext, bestRateOf, cushionOf, percentOf, type Context, type RepStats, type SlotState } from './rules'
 
+const NBSP = '\u00a0'
+
 // "One from the line", "Above the line" and so on. No full stop, callers add it.
 export function standing(stats: RepStats): string {
   switch (stats.toLine.kind) {
@@ -58,6 +60,9 @@ export function coverLine(stats: RepStats): { count: string; standing: string } 
 export function endorsement(stats: RepStats, state: SlotState, training: Training): string | null {
   if (state !== 'stamped' && state !== 'missed') return null
   const what = state === 'stamped' ? 'Stamped' : 'Missed'
+  // Non-breaking spaces inside the date and the count, so a wrap never
+  // splits "17 JUN 2027" or "9 of 12" across two lines.
+  const nb = (text: string) => text.replace(/ /g, NBSP)
   const rate = stats.rate === null ? '' : `, ${percentOf(stats.rate)}%`
-  return `${what} ${stampDate(training.date)}. ${stats.attended} of ${stats.recorded}${rate}. ${standing(stats)}.`
+  return `${what} ${nb(stampDate(training.date))}. ${nb(`${stats.attended} of ${stats.recorded}`)}${rate}. ${standing(stats)}.`
 }

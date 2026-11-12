@@ -31,10 +31,10 @@
 }
 
 /* The page takes the hit when the stamper lands at 40% of its trip: a
-   3px dip and back, like paper on a desk. Transform only. */
+   5px dip and back, like paper on a desk. Transform only. */
 @keyframes visa-thump {
   0%, 40% { transform: none; }
-  44% { transform: translateY(3px); }
+  44% { transform: translateY(5px); }
   54%, 100% { transform: none; }
 }
 .page--visa.is-thumping { animation: visa-thump var(--dur-press) both; }
