@@ -88,6 +88,9 @@
 .data__stat:nth-child(even) { padding-left: var(--space-md); }
 .data__stat dt { font-size: var(--text-sm); color: var(--color-ink-2); }
 .data__stat dd { margin: 0; }
+/* Rank on a passport that isn't ranked yet: the word, then how many to go. */
+.data__unranked { display: grid; gap: var(--space-3xs); }
+.data__unranked-note { font-size: var(--text-sm); color: var(--color-ink-2); }
 
 .data__figure {
   font-family: var(--font-display);

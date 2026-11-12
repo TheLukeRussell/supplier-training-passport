@@ -1,8 +1,8 @@
 // The data page: who the passport belongs to, where they stand against the
 // line, what it takes to get there, and the machine-readable strip.
 
-import { EXPIRY_DATE, ISSUE_DATE, LINE } from '../../config'
-import { givenNames, initials, ordinal, shortDate, stampDate, surname } from '../../lib/format'
+import { EXPIRY_DATE, ISSUE_DATE, LINE, MIN_RECORDED } from '../../config'
+import { givenNames, initials, ordinal, plural, shortDate, stampDate, surname } from '../../lib/format'
 import { lineMessage } from '../../lib/messages'
 import { mrzLines } from '../../lib/mrz'
 import type { Rep } from '../../lib/model'
@@ -15,11 +15,10 @@ interface Props {
   rep: Rep
   row: StandingRow
   rankedCount: number
-  tied: boolean
   ctx: Context
 }
 
-export function DataPage({ rep, row, rankedCount, tied, ctx }: Props) {
+export function DataPage({ rep, row, rankedCount, ctx }: Props) {
   const { stats, rank } = row
   const percent = stats.rate === null ? null : percentOf(stats.rate)
   const message = lineMessage(stats, ctx)
@@ -115,15 +114,23 @@ export function DataPage({ rep, row, rankedCount, tied, ctx }: Props) {
           <div className="data__stat">
             <dt>Rank</dt>
             <dd>
+              {/* Unranked until MIN_RECORDED trainings are recorded. The note
+                  under it takes the same room as the date beside it, so the
+                  row doesn't grow. */}
               {rank === null ? (
-                <span className="data__figure data__figure--word">Not yet</span>
+                <span className="data__unranked">
+                  <span className="data__figure data__figure--word">Not yet</span>{' '}
+                  <span className="data__unranked-note">
+                    {plural(Math.max(MIN_RECORDED - stats.recorded, 1), 'more training', 'more trainings')} to go
+                  </span>
+                </span>
               ) : (
                 <span className="data__figure">
                   {ordinal(rank)}
                   <span className="data__of">
                     {' '}
                     of {rankedCount}
-                    {tied ? ', tied' : ''}
+                    {row.tied ? ', tied' : ''}
                   </span>
                 </span>
               )}

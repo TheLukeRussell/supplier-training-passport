@@ -39,12 +39,16 @@ export function SlotDetail({ training, model, rep, ctx, onClose }: Props) {
   if (training) {
     const state = slotState(model, rep, training, ctx)
     const days = daysBetween(ctx.today, training.date)
+    // Their team got the invite but they didn't, like a new hire before their start date.
+    const teamInvited = model.reps.some((r) => r.team === rep.team && entryFor(model, r, training.id).invited)
     status = {
       stamped: `${name} attended. The stamp is on the page.`,
       missed: `${name} was invited and missed it. It counts against the rate.`,
       today: `It’s today. Attendance isn’t recorded yet, so it doesn’t count either way.`,
       upcoming: `${plural(days, 'day')} away. Attending counts toward the line.`,
-      'not-invited': `${name} wasn’t invited, so it doesn’t count either way.`,
+      'not-invited': teamInvited
+        ? `${name} wasn’t on the list for this one yet, so it doesn’t count either way.`
+        : `${name} wasn’t invited, so it doesn’t count either way.`,
     }[state]
     const invited = model.reps.filter((r) => entryFor(model, r, training.id).invited)
     const came = invited.filter((r) => entryFor(model, r, training.id).attended)

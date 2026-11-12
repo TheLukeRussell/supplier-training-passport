@@ -1,6 +1,7 @@
 // Demo-only logic: who shows up when you hit "Record today's attendance",
 // and which rep the demo opens as. Pure, so the tests can pin it down.
 
+import { MIN_RECORDED } from '../config'
 import { entryFor, type Model, type Rep, type Training } from './model'
 import { unitFor } from './random'
 import { meetsLine, repStats, type Context } from './rules'
@@ -22,14 +23,14 @@ export function pickTodayAttendees(
   return emails.sort()
 }
 
-// Open the demo as someone who's just under the line and crosses it once
+// Open the demo as someone ranked, just under the line, who crosses it once
 // today's attendance is recorded. That's the moment worth showing.
 export function pickDefaultRep(model: Model, ctx: Context): Rep | undefined {
   const today = model.trainings.find((t) => t.date === ctx.today)
   const candidates = model.reps
     .filter((rep) => !today || entryFor(model, rep, today.id).invited)
     .map((rep) => ({ rep, stats: repStats(model, rep, ctx) }))
-    .filter(({ stats }) => stats.recorded > 0 && !meetsLine(stats.rate, ctx.line))
+    .filter(({ stats }) => stats.recorded >= MIN_RECORDED && !meetsLine(stats.rate, ctx.line))
     .filter(({ stats }) => (stats.attended + 1) / (stats.recorded + 1) >= ctx.line)
     .sort((a, b) => (b.stats.rate ?? 0) - (a.stats.rate ?? 0) || a.rep.name.localeCompare(b.rep.name))
   return candidates[0]?.rep ?? model.reps[0]
