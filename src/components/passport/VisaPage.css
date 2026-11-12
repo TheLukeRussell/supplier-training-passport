@@ -1,5 +1,17 @@
 /* Visa page layout: the quarter as the heading, then a two-column grid of
-   slots. Six trainings a quarter fill three rows. */
+   slots on faintly printed paper. Six trainings a quarter fill three rows. */
+
+/* The security print. Real visa pages are matte paper printed flat with
+   fine guilloche lines and a rosette in pale ink. It never shines and never
+   moves, so it's just more background on the page's paper (Page.css): the
+   rosette once in the middle, over the net tiled across the whole sheet.
+   Both tokens are in tokens.css. Paint only, no room taken. */
+.page--visa {
+  background-image: var(--visa-rosette), var(--visa-net);
+  background-position: center 55%, 0 0;
+  background-size: 80% auto, 96px 32px;
+  background-repeat: no-repeat, repeat;
+}
 
 .visa__title {
   font-size: var(--text-2xl);
@@ -71,4 +83,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .page--visa.is-thumping, .visa__endorse.is-writing { animation: none; }
+}
+
+/* High contrast modes get the plain page. */
+@media (forced-colors: active) {
+  .page--visa { background-image: none; }
 }
