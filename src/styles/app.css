@@ -158,12 +158,3 @@
 @media (pointer: coarse) {
   :root { --control-height: 44px; }
 }
-
-/* The brand's two-tone accent bar, Rogue then Ember, under a screen's
-   opening heading. Two flat halves, no blend. */
-.accent-bar {
-  display: block;
-  width: 72px;
-  height: 6px;
-  background: linear-gradient(to right, var(--ss-rogue) 0 50%, var(--ss-ember) 50% 100%);
-}

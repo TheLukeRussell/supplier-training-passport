@@ -8,7 +8,6 @@ export function NotesPage() {
   return (
     <Page kind="notes" label="Inside cover" folio={1}>
       <h2 className="notes__title">How your passport works</h2>
-      <span className="accent-bar" aria-hidden="true" />
       <ol className="notes__rules">
         <li>Every supplier training you attend earns a stamp on your visa pages.</li>
         <li>Your rate is stamps divided by trainings you were invited to. Only trainings that already happened count.</li>
