@@ -1,9 +1,13 @@
-/* Hallmark · shape: app screen · genre: playful · theme: custom · idea: "the cover is the scoreboard: one deep green carries the passport and the standings, and every count on it is a stamp somebody earned" · vibe: "a real passport crossed with a game scoreboard"
- * paper: oklch(95% 0.013 170) · accent: oklch(87% 0.165 95) · display: Big Shoulders · body: Figtree · outlier: Overpass Mono, the machine-readable strip only
- * nav: top bar, wordmark, two screen tabs, the demo switch at the end · signature: the visa pages, one stamp per attended training · states: loading, empty, error, no stamps, no matches
- * axes: light/condensed-heavy/chromatic-yellow · posture: full palette (field green for cover and board, yellow signal, four stamp inks, each with one job) · contrast: pass · v2.0.0 */
-/* Hallmark · pre-emit critique: P4 H4 E4 S5 R4 V5 · weakest: E, three hand-built motions (page turn, stamp, row slide); each is transform only and instant under reduced motion */
+/* Hallmark · shape: app screen · genre: playful · theme: brand · brand: ScanSource (brand guidelines 2026, supplied by the client) · idea: "the cover is the scoreboard: one Royal navy carries the passport and the standings, and every count on it is a stamp somebody earned" · vibe: "a real passport crossed with a game scoreboard"
+ * paper: #F7F7F8 Mist on #EEEEEF Fog · accent: #F47920 Ember · display: Gotham (Helvetica Neue, Arial fallbacks) · body: Gotham · outlier: Overpass Mono, the machine-readable strip only
+ * nav: top bar, the ScanSource logo and program name, two screen tabs, the demo switch at the end · signature: the visa pages, one stamp per attended training, pressed in by a stamper when today is recorded · states: loading, empty, error, no stamps, no matches
+ * axes: light/grotesk-bold/chromatic-orange · posture: full palette (Royal for cover and board, Ember signal, three brand inks for stamps, each with one job) · surface: brand · contrast: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H4 E4 S5 R4 V5 · weakest: E, four hand-built motions (page turn, stamper, row slide, endorsement write-in); each is transform, opacity or clip-path, and instant under reduced motion */
 /* Hallmark · waive 64 · the MRZ strip is machine-readable code by nature · a passport data page prints its name and stats in an OCR face, so the strip keeps a mono */
+/* Hallmark · waive 1 · the display stack is Gotham then Helvetica Neue then Arial · the ScanSource brand names exactly those fallbacks for its licensed face */
+/* Hallmark · waive 22 · neutrals are the brand grays Fog, Mist, Cloud and Stone · the ScanSource palette defines its grays at zero chroma */
+/* Hallmark · waive 80 · a stamper drawing shows for about a second while today's stamp lands, then unmounts · the client asked for a real stamp coming down on the visa page */
+/* Hallmark · dismissed 67 · "ASSA ABLOY" in a slot is the supplier's own name as the company writes it, not a label set in capitals */
 
 /* Main stylesheet: pulls in the tokens and base rules, then the app shell
    and the controls every screen shares. Each component has its own file. */
@@ -155,4 +159,13 @@
 /* Fingers get taller controls than a mouse does. */
 @media (pointer: coarse) {
   :root { --control-height: 44px; }
+}
+
+/* The brand's two-tone accent bar, Rogue then Ember, under a screen's
+   opening heading. Two flat halves, no blend. */
+.accent-bar {
+  display: block;
+  width: 72px;
+  height: 6px;
+  background: linear-gradient(to right, var(--ss-rogue) 0 50%, var(--ss-ember) 50% 100%);
 }

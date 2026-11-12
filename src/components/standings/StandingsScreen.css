@@ -33,5 +33,6 @@
 }
 
 @media (max-width: 40rem) {
+  .standings__search { width: 100%; }
   .scoreboard { padding: var(--space-md) var(--space-sm); margin-inline: calc(-1 * var(--space-xs)); }
 }

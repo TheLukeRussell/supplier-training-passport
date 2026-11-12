@@ -1,4 +1,4 @@
-// The top bar: wordmark, the two screens, the sample data tag and the switch
+// The top bar: the logo and program name, the two screens, and the switch
 // that opens the demo panel.
 
 import { Link, NavLink, useLocation } from 'react-router'
@@ -10,6 +10,9 @@ interface Props {
   onToggleDemo: () => void
 }
 
+// The logo file is used exactly as supplied. BASE_URL keeps the path right on Pages.
+const LOGO = `${import.meta.env.BASE_URL}brand/scansource-logo.svg`
+
 export function TopBar({ demoOpen, onToggleDemo }: Props) {
   const { ready } = useApp()
   const { pathname } = useLocation()
@@ -18,8 +21,9 @@ export function TopBar({ demoOpen, onToggleDemo }: Props) {
   return (
     <header className="topbar">
       <div className="topbar__inner container">
-        <Link to={passportPath} className="topbar__mark" aria-label="Training Passport 2027, your passport">
-          Training Passport 2027
+        <Link to={passportPath} className="topbar__home">
+          <img src={LOGO} alt="ScanSource" width={142} height={28} className="topbar__logo" />
+          <span className="topbar__product">Training Passport 2027</span>
         </Link>
         <nav className="topbar__tabs" aria-label="Screens">
           {/* Passport links to whoever you're viewing as, so it counts as
@@ -35,18 +39,15 @@ export function TopBar({ demoOpen, onToggleDemo }: Props) {
             Standings
           </NavLink>
         </nav>
-        <div className="topbar__end">
-          <span className="topbar__sample">Sample data</span>
-          <button
-            type="button"
-            className="topbar__demo"
-            aria-expanded={demoOpen}
-            aria-controls="demo-panel"
-            onClick={onToggleDemo}
-          >
-            {demoOpen ? 'Hide demo' : 'Demo'}
-          </button>
-        </div>
+        <button
+          type="button"
+          className="topbar__demo"
+          aria-expanded={demoOpen}
+          aria-controls="demo-panel"
+          onClick={onToggleDemo}
+        >
+          {demoOpen ? 'Hide demo' : 'Demo'}
+        </button>
       </div>
     </header>
   )

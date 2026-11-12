@@ -16,6 +16,12 @@ interface Props {
 // Visual order is 2nd, 1st, 3rd. Reading order stays 1st, 2nd, 3rd.
 const PLACES = ['first', 'second', 'third'] as const
 
+// Step height follows each rep's place among the three shown, not the slot:
+// place is one plus how many of the three rank strictly better. Two tied for
+// second both stand on the second step, and a team's top three ranked 5, 5
+// and 14 overall get tall, tall and short.
+const HEIGHTS = ['tall', 'mid', 'short'] as const
+
 export function Podium({ rows, team }: Props) {
   const ranked = rows.filter((row) => row.rank !== null)
   const top = ranked.slice(0, 3)
@@ -30,7 +36,7 @@ export function Podium({ rows, team }: Props) {
         {top.map((row, i) => {
           const tied = ranked.filter((r) => r.rank === row.rank).length > 1
           return (
-            <li key={row.rep.id} className={`podium__step podium__step--${PLACES[i]}`}>
+            <li key={row.rep.id} className={`podium__step podium__step--${PLACES[i]} podium__step--${HEIGHTS[top.filter((r) => r.rank! < row.rank!).length]}`}>
               <p className="podium__rank">
                 <span className="visually-hidden">Rank </span>
                 {tied ? 'T' : ''}

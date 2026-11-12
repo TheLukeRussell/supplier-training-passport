@@ -1,9 +1,10 @@
-/* Top bar. One row on desktop; on phones the tabs drop to a second row so
-   nothing has to shrink to fit. */
+/* Top bar. A light surface, because the colour logo only goes on light
+   backgrounds. Logo, a hairline, then the program name. On phones the name
+   tucks under the logo and the tabs drop to their own row. */
 
 .topbar {
   border-bottom: 1px solid var(--color-rule);
-  background: var(--color-paper);
+  background: var(--color-page);
 }
 
 .topbar__inner {
@@ -11,25 +12,36 @@
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: var(--space-lg);
-  min-height: 64px;
+  min-height: 72px;
 }
 
-.topbar__mark {
+/* The logo gets clear space on every side at least as tall as its
+   lowercase "s", which is about 12px at this size. */
+.topbar__home {
+  display: flex;
+  align-items: center;
+  padding-block: var(--space-sm);
+  color: var(--color-ink);
+  text-decoration: none;
+}
+.topbar__home:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 4px; }
+.topbar__home:active { opacity: 0.85; }
+
+.topbar__logo { width: 142px; height: auto; flex-shrink: 0; }
+
+.topbar__product {
+  margin-left: var(--space-md);
+  padding-left: var(--space-md);
+  border-left: 1px solid var(--color-rule);
   font-family: var(--font-display);
   font-weight: var(--display-weight);
-  font-size: var(--text-xl);
+  font-size: var(--text-lg);
+  letter-spacing: var(--tracking-display);
   line-height: 1;
-  text-transform: uppercase;
-  text-decoration: none;
   white-space: nowrap;
-  color: var(--color-ink);
 }
-.topbar__mark:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 4px; }
 
-.topbar__tabs {
-  display: flex;
-  gap: var(--space-2xs);
-}
+.topbar__tabs { display: flex; gap: var(--space-2xs); }
 
 .topbar__tab {
   display: inline-flex;
@@ -43,22 +55,10 @@
   color: var(--color-ink-2);
   transition: background-color var(--dur-micro) var(--ease-out);
 }
-@media (hover: hover) { .topbar__tab:hover { background: var(--color-paper-2); color: var(--color-ink); } }
+@media (hover: hover) { .topbar__tab:hover { background: var(--color-paper); color: var(--color-ink); } }
 .topbar__tab:active { transform: translateY(1px); }
 .topbar__tab:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 .topbar__tab.is-current { background: var(--color-field); color: var(--color-field-ink); }
-
-.topbar__end {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-}
-
-.topbar__sample {
-  font-size: var(--text-sm);
-  color: var(--color-ink-2);
-  white-space: nowrap;
-}
 
 /* The demo switch is dashed on purpose: it's scaffolding, not product. */
 .topbar__demo {
@@ -73,26 +73,25 @@
   cursor: pointer;
   transition: background-color var(--dur-micro) var(--ease-out);
 }
-@media (hover: hover) { .topbar__demo:hover { background: var(--color-paper-2); } }
+@media (hover: hover) { .topbar__demo:hover { background: var(--color-paper); } }
 .topbar__demo:active { transform: translateY(1px); }
 .topbar__demo:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 .topbar__demo:disabled { opacity: 0.55; cursor: not-allowed; }
-.topbar__demo[aria-expanded="true"] { background: var(--color-paper-3); }
+.topbar__demo[aria-expanded="true"] { background: var(--color-paper-2); }
 
 @media (max-width: 47.99rem) {
-  /* Phones: wordmark with "Sample data" under it, the demo switch to the
-     right, and the two tabs across the full width below. */
   .topbar__inner {
     grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas: "mark demo" "sample demo" "tabs tabs";
-    gap: 0 var(--space-sm);
+    grid-template-areas: "home demo" "tabs tabs";
+    gap: var(--space-xs) var(--space-sm);
+    min-height: 0;
     padding-block: var(--space-xs);
   }
-  .topbar__mark { grid-area: mark; font-size: var(--text-lg); }
-  .topbar__end { display: contents; }
-  .topbar__sample { grid-area: sample; font-size: var(--text-xs); }
-  .topbar__demo { grid-area: demo; align-self: center; }
-  .topbar__tabs { grid-area: tabs; margin-top: var(--space-xs); }
+  .topbar__home { grid-area: home; flex-direction: column; align-items: flex-start; gap: var(--space-xs); }
+  .topbar__logo { width: 121px; }
+  .topbar__product { margin: 0; padding: 0; border: 0; font-size: var(--text-sm); }
+  .topbar__demo { grid-area: demo; }
+  .topbar__tabs { grid-area: tabs; }
   .topbar__tab { flex: 1; justify-content: center; }
 }
 

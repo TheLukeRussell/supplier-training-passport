@@ -128,7 +128,7 @@ export function Board({ rows, viewAsId, team, query, onClear }: Props) {
           {rows.map((row, i) => {
             const you = row.rep.id === viewAsId
             const tied = row.rank !== null && rows.filter((r) => r.rank === row.rank).length > 1
-            const status = row.rank === null ? 'Not ranked yet' : row.above ? 'Above' : 'Below'
+            const status = row.rank === null ? 'Unranked' : row.above ? 'Above' : 'Below'
             return (
               <Fragment key={row.rep.id}>
                 {i === cut && cutRow}
@@ -161,16 +161,18 @@ export function Board({ rows, viewAsId, team, query, onClear }: Props) {
                     {you && <span className="tag tag--you">You</span>}
                   </th>
                   <td role="cell" className="board__team" data-label="Team">
-                    {row.rep.team}
+                    <span className="board__val">{row.rep.team}</span>
                   </td>
                   <td role="cell" className="board__stamps" data-label="Stamps">
-                    {row.stats.attended} of {row.stats.recorded}
+                    <span className="board__val">
+                      {row.stats.attended} of {row.stats.recorded}
+                    </span>
                   </td>
                   <td role="cell" className="board__rate">
                     {row.stats.rate === null ? 'None' : `${percentOf(row.stats.rate)}%`}
                   </td>
                   <td role="cell" className="board__streak" data-label="Streak">
-                    {row.stats.streak}
+                    <span className="board__val">{row.stats.streak}</span>
                   </td>
                   <td role="cell" className="board__status" data-label="Status">
                     {status}

@@ -59,7 +59,7 @@ export function DemoPanel({ open, onClose }: Props) {
           <h2 id="demo-title" className="demo__title">
             Demo controls
           </h2>
-          <p className="demo__note">Only here for the demo. The real passport won't have this panel.</p>
+          <p className="demo__note">Only here for the demo, which runs on made-up sample data. The real passport won't have this panel.</p>
         </div>
 
         {ready && (

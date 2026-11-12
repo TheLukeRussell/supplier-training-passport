@@ -3,7 +3,7 @@
 // live in the URL (#/standings?team=west&q=kai) so a filtered view can be shared.
 
 import { useSearchParams } from 'react-router'
-import { LINE, TEAMS } from '../../config'
+import { TEAMS } from '../../config'
 import { figuresFor } from '../../lib/ranking'
 import { useApp } from '../../state/AppState'
 import { Board } from './Board'
@@ -42,8 +42,9 @@ export function StandingsScreen() {
     <div className="standings container">
       <header className="standings__head">
         <h1 className="standings__title">Standings</h1>
+        <span className="accent-bar" aria-hidden="true" />
         <p className="standings__sub">
-          Ranked by rate, trainings attended out of trainings invited to. The President's Club line is {Math.round(LINE * 100)}% for now (placeholder). Sample data.
+          Ranked by rate: trainings attended out of trainings invited to. The dashed line on the board is the President's Club line.
         </p>
       </header>
 

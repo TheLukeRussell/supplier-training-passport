@@ -75,7 +75,7 @@
 
 .move { display: inline-flex; align-items: center; gap: var(--space-2xs); white-space: nowrap; }
 .move svg { width: 12px; height: 12px; fill: currentColor; flex-shrink: 0; }
-.move--up { color: var(--color-accent); font-weight: 700; }
+.move--up { color: var(--color-up-on-field); font-weight: 700; }
 .move--down { color: var(--color-miss-on-field); font-weight: 700; }
 .move--same, .move--new { color: var(--color-field-muted); font-size: var(--text-sm); }
 
@@ -118,12 +118,15 @@
   .board, .board tbody { display: block; }
   .board__row {
     display: grid;
-    grid-template-columns: 3.25rem minmax(0, 1fr) minmax(0, 1fr) auto;
+    /* Fixed shares, so the columns line up from row to row. Values never
+       split ("10 of 11" stays together); on the narrowest phones the label
+       wraps above its value instead of running into the next column. */
+    grid-template-columns: 3rem minmax(0, 1fr) minmax(0, 1.3fr) auto;
     grid-template-areas:
       "rank rep rep rate"
       "rank team stamps status"
       "rank change streak streak";
-    gap: var(--space-2xs) var(--space-sm);
+    gap: var(--space-2xs) var(--space-xs);
     padding: var(--space-sm) var(--space-xs);
     border-bottom: 1px solid var(--color-field-rule);
   }
@@ -137,6 +140,7 @@
   .board__change { grid-area: change; }
   .board__streak { grid-area: streak; }
   .board__team, .board__stamps, .board__streak, .board__status, .board__change { font-size: var(--text-sm); }
+  .board__val, .board__status, .board__change { white-space: nowrap; }
   .board__team::before, .board__stamps::before, .board__streak::before {
     content: attr(data-label) " ";
     color: var(--color-field-muted);

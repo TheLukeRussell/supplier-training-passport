@@ -22,17 +22,21 @@
 
 .podium__step {
   position: relative;
-  display: grid;
-  align-content: start;
+  display: flex;
+  flex-direction: column;
   gap: var(--space-2xs);
   min-width: 0;
   padding: var(--space-md);
   border-radius: var(--radius-card) var(--radius-card) 0 0;
   background: var(--color-field-2);
 }
-.podium__step--first { grid-column: 2; grid-row: 1; min-height: 228px; background: var(--color-field-3); }
-.podium__step--second { grid-column: 1; grid-row: 1; min-height: 188px; }
-.podium__step--third { grid-column: 3; grid-row: 1; min-height: 160px; }
+/* Position comes from the slot, height from the rank. */
+.podium__step--first { grid-column: 2; grid-row: 1; }
+.podium__step--second { grid-column: 1; grid-row: 1; }
+.podium__step--third { grid-column: 3; grid-row: 1; }
+.podium__step--tall { min-height: 236px; background: var(--color-field-3); }
+.podium__step--mid { min-height: 204px; }
+.podium__step--short { min-height: 180px; }
 
 .podium__rank {
   font-family: var(--font-display);
@@ -58,6 +62,7 @@
 
 .podium__meta { font-size: var(--text-sm); color: var(--color-field-muted); }
 .podium__rate {
+  margin-top: auto;
   font-family: var(--font-display);
   font-weight: var(--display-weight);
   font-size: var(--text-2xl);
@@ -70,10 +75,10 @@
 
 @media (max-width: 40rem) {
   .podium__steps { gap: var(--space-2xs); }
-  .podium__step { padding: var(--space-sm) var(--space-xs); }
-  .podium__step--first { min-height: 200px; }
-  .podium__step--second { min-height: 172px; }
-  .podium__step--third { min-height: 150px; }
+  .podium__step { padding: var(--space-sm); }
+  .podium__step--tall { min-height: 220px; }
+  .podium__step--mid { min-height: 196px; }
+  .podium__step--short { min-height: 172px; }
   .podium__rank { font-size: var(--text-display-s); }
   .podium__name { font-size: var(--text-md); }
   .podium__rate { font-size: var(--text-xl); }
