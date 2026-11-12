@@ -60,8 +60,7 @@
 .board__link { text-decoration: none; }
 .board__link::after { content: ""; position: absolute; inset: 0; }
 @media (hover: hover) { .board__row:hover .board__link { text-decoration: underline; } }
-.board__link:focus-visible { outline: none; }
-.board__link:focus-visible::after { outline: 2px solid var(--color-focus); outline-offset: -2px; }
+.board__link:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 .board__link:active { opacity: 0.85; }
 
 .board__rate {

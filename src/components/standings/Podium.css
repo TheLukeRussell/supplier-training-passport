@@ -53,8 +53,7 @@
 }
 .podium__name::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
 @media (hover: hover) { .podium__step:hover .podium__name { text-decoration: underline; } }
-.podium__name:focus-visible { outline: none; }
-.podium__name:focus-visible::after { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.podium__name:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 .podium__name:active { opacity: 0.85; }
 
 .podium__meta { font-size: var(--text-sm); color: var(--color-field-muted); }

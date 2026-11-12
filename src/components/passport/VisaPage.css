@@ -23,3 +23,9 @@
   color: var(--color-ink-2);
   max-width: 40ch;
 }
+
+/* On the narrowest phones two columns would shrink the stamps until their
+   dates drop under 16px, so the slots stack instead. */
+@container page (max-width: 300px) {
+  .visa__grid { grid-template-columns: minmax(0, 1fr); }
+}
