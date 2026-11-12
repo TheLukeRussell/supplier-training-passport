@@ -12,7 +12,7 @@ export function NotesPage() {
       <ol className="notes__rules">
         <li>Every supplier training you attend earns a stamp on your visa pages.</li>
         <li>Your rate is stamps divided by trainings you were invited to. Only trainings that already happened count.</li>
-        <li>Reach the line on your data page and you've met the training part of President's Club.</li>
+        <li>Reach the line on your data page and you’ve met the training part of President’s Club.</li>
       </ol>
 
       <div className="notes__key">
@@ -28,13 +28,13 @@ export function NotesPage() {
             <span className="notes__swatch notes__swatch--missed" aria-hidden="true">
               Missed
             </span>
-            <span>Invited, didn't make it. It counts against your rate.</span>
+            <span>Invited, didn’t make it. It counts against your rate.</span>
           </li>
           <li>
             <span className="notes__swatch notes__swatch--upcoming" aria-hidden="true">
               Jul 14
             </span>
-            <span>Still to come. It won't count until it happens.</span>
+            <span>Still to come. It won’t count until it happens.</span>
           </li>
         </ul>
       </div>

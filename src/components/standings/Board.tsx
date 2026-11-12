@@ -8,7 +8,7 @@ import { LINE } from '../../config'
 import { DATA_PAGE } from '../../lib/book'
 import { lineIndex, type Change, type StandingRow } from '../../lib/ranking'
 import { percentOf } from '../../lib/rules'
-import { useApp } from '../../state/AppState'
+import { useApp, type SlideFrom } from '../../state/AppState'
 import { useReducedMotion } from '../../state/useMedia'
 import './Board.css'
 
@@ -52,29 +52,49 @@ export function Board({ rows, viewAsId, team, query, onClear }: Props) {
   const bodyRef = useRef<HTMLTableSectionElement>(null)
 
   // The row slide, done FLIP style. The board is already drawn in its new
-  // order. For each row, find where it sat before the recording (its old
-  // index among the rows on screen), measure how far that is from where it
-  // sits now, jump it back there with a transform, and let it glide home.
-  // Rows have the same height, so "the top of the row now at index k" is a
-  // good stand-in for "where index k used to be".
+  // order. Work out where each row sat before the recording by laying the
+  // old order out again from the top, using each row's real height and the
+  // President's Club line at its old place (it moves when someone crosses
+  // it). Then jump each row back there with a transform and let it glide
+  // home. It plays once per recording, even when React runs the effect twice.
+  const played = useRef<SlideFrom | null>(null)
   useLayoutEffect(() => {
-    if (!slideFrom) return
+    if (!slideFrom || played.current === slideFrom) return
+    played.current = slideFrom
     const body = bodyRef.current
     if (!body || reduced) {
       clearSlide()
       return
     }
     const els = Array.from(body.querySelectorAll<HTMLElement>('[data-rep]'))
-    const tops = els.map((el) => el.getBoundingClientRect().top)
-    const onScreen = new Set(els.map((el) => el.dataset.rep!))
-    const before = slideFrom.filter((id) => onScreen.has(id))
-    els.forEach((el, now) => {
-      const was = before.indexOf(el.dataset.rep!)
-      if (was === -1 || was === now) return
-      el.animate([{ transform: `translateY(${tops[was] - tops[now]}px)` }, { transform: 'translateY(0)' }], {
+    const now = new Map(els.map((el) => [el.dataset.rep!, el.getBoundingClientRect()]))
+    const cutEl = body.querySelector<HTMLElement>('.board__cut')
+    const cutBox = cutEl?.getBoundingClientRect()
+    // The space between two neighbouring rows (none in a table, a gap on phones).
+    let space = 0
+    for (let k = 1; k < els.length; k++) {
+      if (els[k - 1].nextElementSibling === els[k]) {
+        space = now.get(els[k].dataset.rep!)!.top - now.get(els[k - 1].dataset.rep!)!.bottom
+        break
+      }
+    }
+    const before = slideFrom.order.filter((id) => now.has(id))
+    const oldCut = before.filter((id) => slideFrom.above.has(id)).length
+    let y = Math.min(...[...now.values()].map((box) => box.top), cutBox?.top ?? Infinity)
+    const oldTop = new Map<string, number>()
+    before.forEach((id, k) => {
+      if (cutBox && k === oldCut) y += cutBox.height + space
+      oldTop.set(id, y)
+      y += now.get(id)!.height + space
+    })
+    els.forEach((el, index) => {
+      const from = oldTop.get(el.dataset.rep!)
+      const to = now.get(el.dataset.rep!)!.top
+      if (from === undefined || Math.abs(from - to) < 1) return
+      el.animate([{ transform: `translateY(${from - to}px)` }, { transform: 'translateY(0)' }], {
         duration: SLIDE_MS,
         easing: EASE_OUT,
-        delay: Math.min(now, 15) * 20,
+        delay: Math.min(index, 15) * 20,
         fill: 'backwards',
       })
     })
@@ -102,7 +122,7 @@ export function Board({ rows, viewAsId, team, query, onClear }: Props) {
     <tr className="board__cut" role="row">
       <td colSpan={8} role="cell">
         <span className="board__cut-label">
-          President's Club line, {Math.round(LINE * 100)}% (placeholder)
+          President’s Club line, {Math.round(LINE * 100)}% (placeholder)
         </span>
       </td>
     </tr>
@@ -135,7 +155,7 @@ export function Board({ rows, viewAsId, team, query, onClear }: Props) {
                 <tr
                   role="row"
                   data-rep={row.rep.id}
-                  className={`board__row${row.above ? ' is-above' : ' is-below'}${you ? ' is-you' : ''}`}
+                  className={`board__row${row.rank === null ? ' is-unranked' : row.above ? ' is-above' : ' is-below'}${you ? ' is-you' : ''}`}
                 >
                   <td role="cell" className="board__rank">
                     {row.rank === null ? (

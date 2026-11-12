@@ -142,7 +142,7 @@ export function DataPage({ rep, row, rankedCount, tied, ctx }: Props) {
         </div>
       </dl>
 
-      {/* The line's number lives here, with the placeholder note beside it. */}
+      {/* The line’s number lives here, with the placeholder note beside it. */}
       <div className={`data__line data__line--${status}`} role="status">
         <p className="data__line-head">{message.head}</p>
         <p className="data__line-sub">{message.sub}</p>

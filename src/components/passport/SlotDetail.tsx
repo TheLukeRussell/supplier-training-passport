@@ -42,9 +42,9 @@ export function SlotDetail({ training, model, rep, ctx, onClose }: Props) {
     status = {
       stamped: `${name} attended. The stamp is on the page.`,
       missed: `${name} was invited and missed it. It counts against the rate.`,
-      today: `It's today. Attendance isn't recorded yet, so it doesn't count either way.`,
+      today: `It’s today. Attendance isn’t recorded yet, so it doesn’t count either way.`,
       upcoming: `${plural(days, 'day')} away. Attending counts toward the line.`,
-      'not-invited': `${name} wasn't invited, so it doesn't count either way.`,
+      'not-invited': `${name} wasn’t invited, so it doesn’t count either way.`,
     }[state]
     const invited = model.reps.filter((r) => entryFor(model, r, training.id).invited)
     const came = invited.filter((r) => entryFor(model, r, training.id).attended)

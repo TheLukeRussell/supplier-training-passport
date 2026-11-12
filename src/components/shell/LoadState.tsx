@@ -17,7 +17,7 @@ export function LoadState({ screen }: Props) {
       <div className="container">
         <section className="state" role="alert" aria-labelledby="state-title">
           <h1 id="state-title" className="state__title">
-            Couldn't load attendance
+            Couldn’t load attendance
           </h1>
           <p className="state__text">{error}</p>
           <p className="state__text">Passports and standings need that file. Nothing you changed in the demo is lost.</p>

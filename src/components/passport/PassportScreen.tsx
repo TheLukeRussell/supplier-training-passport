@@ -82,9 +82,9 @@ export function PassportScreen() {
           <h1 id="missing-title" className="passport-missing__title">
             No passport for “{repId}”
           </h1>
-          <p>That rep ID isn't in the attendance data. It may have a typo, or the rep may not be in this export.</p>
+          <p>That rep ID isn’t in the attendance data. It may have a typo, or the rep may not be in this export.</p>
           <p>
-            <Link to="/standings">Find them on the standings</Link> or <Link to={`/passport/${viewAs.id}`}>open {viewAs.name}'s passport</Link>.
+            <Link to="/standings">Find them on the standings</Link> or <Link to={`/passport/${viewAs.id}`}>open {viewAs.name}’s passport</Link>.
           </p>
         </section>
       </div>
@@ -139,7 +139,7 @@ export function PassportScreen() {
 
   return (
     <div className={`passport container${spread && (view === 0 || view === last) ? ' is-closed' : ''}`}>
-      <h1 className="visually-hidden">{rep.name}'s passport</h1>
+      <h1 className="visually-hidden">{rep.name}’s passport</h1>
       <div
         className="passport__stage"
         onPointerDown={onPointerDown}

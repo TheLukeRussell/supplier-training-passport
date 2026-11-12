@@ -10,7 +10,7 @@ Live demo: https://thelukerussell.github.io/supplier-training-passport/
 
 - **Passport.** A literal passport book. Two-page spreads on a laptop, one page at a time on a phone. A navy leather front cover with gold foil that catches the light as it turns, an inside cover that explains the rules, a data page (rate, rank, next training, what it takes to reach the line, and a machine-readable strip along the bottom), four visa pages, one per quarter, and a leather back cover with the logo in gold foil. Every training you attended is a stamp, and every slot says whether the training is virtual or in person. Tap any slot for the details. Turn pages by swiping, with the arrow buttons, or with the left and right keys.
 - **Standings.** The scoreboard. Three figures up top, the top three on a podium, and the full board with the President's Club line drawn across it. Filter by team, search by name, tap anyone to open their passport.
-- **Demo panel.** The dashed "Demo" button in the top bar. Switch who you're viewing as, record today's attendance, reset (you can undo it), and preview the loading, empty and error states. Recording today is the fun part: a stamper swings in, hovers over today's slot and presses the stamp in, the page takes the hit, and a note gets written under the stamps with your new count. Standings rows slide to their new ranks too. None of this is meant to ship.
+- **Demo panel.** The dashed "Demo" button in the top bar. Switch who you're viewing as, record today's attendance, reset (you can undo it), and preview the loading, empty and error states. Recording today is the fun part: a stamper swings in, hovers over today's slot and presses down, the page takes the hit, the ink shows as it lifts away, and a note gets written under the stamps with your new count. Standings rows slide to their new ranks too. None of this is meant to ship.
 
 ## Run it
 
@@ -34,7 +34,7 @@ npm run build       # production build into dist/
 npm run data        # regenerate the sample data
 ```
 
-The smoke test runs the whole demo at 390px and 1280px wide: open the passport, turn every page, record attendance, check the standings moved, filter, reset. It's local only for now, not in CI. The iPhone run exists because Safari lays some things out differently than Chrome, and that's where pages once ran off the bottom.
+The smoke test runs the whole demo at 390px and 1280px wide: open the passport, turn every page, record attendance, check the standings moved, filter, reset. On phone sizes it also checks every page of two passports fits: nothing runs past the bottom of its page, the page fits on the screen under the top bar, the turn buttons are on screen, and recording today doesn't make the book grow. It's local only for now, not in CI. The iPhone run exists because Safari lays some things out differently than Chrome, and that's where pages once ran off the bottom of the screen.
 
 ## The rules
 

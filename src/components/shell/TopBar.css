@@ -1,6 +1,7 @@
 /* Top bar. A light surface, because the colour logo only goes on light
-   backgrounds. Logo, a hairline, then the program name. On phones the name
-   tucks under the logo and the tabs drop to their own row. */
+   backgrounds. Logo, a hairline, then the program name. On phones that pair
+   gets the first row and the tabs share the second with Demo, which keeps
+   the bar short enough for a passport page to fit under it. */
 
 .topbar {
   border-bottom: 1px solid var(--color-rule);
@@ -9,7 +10,7 @@
 
 .topbar__inner {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-lg);
   min-height: 72px;
@@ -82,17 +83,23 @@
 @media (max-width: 47.99rem) {
   .topbar__inner {
     grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas: "home demo" "tabs tabs";
-    gap: var(--space-xs) var(--space-sm);
+    grid-template-areas: "home home" "tabs demo";
+    gap: 0 var(--space-xs);
     min-height: 0;
-    padding-block: var(--space-xs);
+    padding-bottom: var(--space-xs);
   }
-  .topbar__home { grid-area: home; flex-direction: column; align-items: flex-start; gap: var(--space-xs); }
-  .topbar__logo { width: 121px; }
-  .topbar__product { margin: 0; padding: 0; border: 0; font-size: var(--text-sm); }
-  .topbar__demo { grid-area: demo; }
+  .topbar__home { grid-area: home; justify-self: start; padding-block: var(--space-xs); }
+  .topbar__logo { width: 112px; }
+  .topbar__product { margin-left: var(--space-sm); padding-left: var(--space-sm); font-size: var(--text-sm); }
+  .topbar__demo { grid-area: demo; min-height: 44px; }
   .topbar__tabs { grid-area: tabs; }
   .topbar__tab { flex: 1; justify-content: center; }
+}
+
+/* The smallest phones can't fit the name beside the logo, so it tucks under. */
+@media (max-width: 22.5rem) {
+  .topbar__home { flex-direction: column; align-items: flex-start; gap: var(--space-2xs); }
+  .topbar__product { margin: 0; padding: 0; border: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {

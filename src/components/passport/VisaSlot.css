@@ -33,7 +33,9 @@
 .slot__stamp { position: relative; display: grid; place-items: center; width: 100%; }
 .slot.is-landing { z-index: var(--z-raised); }
 
-.slot__format { font-size: var(--text-xs); color: var(--color-muted); }
+.slot__format { grid-row: 2; font-size: var(--text-xs); color: var(--color-muted); }
+.slot__reserve { visibility: hidden; }
+.slot__reserve, .slot--today .slot__blank { grid-area: 1 / 1; }
 
 .slot__date {
   font-family: var(--font-display);
@@ -61,8 +63,10 @@
 .slot--not-invited { border-color: var(--color-rule); }
 .slot--not-invited .slot__date { color: var(--color-muted); }
 
+/* Phones: a little less air above and below each stamp, so the page holding
+   today fits under the top bar on a big iPhone. */
 @media (max-width: 40rem) {
-  .slot { min-height: 104px; }
+  .slot { min-height: 104px; padding-block: var(--space-2xs); }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,7 +1,7 @@
 /* Standings layout: heading and a one-line explainer, the figures, the
-   filters, then the scoreboard panel on the cover green. */
+   filters, then the scoreboard, a Charcoal panel. */
 
-.standings { display: grid; gap: var(--space-lg); }
+.standings { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-lg); }
 
 .standings__head { display: grid; gap: var(--space-xs); }
 .standings__title {
@@ -21,9 +21,10 @@
 }
 .standings__search { width: min(100%, 20rem); }
 
-/* The scoreboard: one green panel holding the podium and the board. */
+/* The scoreboard: one Charcoal panel holding the podium and the board. */
 .scoreboard {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-lg);
   padding: var(--space-lg);
   border-radius: var(--radius-page);

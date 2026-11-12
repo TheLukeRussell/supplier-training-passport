@@ -1,16 +1,11 @@
 /* Hallmark · shape: app screen · genre: playful · theme: brand · brand: ScanSource (brand guidelines 2026, supplied by the client) · idea: "a real passport you can read your standing off: leather and foil outside, every count inside a stamp somebody earned" · vibe: "a real passport crossed with a game scoreboard"
  * paper: #F7F7F8 Mist on #EEEEEF Fog · accent: #F47920 Ember · display: Gotham (Helvetica Neue, Arial fallbacks) · body: Gotham · outlier: Overpass Mono, the machine-readable strip only
  * nav: top bar, the ScanSource logo and program name, two screen tabs, the demo switch at the end · signature: the visa pages, one stamp per attended training, pressed in by a stamper when today is recorded · states: loading, empty, error, no stamps, no matches
- * axes: light/grotesk-bold/chromatic-orange · posture: full palette (navy leather and gold foil for the covers, Charcoal board, Ember signal, three dark inks for stamps, each with one job) · surface: brand · contrast: pass · v2.0.0 */
+ * axes: light/grotesk-bold/chromatic-orange · posture: full palette (navy leather and gold foil for the covers, Charcoal board, Ember signal, three dark inks for stamps, each with one job) · surface: absolute (the brand's Ink is pure black) · contrast: pass · v2.0.0 */
 /* Hallmark · pre-emit critique: P4 H4 E4 S5 R4 V5 · weakest: E, four hand-built motions (page turn, stamper, row slide, endorsement write-in); each is transform, opacity or clip-path, and instant under reduced motion */
-/* Hallmark · waive 64 · the MRZ strip is machine-readable code by nature · a passport data page prints its name and stats in an OCR face, so the strip keeps a mono */
-/* Hallmark · waive 1 · the display stack is Gotham then Helvetica Neue then Arial · the ScanSource brand names exactly those fallbacks for its licensed face */
+/* Hallmark · waive 7b · pure #000 Ink for body and headline copy, which passes contrast on Mist and Fog · the ScanSource brand sets its Ink at pure black */
 /* Hallmark · waive 22 · neutrals are the brand grays Fog, Mist, Cloud and Stone · the ScanSource palette defines its grays at zero chroma */
-/* Hallmark · waive 80 · a stamper drawing shows for about a second while today's stamp lands, then unmounts · the client asked for a real stamp coming down on the visa page */
-/* Hallmark · waive 47c · leather grain, a sheen and foil pressed into the covers, CSS only · the client asked for the passport covers to look like real leather booklets */
-/* Hallmark · waive 29 · one faint top-left sheen on the leather covers, no glow or bloom · it is the light catching a leather passport cover the client asked for */
-/* Hallmark · waive 2b · a gold to pale-gold ramp on the cover foil, both stops tokens, only while a cover is turning · the client asked for the foil to catch the light as the passport cover turns */
-/* Hallmark · dismissed 67 · "ASSA ABLOY" in a slot is the supplier's own name as the company writes it, not a label set in capitals */
+/* Hallmark · dismissed F25 · a phone shows one passport page at a time by design; the inside cover is one page turn away, with the same words */
 
 /* Main stylesheet: pulls in the tokens and base rules, then the app shell
    and the controls every screen shares. Each component has its own file. */
@@ -72,7 +67,7 @@
 .btn:disabled, .btn[aria-disabled="true"] { opacity: 0.55; cursor: not-allowed; transform: none; }
 .btn[aria-busy="true"] { cursor: progress; }
 
-.btn--quiet { background: var(--color-page); color: var(--color-ink); border-color: var(--color-muted); }
+.btn--quiet { background: transparent; color: var(--color-ink); border-color: var(--color-muted); }
 @media (hover: hover) { .btn--quiet:hover { background: var(--color-paper-2); } }
 
 /* A text button that reads like a link, for Undo and Clear search. */

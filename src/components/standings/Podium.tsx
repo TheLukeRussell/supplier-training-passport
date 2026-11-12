@@ -31,7 +31,7 @@ export function Podium({ rows, team }: Props) {
 
   return (
     <div className="podium">
-      <h2 className="podium__title">{team ? `${team}'s top three` : 'Top three'}</h2>
+      <h2 className="podium__title">{team ? `${team}’s top three` : 'Top three'}</h2>
       <ol className="podium__steps">
         {top.map((row, i) => {
           const tied = ranked.filter((r) => r.rank === row.rank).length > 1

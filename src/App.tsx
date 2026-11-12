@@ -17,7 +17,16 @@ export function App() {
 
   return (
     <div className="app">
-      <a className="skip" href="#main">
+      {/* The router owns the hash, so the link moves focus itself instead of
+          following #main, which the router would read as a page. */}
+      <a
+        className="skip"
+        href="#main"
+        onClick={(event) => {
+          event.preventDefault()
+          document.getElementById('main')?.focus()
+        }}
+      >
         Skip to content
       </a>
       <TopBar demoOpen={demoOpen} onToggleDemo={() => setDemoOpen((open) => !open)} />

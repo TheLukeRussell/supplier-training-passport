@@ -1,3 +1,10 @@
+/* Hallmark · this folder follows the build stamp in src/styles/app.css */
+/* Hallmark · waive 2b · a gold to pale-gold ramp on the cover foil, both stops tokens, only while a cover is turning · the client asked for the foil to catch the light as the passport cover turns */
+/* Hallmark · waive 47c · leather grain, a sheen and foil pressed into the covers, CSS only · the client asked for the passport covers to look like real leather booklets */
+/* Hallmark · waive 29 · one faint top-left sheen on the leather covers, no glow or bloom · it is the light catching a leather passport cover the client asked for */
+/* Hallmark · waive 80 · a stamper drawing shows for about a second while today’s stamp lands, then unmounts · the client asked for a real stamp coming down on the visa page */
+/* Hallmark · waive 39b · each visa slot is a tappable card the size of the stamp it holds, with a 44px minimum both ways · it is the page of a passport, where the slot is the stamp, not a toolbar button */
+/* Hallmark · dismissed 49 · a visa slot button is a small card of three short lines (date, supplier, status), not a label that should sit on one line */
 /* The book: one page on phones, a two-page spread on wide screens. The
    moving leaf is a 3D card with a page on each face. Only transform animates. */
 
@@ -12,7 +19,7 @@
      distance made it spill well past the top and bottom of the book. */
   perspective: 6000px;
   /* Vertical scrolling still works; horizontal drags become swipes. */
-  touch-action: pan-y;
+  touch-action: pan-y pinch-zoom;
   transition: transform var(--dur-turn) var(--ease-in-out);
 }
 
@@ -31,6 +38,9 @@
 .book--spread.is-closed-back { transform: translateX(25%); }
 
 .book--single { width: min(100%, var(--page-width)); }
+/* Safari draws a sliver of the turning page's mirrored back in the gutter
+   once it passes edge-on, so a phone book clips sideways while it turns. */
+.book--single.is-turning { overflow-x: clip; }
 
 /* Everything shares row 1. The slots sit in their columns; the sizer sits
    under the left (or only) slot. */

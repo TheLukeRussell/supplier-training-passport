@@ -14,6 +14,13 @@ import { readSaved, writeSaved, type SavedDemo } from './storage'
 export type LoadStatus = 'loading' | 'error' | 'empty' | 'ready'
 export type Preview = 'live' | 'loading' | 'empty' | 'error'
 
+// The board as it stood just before today was recorded, so Standings can
+// slide each row from where it was: the order, and who was above the line.
+export interface SlideFrom {
+  order: string[]
+  above: ReadonlySet<string>
+}
+
 interface Ready {
   model: Model
   ctx: Context
@@ -36,7 +43,7 @@ interface AppValue {
   undoReset: () => void
   canUndo: boolean
   storageOk: boolean
-  slideFrom: string[] | null
+  slideFrom: SlideFrom | null
   clearSlide: () => void
   landing: ReadonlySet<string>
   landed: (email: string) => void
@@ -59,7 +66,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [saved, setSaved] = useState<SavedDemo>(initial.saved)
   const storageOk = initial.ok
   const [undo, setUndo] = useState<SavedDemo | null>(null)
-  const [slideFrom, setSlideFrom] = useState<string[] | null>(null)
+  const [slideFrom, setSlideFrom] = useState<SlideFrom | null>(null)
   const [landing, setLanding] = useState<ReadonlySet<string>>(new Set())
 
   useEffect(() => {
@@ -114,15 +121,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const emails = pickTodayAttendees(baseModel, ready.today, rep, DEMO_TODAY_SHARE, DEMO_SEED)
     // Remember the board order from right before, so Standings can slide
     // each row from where it was to where it lands.
-    setSlideFrom(ready.board.map((row) => row.rep.id))
+    setSlideFrom({
+      order: ready.board.map((row) => row.rep.id),
+      above: new Set(ready.board.filter((row) => row.above).map((row) => row.rep.id)),
+    })
     setLanding(new Set(emails))
     setUndo(null)
     setSaved((s) => ({ ...s, viewAs: rep.id, recorded: { trainingId: ready.today!.id, emails } }))
   }, [ready, baseModel])
 
   // Reset keeps a copy of what it wiped so Undo can put it back.
+  // A second press while Undo is still up has nothing new to wipe, so it
+  // keeps the first copy instead of saving an empty one over it.
   const reset = useCallback(() => {
-    setUndo(saved)
+    setUndo((prev) => (saved.recorded || saved.viewAs ? saved : prev))
     setSaved({})
     setSlideFrom(null)
     setLanding(new Set())

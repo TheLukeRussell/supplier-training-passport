@@ -5,10 +5,11 @@
      0 to 30%   swings in from the right, slowing into a hover over its slot
      30 to 38%  a small wind-up, lifting a touch
      38 to 46%  the press: it speeds up all the way down, like a real hand
-     46%        contact. The ink is laid down underneath, the page thumps
+     46%        contact, and the page thumps
      46 to 58%  squashes into the paper and settles
      58 to 64%  holds a beat while the ink takes
-     64 to 100% lifts off and drifts away, fading out at the end
+     64 to 100% lifts off and drifts away, fading out at the end. The ink
+                shows as it comes up (Stamp.css)
    Each stretch has its own easing, chosen so the speed never jumps where
    one stretch hands over to the next: it eases into the hover and out of
    it, accelerates into the hit, and eases off the page. The shadow runs

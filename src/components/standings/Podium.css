@@ -1,4 +1,4 @@
-/* The podium: three steps of different heights on the scoreboard green.
+/* The podium: three steps of different heights on the scoreboard.
    First is in the middle and tallest, like a real one. */
 
 .podium { display: grid; gap: var(--space-md); }

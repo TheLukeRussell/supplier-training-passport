@@ -16,7 +16,7 @@ interface Props {
 
 export function Cover({ rep, onOpen, still }: Props) {
   return (
-    <section className="page cover" aria-label={`Cover of ${rep.name}'s passport`}>
+    <section className="page cover" aria-label={`Cover of ${rep.name}’s passport`}>
       <p className="cover__program foil">Supplier Training</p>
       <p className="cover__year foil">{PROGRAM_YEAR}</p>
       <p className="cover__title foil">Passport</p>

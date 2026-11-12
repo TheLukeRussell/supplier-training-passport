@@ -74,10 +74,10 @@ test('the demo flow works end to end', async ({ page }, info) => {
   // page, the stamper brings the stamp down, the endorsement gets written in,
   // and the data page shows Hannah on the line.
   await page.getByRole('button', { name: 'Demo', exact: true }).click()
-  await page.getByRole('button', { name: "Record today's attendance" }).click()
+  await page.getByRole('button', { name: "Record today’s attendance" }).click()
   await expect(page).toHaveURL(/page=4/)
   await expect(page.getByRole('button', { name: /^Pioneer, Thu, Jun 17, virtual\. Attended/ })).toBeVisible()
-  await expect(page.getByRole('button', { name: "Record today's attendance" })).toBeDisabled()
+  await expect(page.getByRole('button', { name: "Record today’s attendance" })).toBeDisabled()
   await expect(shown(page).locator('.visa__endorse')).toHaveText('Stamped 17 JUN 2027. 9 of 12, 75%. Right on the line.')
   await expect(page.locator('.stamper')).toHaveCount(0, { timeout: 5000 })
   await page.goto('./#/passport/hannah-kowalski?page=2')
@@ -112,7 +112,7 @@ test('the demo flow works end to end', async ({ page }, info) => {
   await page.getByRole('button', { name: 'Reset demo' }).click()
   await expect(page.getByRole('button', { name: 'Undo' })).toBeVisible()
   await expect(page.locator('.figures__value').nth(2)).toHaveText('11')
-  await expect(page.getByRole('button', { name: "Record today's attendance" })).toBeEnabled()
+  await expect(page.getByRole('button', { name: "Record today’s attendance" })).toBeEnabled()
   await page.getByRole('button', { name: 'Undo' }).click()
   await expect(page.locator('.figures__value').nth(2)).toHaveText('12')
   await page.getByRole('button', { name: 'Reset demo' }).click()
@@ -140,6 +140,44 @@ test('the app still works when storage is blocked', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Standings' })).toBeVisible()
   await page.getByRole('button', { name: 'Demo', exact: true }).click()
   await expect(page.getByText('This browser is blocking storage')).toBeVisible()
-  await page.getByRole('button', { name: "Record today's attendance" }).click()
+  await page.getByRole('button', { name: "Record today’s attendance" }).click()
   await expect(page.locator('.figures__value').nth(2)).toHaveText('12')
+})
+
+// Phones only. Every page of two passports (the default rep and the new hire)
+// fits on its paper, the paper fits on the screen under the top bar, and the
+// turn buttons are on screen. Recording today mustn't make the book grow.
+test('every passport page fits on a phone screen', async ({ page }, info) => {
+  test.skip(!info.project.name.startsWith('phone'), 'phones only')
+
+  const check = async (rep: string, p: number) => {
+    await page.goto(`./#/passport/${rep}${p ? `?page=${p}` : ''}`)
+    await expect(shown(page).locator('.page').first()).toBeVisible()
+    await page.evaluate(() => document.fonts.ready)
+    const r = await page.evaluate(() => {
+      const sheet = document.querySelector('.book__slot .page')!
+      const box = sheet.getBoundingClientRect()
+      const spill = [...sheet.querySelectorAll('*')]
+        .map((el) => ({ el, b: el.getBoundingClientRect() }))
+        .filter(({ b }) => b.height > 0 && b.bottom > box.bottom + 1)
+        .map(({ el }) => el.className.toString())
+      const controls = document.querySelector('.passport__controls')!.getBoundingClientRect()
+      return { spill, bottom: box.bottom, vh: window.innerHeight, controls: controls.bottom, book: document.querySelector('.book')!.getBoundingClientRect().height }
+    })
+    expect(r.spill, `${rep} page ${p}: content runs past the bottom of the page`).toEqual([])
+    expect(r.bottom, `${rep} page ${p}: the page runs past the bottom of the screen`).toBeLessThanOrEqual(r.vh)
+    expect(r.controls, `${rep} page ${p}: the turn buttons are off screen`).toBeLessThanOrEqual(r.vh + 1)
+    return r.book
+  }
+
+  for (const rep of ['hannah-kowalski', 'clara-dubois']) {
+    for (const p of [0, 1, 2, 3, 4, 5, 6, 7]) await check(rep, p)
+  }
+
+  const before = await check('hannah-kowalski', 4)
+  await page.getByRole('button', { name: 'Demo' }).click()
+  await page.getByRole('button', { name: 'Record today’s attendance' }).click()
+  await page.getByRole('button', { name: 'Hide demo' }).click()
+  await expect(shown(page).locator('.visa__endorse')).toBeVisible()
+  expect(await check('hannah-kowalski', 4), 'recording made the book grow').toBeLessThanOrEqual(before + 0.5)
 })

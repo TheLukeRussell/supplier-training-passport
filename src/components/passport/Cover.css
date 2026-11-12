@@ -30,14 +30,14 @@
   text-shadow: 0 -1px 0 var(--color-foil-press), 0 1px 0 var(--color-leather-sheen);
 }
 
-/* Real passports space their cover capitals wide. At these sizes that's
-   display lettering, not a label. */
+/* The issuer line: capitals, but not spaced out. Wide tracking stays on
+   the PASSPORT title only. */
 .cover__program {
   font-family: var(--font-display);
   font-weight: var(--display-weight);
   font-size: var(--text-lg);
   line-height: 1.2;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
 }
 
@@ -146,12 +146,13 @@
 }
 .book__face .foil,
 .book__face .cover__mark {
-  background-image: linear-gradient(105deg, var(--color-foil) 0 44%, var(--color-foil-glint) 50%, var(--color-foil) 56% 100%);
   background-size: 300% 100%;
   background-position: 100% 0;
   animation: foil-glint-early var(--dur-turn) linear both;
 }
+.book__face .cover__mark { background-image: linear-gradient(105deg, var(--color-foil) 0 44%, var(--color-foil-glint) 50%, var(--color-foil) 56% 100%); }
 .book__face .foil {
+  background-image: linear-gradient(105deg, var(--color-foil) 0 44%, var(--color-foil-glint) 50%, var(--color-foil) 56% 100%);
   color: transparent;
   -webkit-background-clip: text;
   background-clip: text;

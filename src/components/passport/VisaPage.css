@@ -17,6 +17,7 @@
   list-style: none;
 }
 .visa__grid > li { display: grid; min-width: 0; }
+@media (max-width: 40rem) { .visa__grid { gap: var(--space-xs); } }
 
 .visa__note {
   font-size: var(--text-sm);
@@ -59,6 +60,7 @@
 .visa__endorse--ink-2 { color: var(--color-stamp-2); }
 .visa__endorse--ink-3 { color: var(--color-stamp-3); }
 .visa__endorse--missed { color: var(--color-miss); }
+.visa__endorse--reserve { visibility: hidden; }
 
 @keyframes endorse-write {
   from { clip-path: inset(0 100% 0 0); }

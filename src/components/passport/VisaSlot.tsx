@@ -53,13 +53,22 @@ export function VisaSlot({ training, state, repEmail, landing, onOpen, focusable
           {landing && <Stamper {...stamperLook(training, repEmail)} />}
         </span>
       ) : (
-        <span className="slot__blank">
-          {state === 'today' && <span className="tag tag--today">Today</span>}
-          <span className="slot__date">{shortDate(training.date)}</span>
-          <span className="slot__supplier">{training.supplier}</span>
-          {state === 'missed' && <span className="slot__missed">Missed</span>}
-          {state === 'not-invited' && <span className="slot__note">Not on your list</span>}
-        </span>
+        <>
+          {/* Today's slot holds the room its stamp will take, so the page
+              doesn't grow when attendance is recorded. */}
+          {state === 'today' && (
+            <span className="slot__stamp slot__reserve" aria-hidden="true">
+              <Stamp supplier={training.supplier} date={training.date} repEmail={repEmail} trainingId={training.id} landing={false} />
+            </span>
+          )}
+          <span className="slot__blank">
+            {state === 'today' && <span className="tag tag--today">Today</span>}
+            <span className="slot__date">{shortDate(training.date)}</span>
+            <span className="slot__supplier">{training.supplier}</span>
+            {state === 'missed' && <span className="slot__missed">Missed</span>}
+            {state === 'not-invited' && <span className="slot__note">Not on your list</span>}
+          </span>
+        </>
       )}
       <span className="slot__format">{format}</span>
     </button>

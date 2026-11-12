@@ -43,7 +43,7 @@ export function StandingsScreen() {
       <header className="standings__head">
         <h1 className="standings__title">Standings</h1>
         <p className="standings__sub">
-          Ranked by rate: trainings attended out of trainings invited to. The dashed line on the board is the President's Club line.
+          Ranked by rate: trainings attended out of trainings invited to. The dashed line on the board is the President’s Club line.
         </p>
       </header>
 

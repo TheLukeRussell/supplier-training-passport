@@ -20,7 +20,7 @@ export function Stamper({ ink, tilt }: Props) {
       <span className="stamper__shadow" />
       <svg className="stamper__tool" viewBox="0 0 120 132">
         {/* Knob with a highlight, neck, block with a lit top edge, rubber.
-            The pad's bottom edge meets the page. */}
+            The pad’s bottom edge meets the page. */}
         <circle cx={60} cy={20} r={18} className="stamper__knob" />
         <circle cx={54} cy={14} r={6} className="stamper__knob-shine" />
         <rect x={50} y={34} width={20} height={38} rx={4} className="stamper__neck" />

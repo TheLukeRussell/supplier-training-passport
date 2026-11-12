@@ -29,6 +29,8 @@ interface Props {
 // How long the whole stamp moment runs: the stamper's trip (--dur-press,
 // 1400ms) with the endorsement writing itself in from 80% of the way, 620ms.
 const MOMENT_MS = 1900
+// When the ink shows: as the stamper lifts, 64% of --dur-press.
+const INK_MS = 900
 
 export function VisaPage({ page, model, rep, ctx, stats, landing, onLanded, onOpen, still }: Props) {
   const reduced = useReducedMotion()
@@ -44,6 +46,10 @@ export function VisaPage({ page, model, rep, ctx, stats, landing, onLanded, onOp
   const todayIndex = trainings.findIndex((t) => t.date === ctx.today)
   const today = todayIndex === -1 ? null : trainings[todayIndex]
   const note = today ? endorsement(stats, states[todayIndex], today) : null
+  // Until today is recorded there's no endorsement yet, but the page keeps
+  // the room for one (and the slot keeps room for its stamp, see VisaSlot),
+  // so recording never makes the book grow mid-turn.
+  const reserve = today && states[todayIndex] === 'today' ? endorsement(stats, 'stamped', today) : null
   // The moment only plays on the real page, never on the hidden sizer copy
   // or a page mid-turn, and only if today's slot actually got a stamp.
   const playing = landing && !still && today !== null && states[todayIndex] === 'stamped'
@@ -57,8 +63,18 @@ export function VisaPage({ page, model, rep, ctx, stats, landing, onLanded, onOp
       onLanded()
       return
     }
-    const timer = window.setTimeout(onLanded, MOMENT_MS)
-    return () => window.clearTimeout(timer)
+    const started = performance.now()
+    let done = false
+    const timer = window.setTimeout(() => {
+      done = true
+      onLanded()
+    }, MOMENT_MS)
+    return () => {
+      window.clearTimeout(timer)
+      // Turning away once the ink is down still counts, so coming back
+      // doesn't bring the stamper down a second time.
+      if (!done && performance.now() - started >= INK_MS) onLanded()
+    }
   }, [playing, reduced, onLanded])
 
   return (
@@ -89,11 +105,11 @@ export function VisaPage({ page, model, rep, ctx, stats, landing, onLanded, onOp
       {trainings.length > 0 && !invitedHere && (
         <p className="visa__note">
           {stats.next
-            ? `${firstName(rep.name)} wasn't on the list for these. The next chance at a stamp is ${stats.next.supplier} on ${shortDate(stats.next.date)}.`
-            : `${firstName(rep.name)} wasn't on the list for these.`}
+            ? `${firstName(rep.name)} wasn’t on the list for these. The next chance at a stamp is ${stats.next.supplier} on ${shortDate(stats.next.date)}.`
+            : `${firstName(rep.name)} wasn’t on the list for these.`}
         </p>
       )}
-      {/* The endorsement: written in the stamp's ink once today is recorded,
+      {/* The endorsement: written in the stamp’s ink once today is recorded,
           because the new rate lives on the data page, not here. */}
       {note && (
         <p
@@ -101,6 +117,11 @@ export function VisaPage({ page, model, rep, ctx, stats, landing, onLanded, onOp
           role="status"
         >
           {note}
+        </p>
+      )}
+      {reserve && (
+        <p className="visa__endorse visa__endorse--reserve" aria-hidden="true">
+          {reserve}
         </p>
       )}
     </Page>

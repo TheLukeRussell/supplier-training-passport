@@ -26,7 +26,7 @@ export function TopBar({ demoOpen, onToggleDemo }: Props) {
           <span className="topbar__product">Training Passport 2027</span>
         </Link>
         <nav className="topbar__tabs" aria-label="Screens">
-          {/* Passport links to whoever you're viewing as, so it counts as
+          {/* Passport links to whoever you’re viewing as, so it counts as
               current on any passport, not just that one URL. */}
           <Link
             to={passportPath}

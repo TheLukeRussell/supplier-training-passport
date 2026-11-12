@@ -1,5 +1,6 @@
 /* Passport screen layout. On a phone the turn buttons sit in a row under
-   the page. On a wide screen they flank the spread and the page label sits
+   the page and stick to the bottom of the screen until you get there, so a
+   page that runs below the fold can still be turned without scrolling. On a wide screen they flank the spread and the page label sits
    under it, so the whole book fits a laptop screen. */
 
 .passport {
@@ -46,6 +47,19 @@
 .passport__turn:active { transform: translateY(1px); }
 .passport__turn:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 .passport__turn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+@media (max-width: 59.99rem) {
+  .passport__controls {
+    position: sticky;
+    bottom: 0;
+    z-index: var(--z-sticky);
+    width: auto;
+    margin-inline: calc(-1 * var(--gutter));
+    padding: var(--space-xs) calc(var(--gutter) + max(0px, (100% - var(--page-width)) / 2));
+    border-top: 1px solid var(--color-rule);
+    background: var(--color-paper);
+  }
+}
 
 @media (min-width: 60rem) {
   /* --reach is half the open spread, the same sum Book.css uses for the

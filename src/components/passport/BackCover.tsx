@@ -22,7 +22,7 @@ const LOGO = `url("${import.meta.env.BASE_URL}brand/scansource-logo.svg")`
 
 export function BackCover({ rep, onFront, still }: Props) {
   return (
-    <section className="page cover cover--back" aria-label={`Back cover of ${rep.name}'s passport`}>
+    <section className="page cover cover--back" aria-label={`Back cover of ${rep.name}’s passport`}>
       <span className="cover__mark" role="img" aria-label="ScanSource" style={{ '--logo': LOGO } as CSSProperties} />
       <p className="cover__back-note foil">
         Valid for the {PROGRAM_YEAR} program year, {stampDate(ISSUE_DATE)} to {stampDate(EXPIRY_DATE)}.

@@ -1,3 +1,4 @@
+/* Hallmark · this folder follows the build stamp in src/styles/app.css */
 /* The board. A real table on wide screens; on phones each row restacks into
    a labelled block so nothing scrolls sideways. Below-the-line rows sit on a
    darker band, and the line itself is a row of its own. */
@@ -38,7 +39,7 @@
   text-align: left;
   vertical-align: middle;
 }
-.board__row.is-below { background: var(--color-field-2); }
+.board__row.is-below, .board__row.is-unranked { background: var(--color-field-2); }
 .board__row.is-you { background: var(--color-field-3); }
 @media (hover: hover) { .board__row:hover { background: var(--color-field-3); } }
 
@@ -58,7 +59,7 @@
 
 /* The name is the link; it stretches over the whole row so any tap opens
    the passport. */
-.board__link { text-decoration: none; }
+.board__link { text-decoration: none; white-space: nowrap; }
 .board__link::after { content: ""; position: absolute; inset: 0; }
 @media (hover: hover) { .board__row:hover .board__link { text-decoration: underline; } }
 .board__link:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
@@ -73,6 +74,8 @@
 
 .board__status { white-space: nowrap; }
 .board__row.is-below .board__status { color: var(--color-miss-on-field); font-weight: 700; }
+/* A new hire with nothing held yet isn’t below anything, just not counted. */
+.board__row.is-unranked .board__status { color: var(--color-field-muted); }
 
 .move { display: inline-flex; align-items: center; gap: var(--space-2xs); white-space: nowrap; }
 .move svg { width: 12px; height: 12px; fill: currentColor; flex-shrink: 0; }
@@ -97,6 +100,7 @@
 
 .board-empty {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   justify-items: start;
   gap: var(--space-xs);
   padding: var(--space-lg) 0;
@@ -107,6 +111,9 @@
   font-size: var(--text-2xl);
   line-height: 1.05;
   text-transform: uppercase;
+  /* It repeats the search, which can be one long string with no spaces. */
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 .board-empty__text { color: var(--color-field-muted); }
 .board-empty__action { margin-top: var(--space-xs); background: var(--color-board-signal); color: var(--color-board-signal-ink); border-color: var(--color-board-signal); }
@@ -115,7 +122,9 @@
 /* Phones: one block per rep. Rank down the left, name and rate on top, the
    rest as small labelled pairs underneath. */
 @media (max-width: 47.99rem) {
-  .board thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  /* Kept for screen readers, but every header cell collapses too, so none of
+     them lays out past the edge of a phone. */
+  .board thead, .board thead th { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   .board, .board tbody { display: block; }
   .board__row {
     display: grid;

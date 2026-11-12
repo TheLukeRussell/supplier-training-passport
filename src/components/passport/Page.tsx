@@ -18,7 +18,7 @@ export function Page({ kind, label, folio, runningHead, className, children }: P
     <section className={`page page--${kind}${className ? ` ${className}` : ''}`} aria-label={label}>
       <div className="page__body">{children}</div>
       {/* The section name rides in the foot beside the number, so nothing
-          small sits on top of the page's heading. */}
+          small sits on top of the page’s heading. */}
       <p className="page__folio" aria-hidden="true">
         <span className="page__number">{folio}</span>
         {runningHead && <span className="page__running">{runningHead}</span>}

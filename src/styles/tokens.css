@@ -52,7 +52,7 @@
 
   /* Missed and below the line: Rogue on paper; on the dark board a light
      Rogue, because full Rogue is too dark there. Moving up is Jewel. */
-  --color-miss: var(--ss-rogue); --color-miss-on-field: #F28B91 /* derived, light Rogue */; --color-up-on-field: var(--ss-jewel);
+  --color-miss: var(--ss-rogue); --color-miss-on-field: #F5A3A8 /* derived, light Rogue, 4.7:1 on Stone */; --color-up-on-field: #5FD3D5 /* derived, light Jewel, 5.2:1 on Stone */;
 
   /* The standings board's signal is Marine, the brand's data colour, so the
      scoreboard carries no orange at all. Text on Marine is Ink. */
@@ -60,9 +60,11 @@
   --color-error: var(--ss-rogue); --color-success: #1E7F82 /* derived from Jewel */;
 
   /* Stamp inks, one per supplier, see src/lib/stamps.ts. Ember, Marine and
-     Jewel are too light for stamp lettering on paper. Rogue and Charcoal are
-     brand; the navy is derived from Marine, darkened to read at 10:1. */
-  --color-stamp-1: var(--ss-rogue); --color-stamp-2: #1F3A68; --color-stamp-3: var(--ss-charcoal);
+     Jewel are too light for stamp lettering on paper, and Rogue is kept for
+     missed trainings, so a stamp never reads as a miss. The teal is Jewel
+     darkened to read at 6:1, the navy is Marine darkened to 10:1, and
+     Charcoal is brand. */
+  --color-stamp-1: #17696B; --color-stamp-2: #1F3A68; --color-stamp-3: var(--ss-charcoal);
 
   /* Gotham is the brand face. It's licensed, so the page names it first and
      falls back to the brand's own fallbacks, Helvetica Neue then Arial. The

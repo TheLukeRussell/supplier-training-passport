@@ -8,6 +8,7 @@ import { TEAMS } from '../../config'
 import { firstName, shortDate } from '../../lib/format'
 import { pageForTraining } from '../../lib/book'
 import { useApp, type Preview } from '../../state/AppState'
+import { useReducedMotion } from '../../state/useMedia'
 import './DemoPanel.css'
 
 interface Props {
@@ -24,6 +25,7 @@ const PREVIEWS: { value: Preview; label: string }[] = [
 
 export function DemoPanel({ open, onClose }: Props) {
   const app = useApp()
+  const reduced = useReducedMotion()
   const { ready } = app
   const navigate = useNavigate()
   const { pathname } = useLocation()
@@ -51,8 +53,13 @@ export function DemoPanel({ open, onClose }: Props) {
   const onRecord = () => {
     app.record(passportRep?.id)
     // Recording from a passport turns to the page with today's slot, so you
-    // actually see the stamp land.
+    // actually see the stamp land. On a phone this panel pushes the book down
+    // the screen, so bring the book up first and the turn plays in view.
     if (ready?.today && pathname.startsWith('/passport')) {
+      const book = document.querySelector('.passport')
+      if (book && book.getBoundingClientRect().top > window.innerHeight * 0.4) {
+        book.scrollIntoView({ block: 'start', behavior: reduced ? 'auto' : 'smooth' })
+      }
       navigate(`${pathname}?page=${pageForTraining(ready.today)}`, { replace: true })
     }
   }
@@ -64,7 +71,7 @@ export function DemoPanel({ open, onClose }: Props) {
           <h2 id="demo-title" className="demo__title">
             Demo controls
           </h2>
-          <p className="demo__note">Only here for the demo, which runs on made-up sample data. The real passport won't have this panel.</p>
+          <p className="demo__note">Only here for the demo, which runs on made-up sample data. The real passport won’t have this panel.</p>
         </div>
 
         {ready && (
@@ -89,13 +96,13 @@ export function DemoPanel({ open, onClose }: Props) {
         {ready && (
           <div className="demo__record">
             <button type="button" className="btn" onClick={onRecord} disabled={app.recorded || !ready.today}>
-              Record today's attendance
+              Record today’s attendance
             </button>
             <p className="demo__help" aria-live="polite">
               {app.recorded
                 ? `Recorded for ${shortDate(ready.ctx.today)}. Reset to run it again.`
                 : ready.today
-                  ? `Marks ${firstName(recordRep!.name)} at today's ${ready.today.supplier} training, plus about two thirds of everyone else invited.`
+                  ? `Marks ${firstName(recordRep!.name)} at today’s ${ready.today.supplier} training, plus about two thirds of everyone else invited.`
                   : 'No training lands on the demo date, so there is nothing to record.'}
             </p>
           </div>
