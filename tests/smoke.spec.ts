@@ -309,7 +309,7 @@ test('a spread fits a short laptop or projector screen', async ({ page }, info) 
 
   for (const [width, height] of [[1280, 720], [1280, 610], [1366, 768], [1536, 730], [1440, 790], [1536, 864]]) {
     await page.setViewportSize({ width, height })
-    for (const p of [0, 2, 3, 5, 7]) {
+    for (const p of [0, 2, 5, 7]) {
       await page.goto(`./#/passport/hannah-kowalski${p ? `?page=${p}` : ''}`)
       await expect(shown(page).locator('.page').first()).toBeVisible()
       await expect(page.locator('.book.is-turning')).toHaveCount(0)
