@@ -19,6 +19,8 @@ const H = 110
 // How far above the stamp the stamper starts its swing, in pixels, so it
 // should be on screen too when the stamp lands.
 const STAMPER_ROOM = 110
+// A little air between the endorsement and the sticky page bar.
+const BAR_GAP = 8
 const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
 
 // The widest the supplier lines and the date line can run inside each shape,
@@ -148,13 +150,16 @@ export function Stamp({ supplier, date, repEmail, trainingId, landing = false }:
     if (!landing || !el) return
     const box = el.getBoundingClientRect()
     const bar = document.querySelector('.passport__controls')
-    const floor = Math.min(window.innerHeight, bar && getComputedStyle(bar).position === 'sticky' ? bar.getBoundingClientRect().top : Infinity)
+    const floor = Math.min(window.innerHeight, bar && getComputedStyle(bar).position === 'sticky' ? bar.getBoundingClientRect().top - BAR_GAP : Infinity)
     const note = el.closest('.page')?.querySelector('.visa__endorse:not(.visa__endorse--reserve)')
     const top = box.top - STAMPER_ROOM
     const bottom = Math.max(box.bottom, note?.getBoundingClientRect().bottom ?? -Infinity)
     if (top >= 0 && bottom <= floor) return
-    // Both fit: scroll just far enough. If not, the stamp wins.
+    // All of it fits: scroll just far enough. Stamp and endorsement fit but
+    // not the stamper's full swing: sit the endorsement on the bar and give
+    // the stamper what's left. Neither: the stamp wins.
     if (bottom - top <= floor) window.scrollBy(0, top < 0 ? top : bottom - floor)
+    else if (bottom - box.top <= floor) window.scrollBy(0, bottom - floor)
     else el.scrollIntoView({ block: 'center' })
   }, [landing])
 
