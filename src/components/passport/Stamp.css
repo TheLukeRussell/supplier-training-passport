@@ -47,3 +47,10 @@
 @media (prefers-reduced-motion: reduce) {
   .stamp.is-landing { animation: none; }
 }
+
+/* High contrast keeps an SVG's own colour, and the Charcoal and navy inks
+   nearly vanish on its black. Stamps go to the system text colour. This has
+   to come after the ink rules to win. */
+@media (forced-colors: active) {
+  .stamp { color: CanvasText; }
+}
