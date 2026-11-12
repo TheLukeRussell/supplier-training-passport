@@ -2,8 +2,7 @@
 // ink, tilted a little. Text only, no logos. Drawn as SVG so the shape, the
 // text and the tilt all scale together.
 
-import { useEffect, useRef, type CSSProperties } from 'react'
-import { stampDate } from '../../lib/format'
+import { useEffect, useLayoutEffect, useRef, type CSSProperties } from 'react'
 import { stampLook, type StampShape } from '../../lib/stamps'
 import './Stamp.css'
 
@@ -13,19 +12,22 @@ interface Props {
   repEmail: string
   trainingId: string
   landing?: boolean
-  onLanded?: () => void
 }
 
 const W = 140
 const H = 110
+const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
 
-// The widest the text can run inside each shape, in SVG units.
-const ROOM: Record<StampShape, number> = { circle: 84, rect: 118, oval: 100, hexagon: 96, ticket: 108, octagon: 96 }
+// The widest the supplier lines and the date line can run inside each shape,
+// in SVG units. The date sits lower, where round and angled shapes narrow.
+const ROOM: Record<StampShape, number> = { circle: 88, rect: 118, oval: 100, hexagon: 96, ticket: 108, octagon: 96 }
+const DATE_ROOM: Record<StampShape, number> = { circle: 78, rect: 118, oval: 96, hexagon: 84, ticket: 108, octagon: 96 }
 
-// Big Shoulders is condensed: capitals average about half an em wide. Good
-// enough to pick a size and decide whether a name needs two lines.
-const CHAR = 0.5
-const MAX_SIZE = 26
+// Bold Gotham or Helvetica capitals average about two thirds of an em wide.
+// Close enough to pick a size and decide whether a name needs two lines; the
+// effect below measures the real thing and squeezes anything that still spills.
+const CHAR = 0.64
+const MAX_SIZE = 24
 const MIN_SIZE = 18
 
 function fitLines(name: string, room: number): { lines: string[]; size: number } {
@@ -47,13 +49,19 @@ function fitLines(name: string, room: number): { lines: string[]; size: number }
   return { lines, size: Math.min(MAX_SIZE - 2, Math.max(MIN_SIZE, room / (longest * CHAR))) }
 }
 
+// 17 JUN 27, the way a border stamp prints it.
+function stampDay(date: string): string {
+  const [y, m, d] = date.split('-')
+  return `${d} ${MONTHS[Number(m) - 1]} ${y.slice(2)}`
+}
+
 function Shape({ shape }: { shape: StampShape }) {
   switch (shape) {
     case 'circle':
       return (
         <>
-          <circle cx={70} cy={55} r={52} className="stamp__line--heavy" />
-          <circle cx={70} cy={55} r={46} className="stamp__line--light" />
+          <circle cx={70} cy={55} r={54} className="stamp__line--heavy" />
+          <circle cx={70} cy={55} r={48} className="stamp__line--light" />
         </>
       )
     case 'rect':
@@ -95,28 +103,46 @@ function Shape({ shape }: { shape: StampShape }) {
   }
 }
 
-export function Stamp({ supplier, date, repEmail, trainingId, landing = false, onLanded }: Props) {
+export function Stamp({ supplier, date, repEmail, trainingId, landing = false }: Props) {
   const look = stampLook(supplier, repEmail, trainingId)
   const { lines, size } = fitLines(supplier, ROOM[look.shape])
   const ref = useRef<SVGSVGElement>(null)
 
-  // Make sure the stamp is on screen when it lands. With the demo panel open
-  // the slot can sit below the fold. No smooth scroll, just a jump.
+  // Measure every line once it's drawn. Anything wider than its room gets
+  // squeezed to fit with textLength, so a long name or a wider fallback font
+  // never runs over the stamp's border. Runs again once web fonts settle.
+  useLayoutEffect(() => {
+    const svg = ref.current
+    if (!svg) return
+    const fit = () => {
+      for (const text of svg.querySelectorAll<SVGTextElement>('text[data-room]')) {
+        text.removeAttribute('textLength')
+        text.removeAttribute('lengthAdjust')
+        const room = Number(text.dataset.room)
+        if (text.getComputedTextLength() > room) {
+          text.setAttribute('textLength', String(room))
+          text.setAttribute('lengthAdjust', 'spacingAndGlyphs')
+        }
+      }
+    }
+    fit()
+    let live = true
+    document.fonts?.ready.then(() => live && fit())
+    return () => {
+      live = false
+    }
+  }, [supplier, date])
+
+  // Make sure the stamp is on screen when it lands, with room above it for
+  // the stamper coming down. A jump, not a smooth scroll.
   useEffect(() => {
-    if (landing) ref.current?.scrollIntoView({ block: 'nearest' })
+    if (landing) ref.current?.scrollIntoView({ block: 'center' })
   }, [landing])
 
-  // If reduced motion turns the animation off entirely, animationend may
-  // never come. Settle it anyway so the stamp doesn't wait forever.
-  useEffect(() => {
-    if (!landing || !onLanded) return
-    const timer = window.setTimeout(onLanded, 1200)
-    return () => window.clearTimeout(timer)
-  }, [landing, onLanded])
-
-  const top = lines.length === 1 ? 52 : 42
-  const dateY = lines.length === 1 ? 78 : 88
-  const ruleY = lines.length === 1 ? 62 : 72
+  const two = lines.length === 2
+  const top = two ? 36 : 52
+  const ruleY = two ? 65 : 62
+  const dateY = two ? 84 : 82
 
   return (
     <svg
@@ -125,19 +151,26 @@ export function Stamp({ supplier, date, repEmail, trainingId, landing = false, o
       viewBox={`0 0 ${W} ${H}`}
       style={{ '--tilt': `${look.rotate}deg` } as CSSProperties}
       aria-hidden="true"
-      onAnimationEnd={landing ? onLanded : undefined}
     >
       <g className="stamp__shape">
         <Shape shape={look.shape} />
       </g>
       {lines.map((line, i) => (
-        <text key={i} x={W / 2} y={top + i * (size + 1)} className="stamp__supplier" style={{ fontSize: size }} textAnchor="middle">
+        <text
+          key={i}
+          x={W / 2}
+          y={top + i * (size + 1)}
+          className="stamp__supplier"
+          style={{ fontSize: size }}
+          textAnchor="middle"
+          data-room={ROOM[look.shape]}
+        >
           {line}
         </text>
       ))}
       <line x1={W / 2 - 24} x2={W / 2 + 24} y1={ruleY} y2={ruleY} className="stamp__line--light" />
-      <text x={W / 2} y={dateY} className="stamp__date" textAnchor="middle">
-        {stampDate(date)}
+      <text x={W / 2} y={dateY} className="stamp__date" textAnchor="middle" data-room={DATE_ROOM[look.shape]}>
+        {stampDay(date)}
       </text>
     </svg>
   )

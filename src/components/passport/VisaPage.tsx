@@ -1,9 +1,15 @@
 // A visa page: one quarter of the year, one slot per training in date order.
+// The page holding today's training also runs the stamp moment when today's
+// attendance gets recorded, and carries the endorsement written after it.
 
+import { useEffect } from 'react'
 import { PAGES } from '../../lib/book'
 import { firstName, monthName, shortDate } from '../../lib/format'
+import { endorsement } from '../../lib/messages'
 import type { Model, Rep, Training } from '../../lib/model'
+import { stampLook } from '../../lib/stamps'
 import { slotState, type Context, type RepStats } from '../../lib/rules'
+import { useReducedMotion } from '../../state/useMedia'
 import { Page } from './Page'
 import { VisaSlot } from './VisaSlot'
 import './VisaPage.css'
@@ -20,7 +26,12 @@ interface Props {
   still: boolean
 }
 
+// How long the whole stamp moment runs: the stamper's trip (--dur-press,
+// 1100ms) plus the endorsement writing itself in after it lifts.
+const MOMENT_MS = 1700
+
 export function VisaPage({ page, model, rep, ctx, stats, landing, onLanded, onOpen, still }: Props) {
+  const reduced = useReducedMotion()
   const info = PAGES[page - 1]
   const [first, , last] = info.months!
   const trainings = model.trainings.filter((t) => {
@@ -30,8 +41,28 @@ export function VisaPage({ page, model, rep, ctx, stats, landing, onLanded, onOp
   const states = trainings.map((t) => slotState(model, rep, t, ctx))
   const invitedHere = states.some((s) => s !== 'not-invited')
 
+  const todayIndex = trainings.findIndex((t) => t.date === ctx.today)
+  const today = todayIndex === -1 ? null : trainings[todayIndex]
+  const note = today ? endorsement(stats, states[todayIndex], today) : null
+  // The moment only plays on the real page, never on the hidden sizer copy
+  // or a page mid-turn, and only if today's slot actually got a stamp.
+  const playing = landing && !still && today !== null && states[todayIndex] === 'stamped'
+  const ink = today ? stampLook(today.supplier, rep.email, today.id).ink : 1
+
+  // Let the moment run, then tell the app the stamp has landed so it won't
+  // replay. Under reduced motion there's nothing to wait for.
+  useEffect(() => {
+    if (!playing) return
+    if (reduced) {
+      onLanded()
+      return
+    }
+    const timer = window.setTimeout(onLanded, MOMENT_MS)
+    return () => window.clearTimeout(timer)
+  }, [playing, reduced, onLanded])
+
   return (
-    <Page kind="visa" label={info.name} folio={page} runningHead="Visas">
+    <Page kind="visa" label={info.name} folio={page} runningHead="Visas" className={playing ? 'is-thumping' : undefined}>
       <h2 className="visa__title">
         {monthName(first)} to {monthName(last)}
       </h2>
@@ -45,8 +76,7 @@ export function VisaPage({ page, model, rep, ctx, stats, landing, onLanded, onOp
                 training={training}
                 state={states[i]}
                 repEmail={rep.email}
-                landing={landing && training.date === ctx.today && !still}
-                onLanded={onLanded}
+                landing={playing && i === todayIndex}
                 onOpen={onOpen}
                 focusable={!still}
               />
@@ -61,6 +91,16 @@ export function VisaPage({ page, model, rep, ctx, stats, landing, onLanded, onOp
           {stats.next
             ? `${firstName(rep.name)} wasn't on the list for these. The next chance at a stamp is ${stats.next.supplier} on ${shortDate(stats.next.date)}.`
             : `${firstName(rep.name)} wasn't on the list for these.`}
+        </p>
+      )}
+      {/* The endorsement: written in the stamp's ink once today is recorded,
+          because the new rate lives on the data page, not here. */}
+      {note && (
+        <p
+          className={`visa__endorse visa__endorse--${states[todayIndex] === 'missed' ? 'missed' : `ink-${ink}`}${playing ? ' is-writing' : ''}`}
+          role="status"
+        >
+          {note}
         </p>
       )}
     </Page>

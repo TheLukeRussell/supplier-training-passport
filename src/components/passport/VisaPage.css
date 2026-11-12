@@ -29,3 +29,42 @@
 @container page (max-width: 300px) {
   .visa__grid { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* The page takes the hit when the stamper lands at 40% of its trip: a
+   3px dip and back, like paper on a desk. Transform only. */
+@keyframes visa-thump {
+  0%, 40% { transform: none; }
+  44% { transform: translateY(3px); }
+  54%, 100% { transform: none; }
+}
+.page--visa.is-thumping { animation: visa-thump var(--dur-press) both; }
+
+/* The endorsement, like an officer's note written under the stamps, in
+   the same ink as the stamp it's about (Rogue for a miss). It writes itself
+   in left to right once the stamper has lifted. */
+.visa__endorse {
+  margin-top: auto;
+  max-width: 34ch;
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  font-size: var(--text-lg);
+  line-height: 1.2;
+  text-transform: uppercase;
+  text-wrap: balance;
+  transform: rotate(-1.5deg);
+  transform-origin: left center;
+}
+.visa__endorse--ink-1 { color: var(--color-stamp-1); }
+.visa__endorse--ink-2 { color: var(--color-stamp-2); }
+.visa__endorse--ink-3 { color: var(--color-stamp-3); }
+.visa__endorse--missed { color: var(--color-miss); }
+
+@keyframes endorse-write {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+.visa__endorse.is-writing { animation: endorse-write 520ms var(--ease-out) calc(var(--dur-press) * 0.92) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .page--visa.is-thumping, .visa__endorse.is-writing { animation: none; }
+}

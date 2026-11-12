@@ -1,11 +1,14 @@
 /* Visa slots. Stamped slots are just the stamp on the page. Empty slots get
    a dashed outline: red for missed, ink for what's still to come, and barely
-   there for trainings the rep wasn't invited to. */
+   there for trainings the rep wasn't invited to. Every slot ends with a small
+   caption saying whether it's virtual or in person. */
 
 .slot {
   position: relative;
   display: grid;
+  grid-template-rows: 1fr auto;
   place-items: center;
+  gap: var(--space-2xs);
   min-width: 0;
   min-height: 112px;
   padding: var(--space-xs);
@@ -25,10 +28,17 @@
 
 .slot__blank { display: grid; justify-items: center; gap: var(--space-3xs); }
 
+/* The stamp and, while it lands, the stamper over it. Stays above the
+   neighbouring slots so the stamper can swing in across them. */
+.slot__stamp { position: relative; display: grid; place-items: center; width: 100%; }
+.slot.is-landing { z-index: var(--z-raised); }
+
+.slot__format { font-size: var(--text-xs); color: var(--color-muted); }
+
 .slot__date {
   font-family: var(--font-display);
   font-weight: var(--display-weight);
-  font-size: var(--text-xl);
+  font-size: var(--text-lg);
   line-height: 1.05;
   font-variant-numeric: tabular-nums;
 }
