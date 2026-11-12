@@ -46,11 +46,12 @@ Everything's in `src/config.ts` and `src/lib/rules.ts`.
 
 - **The line** is `LINE = 0.75`. It's a placeholder until leadership picks the real number, and the app says "placeholder" everywhere it shows up.
 - **Rate** is trainings attended divided by trainings you were invited to. It only counts trainings that already happened, so upcoming ones don't hurt anyone.
-- **Rank** goes by rate. Ties share a rank (1, 2, 2, 4) and show as T2 on the board. If you don't have anything recorded yet, you're not ranked.
+- **Rank** goes by rate, but only once you have at least 3 trainings recorded (`MIN_RECORDED`). One or two doesn't say much, and I didn't want a new hire at 1 of 1 tied for first or one at 0 of 1 sitting dead last. Until then you're unranked: you don't count toward "Above the line" or the average on Standings, and your data page says how many more trainings to go.
+- **Ties** share a rank (1, 2, 2, 4) and show as T2, on a team filter too.
 - **Change** is how many spots someone moved since the last training.
 - **Streak** is how many trainings in a row you've attended, counting back from the latest one. A training you weren't invited to doesn't break it.
 - **Attend the next N** is the smallest N where (attended + N) / (recorded + N) gets you to the line, capped at what's left this year. If you'd need more than what's left, it tells you the line is out of reach.
-- **Today** is pinned to `DEMO_TODAY = 2027-06-17`. That's a training day, so the passports show a mix of stamped, missed and upcoming. Today's training doesn't count until you record it in the demo.
+- **Today** is pinned to `DEMO_TODAY = 2027-06-17`. That's a training day, so the passports show a mix of stamped, missed and upcoming. Today's training doesn't count until you record it in the demo. When you do, it marks whoever's passport is open (or the View as rep) plus about two thirds of everyone else invited. `DEMO_SEED` picks who, and I picked one where nobody drops under the line.
 
 ## How the data works
 
@@ -80,7 +81,7 @@ The sample data comes from `scripts/generate-data.ts`. It's seeded, so `npm run 
 - two reps tied for second
 - a new hire who started June 1, wasn't invited to anything before that, and has no stamps yet
 - about half the reps above the line
-- a rep who crosses the line when today's attendance gets recorded (the demo opens as them)
+- a rep who crosses the line when today's attendance gets recorded (the demo opens as them), and more reps above the line afterwards, not fewer
 
 `src/lib/sample-data.test.ts` checks every one of those. If someone changes the script and breaks the story, the tests fail.
 
