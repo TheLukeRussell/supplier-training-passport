@@ -159,6 +159,15 @@
   .btn, .seg label { transition: background-color var(--dur-short) linear; }
 }
 
+/* Windows High Contrast throws away the fill that marks the picked team
+   and the current screen, so those take the system highlight. The top bar's
+   tab sits here with the other selected states, one class heavier so it
+   still wins over TopBar.css, which loads after this file. */
+@media (forced-colors: active) {
+  .seg input:checked + label,
+  .topbar__tabs .topbar__tab.is-current { forced-color-adjust: none; background: Highlight; border-color: Highlight; color: HighlightText; }
+}
+
 /* Fingers get taller controls than a mouse does. */
 @media (pointer: coarse) {
   :root { --control-height: 44px; }

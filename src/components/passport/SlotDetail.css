@@ -25,6 +25,9 @@
   line-height: 1.02;
   text-transform: uppercase;
 }
+/* The slip opens with focus on its title so it starts at the top. It's a
+   heading, not a control, so no ring; Tab goes on to Close. */
+.slip__title:focus { outline: none; }
 .slip__lead { color: var(--color-ink-2); }
 
 .slip__facts {

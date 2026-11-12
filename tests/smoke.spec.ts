@@ -163,6 +163,102 @@ test('the app still works when storage is blocked', async ({ page }) => {
   await expect(page.locator('.figures__value').nth(0)).toHaveText('15')
 })
 
+// Keyboard and screen reader basics. The arrow keys turn pages even after
+// the demo panel's buttons and select, focus never drops to the page body
+// (Open passport, either end of the book, Record, Undo, Escape, a new
+// screen), every screen has its own title, and the slip opens on its title.
+test('keyboard focus stays put and the arrows always turn pages', async ({ page }) => {
+  const lost = () => page.evaluate(() => !document.activeElement || document.activeElement === document.body)
+  const still = () => expect(page.locator('.book.is-turning')).toHaveCount(0)
+  const demo = page.getByRole('button', { name: 'Demo', exact: true })
+
+  await page.goto('./#/passport/hannah-kowalski')
+  await expect(page).toHaveTitle('Hannah Kowalski’s passport · Training Passport 2027')
+  await page.getByRole('button', { name: 'Open passport' }).focus()
+  await page.keyboard.press('Enter')
+  await expect(page).toHaveURL(/page=2/)
+  // The cover leaves the moment the turn starts. Then wait for it to land.
+  await expect(shown(page).locator('.cover')).toHaveCount(0)
+  await still()
+  expect(await lost(), 'focus dropped after Open passport').toBe(false)
+
+  // The machine-readable strip reads as its label, not 88 chevrons.
+  await expect(shown(page).getByRole('img', { name: 'Machine-readable zone for Hannah Kowalski' })).toBeVisible()
+
+  // Preview a data state, go back to live data, then turn with the arrows.
+  await demo.click()
+  await page.getByRole('button', { name: 'Loading', exact: true }).click()
+  const live = page.getByRole('button', { name: 'Live data' })
+  await live.click()
+  await expect(live).toHaveAttribute('aria-pressed', 'true')
+  await live.focus()
+  await page.keyboard.press('ArrowRight')
+  await expect(page).toHaveURL(/page=3/)
+  await expect(live).toHaveAttribute('aria-pressed', 'true')
+  await expect(shown(page).locator('.page').first()).toBeVisible()
+  await still()
+
+  // Same from the View as select: the page turns and the rep stays.
+  const viewAs = page.locator('#view-as')
+  await viewAs.focus()
+  await page.keyboard.press('ArrowLeft')
+  await expect(page).toHaveURL(/page=2/)
+  await expect(viewAs).toHaveValue('hannah-kowalski')
+  await still()
+
+  // Escape from inside the panel hands focus back to the Demo button.
+  await page.keyboard.press('Escape')
+  await expect(page.locator('#demo-panel')).toBeHidden()
+  await expect(demo).toBeFocused()
+
+  // Back to the front from the back cover, then Previous page at the front:
+  // focus lands on the book, then stays on the button that can't go further.
+  await page.goto('./#/passport/hannah-kowalski?page=7')
+  await page.getByRole('button', { name: 'Back to the front' }).focus()
+  await page.keyboard.press('Enter')
+  await expect(page).toHaveURL(/hannah-kowalski$/)
+  await expect(shown(page).locator('.cover--back')).toHaveCount(0)
+  await still()
+  expect(await lost(), 'focus dropped after Back to the front').toBe(false)
+  await prev(page).focus()
+  await page.keyboard.press('Enter')
+  await expect(prev(page)).toBeFocused()
+  await expect(prev(page)).toBeDisabled()
+
+  // A new screen gets its own title and focus moves to the top of it.
+  await page.getByRole('link', { name: 'Standings' }).click()
+  await expect(page).toHaveTitle('Standings · Training Passport 2027')
+  await expect(page.locator('#main')).toBeFocused()
+  const search = page.getByLabel('Search by name')
+  await search.fill('zzz')
+  await page.getByRole('button', { name: 'Clear search' }).click()
+  await expect(search).toBeFocused()
+  await page.getByRole('link', { name: 'Ethan Park' }).first().click()
+  await expect(page).toHaveTitle('Ethan Park’s passport · Training Passport 2027')
+  await expect(page.locator('#main')).toBeFocused()
+
+  // The slip opens on its heading, so it starts at the top.
+  await page.goto('./#/passport/hannah-kowalski?page=3')
+  await shown(page).getByRole('button', { name: /^Zebra, Tue, Jan 12/ }).click()
+  await expect(page.getByRole('dialog').getByRole('heading', { name: 'Zebra' })).toBeFocused()
+  await page.keyboard.press('Escape')
+  await expect(page.getByRole('dialog')).toBeHidden()
+
+  // Record and Undo keep focus in the panel.
+  await demo.click()
+  const record = page.getByRole('button', { name: 'Record today’s attendance' })
+  await record.focus()
+  await page.keyboard.press('Enter')
+  await expect(page.getByRole('button', { name: /^Pioneer, Thu, Jun 17, virtual\. Attended/ })).toBeVisible()
+  await expect(record).toBeDisabled()
+  await expect(record).toBeFocused()
+  await page.getByRole('button', { name: 'Reset demo' }).click()
+  await page.getByRole('button', { name: 'Undo' }).focus()
+  await page.keyboard.press('Enter')
+  await expect(page.getByRole('button', { name: 'Reset demo' })).toBeFocused()
+  await expect(record).toBeDisabled()
+})
+
 // Grab-to-tilt. With a mouse, drag the cover: it tilts, the foil lights up,
 // and when you let go it settles flat with nothing left behind. The drag
 // isn't a click, but a click after it still opens the passport, and the data
