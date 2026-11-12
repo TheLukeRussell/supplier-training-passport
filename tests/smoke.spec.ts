@@ -146,7 +146,8 @@ test('the app still works when storage is blocked', async ({ page }) => {
 
 // Grab-to-tilt. With a mouse, drag the cover: it tilts, the foil lights up,
 // and when you let go it settles flat with nothing left behind. The drag
-// isn't a click, but a click after it still opens the passport. On a phone
+// isn't a click, but a click after it still opens the passport, and the data
+// page's laminate lights up the same way without moving anything. On a phone
 // (Chrome only, since it needs real touch input), hold, wobble a pixel the
 // way a resting finger does, then drag up: it stays held and the page
 // doesn't scroll. A still tap that's a little slow still opens a slot.
@@ -157,7 +158,7 @@ test('the passport can be picked up and tilted', async ({ page, browserName }, i
   const settled = async () => {
     await expect(stage).not.toHaveClass(/is-lit/, { timeout: 4000 })
     expect(await stage.evaluate((el) => el.style.transform)).toBe('')
-    expect(await page.locator('.book__slot .foil, .book__slot .cover__mark').evaluateAll((els) => els.map((el) => (el as HTMLElement).style.length))).not.toContain(3)
+    expect(await page.locator('.book__slot .foil, .book__slot .cover__mark, .book__slot .data__light').evaluateAll((els) => els.map((el) => (el as HTMLElement).style.length))).not.toContain(3)
   }
 
   if (!phone) {
@@ -177,6 +178,25 @@ test('the passport can be picked up and tilted', async ({ page, browserName }, i
     await settled()
     await expect(page).toHaveURL(/#\/passport\/hannah-kowalski$/)
     await page.mouse.click(x, y)
+    await expect(page).toHaveURL(/page=2/)
+
+    // The data page's laminate lights up the same way. It's paint only: the
+    // page keeps its size, the film never takes a click, and a drag across
+    // the page doesn't turn it.
+    const data = shown(page).locator('.page--data')
+    await expect(data).toBeVisible()
+    const size = () => data.evaluate((el) => [(el as HTMLElement).offsetWidth, (el as HTMLElement).offsetHeight])
+    const flat = await size()
+    expect(await shown(page).locator('.data__laminate').evaluate((el) => getComputedStyle(el).pointerEvents)).toBe('none')
+    const d = (await data.boundingBox())!
+    await page.mouse.move(d.x + d.width / 2, d.y + d.height / 2)
+    await page.mouse.down()
+    await page.mouse.move(d.x + d.width / 2 - 80, d.y + d.height / 2 + 20, { steps: 8 })
+    await expect(stage).toHaveClass(/is-held/)
+    await expect.poll(() => shown(page).locator('.data__light').evaluate((el) => Number((el as HTMLElement).style.getPropertyValue('--shine')))).toBeGreaterThan(0.5)
+    expect(await size()).toEqual(flat)
+    await page.mouse.up()
+    await settled()
     await expect(page).toHaveURL(/page=2/)
     return
   }

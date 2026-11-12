@@ -133,6 +133,7 @@
 @media (prefers-reduced-motion: reduce) {
   .passport__turn { transition: none; }
   /* The book stays flat (useTilt skips the transform too). Dragging a
-     cover still moves the light across the foil. */
+     cover still moves the light across the foil, and dragging the data
+     page still brightens its laminate. */
   .passport__stage.is-lit { transform: none !important; }
 }

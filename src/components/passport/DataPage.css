@@ -153,3 +153,106 @@
   .data__photo { font-size: var(--text-2xl); }
   .data__figure { font-size: var(--text-xl); }
 }
+
+/* Everything above the strip, in one box the laminate can cover. Same
+   column, same gap as the page body around it, so nothing moves. It's its
+   own stacking layer, so the film can sit over the paper but under the type. */
+.data__viz {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  gap: inherit;
+  min-width: 0;
+}
+
+/* The laminate. A real data page sits under a clear film printed with fine
+   security lines that you barely see straight on and that light up as you
+   tilt the page. This is that film, in the cover's gold: one box masked by
+   the wave tile, with a faint fill so the print is just there at rest, and
+   one band of light inside it.
+   The film never moves. Only the band does, by transform, and it fades by
+   opacity, so a held or turning page never repaints the film. While the
+   book is held, useTilt.ts writes --tilt-x, --tilt-y (-1 to 1) and --shine
+   (0 to 1) on the band alone. Any style change on this masked box, even a
+   custom property, makes Safari repaint it.
+   It sits on the paper, under the type. Gold on the off-white paper only
+   darkens it, and every letter, the photo box, the Today tag and the line
+   box paint over it, so it never touches the text itself. No blend mode:
+   Chrome makes one expensive while the book tilts. It stops above the
+   strip and the page number. Paint only: no room, no clicks. */
+.data__laminate {
+  /* How dark the band gets at full shine. Grey labels on lit paper are the
+     closest call, and they stay well above AA. */
+  --lam-peak: 0.5;
+  position: absolute;
+  /* Out to the edges of the paper (the page's own padding, see Page.css)
+     and a little way into the gap above the strip. */
+  inset: calc(-1 * var(--space-lg)) calc(-1 * var(--space-lg)) calc(-1 * var(--space-xs));
+  overflow: clip;
+  pointer-events: none;
+  z-index: -1;
+  background-color: color-mix(in srgb, var(--color-foil) 7%, transparent);
+  /* The waves, faded in below the page's rounded top corners and out again
+     just above the strip, so the film has no hard edge. */
+  -webkit-mask:
+    var(--laminate-waves) 0 0 / 160px 96px repeat,
+    linear-gradient(transparent var(--radius-page), var(--color-ink) calc(var(--radius-page) + var(--space-md)) calc(100% - var(--space-md)), transparent);
+  -webkit-mask-composite: source-in;
+  mask:
+    var(--laminate-waves) 0 0 / 160px 96px repeat,
+    linear-gradient(transparent var(--radius-page), var(--color-ink) calc(var(--radius-page) + var(--space-md)) calc(100% - var(--space-md)), transparent);
+  mask-composite: intersect;
+}
+/* The hidden sizer's copy of this page has no film at all. */
+.book__sizer .data__laminate { display: none; }
+
+/* The light: a band of gold at the cover foil's 105deg, sitting where the
+   cover's band sits. Its centre is half a page in at rest and moves 0.7 of
+   a page per unit of tilt left and right, 0.3 up and down, the same way the
+   cover ramp moves, so both read as one light. */
+.data__light {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(105deg, transparent calc(50% - 26cqi), var(--color-foil) calc(50% - 5cqi) calc(50% + 5cqi), transparent calc(50% + 26cqi));
+  opacity: calc(var(--shine, 0) * var(--lam-peak));
+  transform: translateX(calc((var(--tilt-x, 0) * -0.7 + var(--tilt-y, 0) * -0.3) * 100%));
+}
+/* Held or turning, the band gets its own layer, so moving it is just the
+   compositor sliding a picture under the film. Never in the sizer. */
+.is-lit .book__slot .data__light,
+.book__face .data__light { will-change: transform, opacity; }
+
+/* The glint on a turn, like the cover foil's: the band sweeps across once,
+   left to right, during the half of the turn this face is toward you. The
+   front of the leaf early, its back (or a phone page swinging back in)
+   late. It's no brighter than a held page at full shine. */
+@keyframes laminate-glint-early {
+  0% { transform: translateX(-100%); opacity: 0; }
+  15%, 35% { opacity: var(--lam-peak); }
+  50%, 100% { transform: translateX(100%); opacity: 0; }
+}
+@keyframes laminate-glint-late {
+  0%, 50% { transform: translateX(-100%); opacity: 0; }
+  65%, 85% { opacity: var(--lam-peak); }
+  100% { transform: translateX(100%); opacity: 0; }
+}
+.book__face .data__light { animation: laminate-glint-early var(--dur-turn) linear both; }
+.book__face--back .data__light,
+.book__leaf.is-incoming .book__face--front .data__light { animation-name: laminate-glint-late; }
+
+@media (max-width: 40rem) {
+  .data__laminate { inset: calc(-1 * var(--space-md)) calc(-1 * var(--space-md)) calc(-1 * var(--space-xs)); }
+}
+
+/* Reduced motion: the band holds still in the middle and only brightens as
+   the page tilts. Pages don't turn there, and no glint either way. */
+@media (prefers-reduced-motion: reduce) {
+  .data__light { transform: none; }
+  .book__face .data__light { animation: none; }
+}
+
+/* High contrast modes get the plain page. */
+@media (forced-colors: active) {
+  .data__laminate { display: none; }
+}
