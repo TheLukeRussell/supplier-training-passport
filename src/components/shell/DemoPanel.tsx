@@ -2,7 +2,7 @@
 // attendance, reset (with undo), and preview the loading, empty and error
 // states. None of this ships in the real version.
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 import { TEAMS } from '../../config'
 import { firstName, shortDate } from '../../lib/format'
@@ -32,6 +32,8 @@ export function DemoPanel({ open, onClose }: Props) {
   const { pathname, search } = useLocation()
   // True from the click until the turn lands and today actually gets recorded.
   const [turning, setTurning] = useState(false)
+  const resetRef = useRef<HTMLButtonElement>(null)
+  const hadUndo = useRef(false)
   // On a passport, "the current rep" is the one whose passport is open,
   // which may not be the rep in the View as box.
   const passportId = /^\/passport\/([^/]+)/.exec(pathname)?.[1]
@@ -41,11 +43,26 @@ export function DemoPanel({ open, onClose }: Props) {
   useEffect(() => {
     if (!open) return
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && !document.querySelector('dialog[open]')) onClose()
+      if (event.key !== 'Escape' || document.querySelector('dialog[open]')) return
+      // Closing from inside the panel hands focus back to the Demo button,
+      // instead of dropping it on the page.
+      if (document.getElementById('demo-panel')?.contains(document.activeElement)) {
+        document.querySelector<HTMLElement>('.topbar__demo')?.focus()
+      }
+      onClose()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [open, onClose])
+
+  // Undo goes away once it's used (or times out). If it had focus, put it
+  // on Reset demo instead of losing it.
+  useEffect(() => {
+    if (hadUndo.current && !app.canUndo && (!document.activeElement || document.activeElement === document.body)) {
+      resetRef.current?.focus()
+    }
+    hadUndo.current = app.canUndo
+  }, [app.canUndo])
 
   const onViewAs = (repId: string) => {
     app.setViewAs(repId)
@@ -53,10 +70,13 @@ export function DemoPanel({ open, onClose }: Props) {
     if (pathname.startsWith('/passport')) navigate(`/passport/${repId}?page=2`)
   }
 
+  // Record stays focusable once it's used up (aria-disabled, not disabled),
+  // so keyboard focus doesn't drop out of the panel. Clicks then do nothing.
+  const recordOff = app.recorded || turning || !ready?.today
   const onRecord = () => {
-    if (turning) return
+    if (recordOff || !ready?.today) return
     const repId = passportRep?.id
-    if (!ready?.today || !pathname.startsWith('/passport')) {
+    if (!pathname.startsWith('/passport')) {
       app.record(repId)
       return
     }
@@ -115,7 +135,7 @@ export function DemoPanel({ open, onClose }: Props) {
 
         {ready && (
           <div className="demo__record">
-            <button type="button" className="btn" onClick={onRecord} disabled={app.recorded || turning || !ready.today}>
+            <button type="button" className="btn" onClick={onRecord} aria-disabled={recordOff || undefined}>
               Record today’s attendance
             </button>
             <p className="demo__help" aria-live="polite">
@@ -129,7 +149,7 @@ export function DemoPanel({ open, onClose }: Props) {
         )}
 
         <div className="demo__reset">
-          <button type="button" className="btn btn--quiet" onClick={app.reset} disabled={!ready}>
+          <button ref={resetRef} type="button" className="btn btn--quiet" onClick={app.reset} disabled={!ready}>
             Reset demo
           </button>
           <p className="demo__help" role="status">
@@ -144,20 +164,20 @@ export function DemoPanel({ open, onClose }: Props) {
           </p>
         </div>
 
+        {/* Toggle buttons, not radios: a radio keeps the arrow keys, so turning
+            a page after a preview used to flip the app to Loading or Error. */}
         <fieldset className="seg demo__states">
           <legend>Data states</legend>
           {PREVIEWS.map((p) => (
-            <span key={p.value}>
-              <input
-                type="radio"
-                name="preview"
-                id={`preview-${p.value}`}
-                value={p.value}
-                checked={app.preview === p.value}
-                onChange={() => app.setPreview(p.value)}
-              />
-              <label htmlFor={`preview-${p.value}`}>{p.label}</label>
-            </span>
+            <button
+              key={p.value}
+              type="button"
+              className="demo__state"
+              aria-pressed={app.preview === p.value}
+              onClick={() => app.setPreview(p.value)}
+            >
+              {p.label}
+            </button>
           ))}
         </fieldset>
 

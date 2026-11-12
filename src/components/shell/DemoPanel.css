@@ -58,6 +58,29 @@
 .demo__states { grid-area: states; align-items: center; }
 .demo__states legend { float: left; margin-right: var(--space-sm); padding-top: var(--space-xs); }
 
+/* The data states are toggle buttons dressed like the segmented radios, so
+   the arrow keys stay free to turn pages. Pressed is the black fill. */
+.demo__state {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--control-height);
+  padding: 0 var(--space-sm);
+  border: 1px solid var(--color-muted);
+  border-radius: var(--radius-input);
+  background: var(--color-page);
+  color: var(--color-ink);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--dur-micro) var(--ease-out);
+}
+@media (hover: hover) { .demo__state:hover { background: var(--color-paper-2); } }
+.demo__state[aria-pressed="true"] { background: var(--color-ink); border-color: var(--color-ink); color: var(--color-page); }
+.demo__state:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.demo__state:active { transform: translateY(1px); }
+.demo__state:disabled { opacity: 0.55; cursor: not-allowed; }
+
 .demo__warn {
   grid-column: 1 / -1;
   font-size: var(--text-sm);
@@ -72,4 +95,16 @@
   .demo__record, .demo__reset { padding-top: 0; }
   .demo__record { grid-template-columns: minmax(0, 1fr); justify-items: start; }
   .demo__states legend { float: none; padding-top: 0; }
+}
+
+@media (max-width: 40rem) { .demo__state { padding: 0 var(--space-xs); } }
+
+/* High contrast drops the black fill, so the pressed state takes the
+   system highlight instead. */
+@media (forced-colors: active) {
+  .demo__state[aria-pressed="true"] { forced-color-adjust: none; background: Highlight; border-color: Highlight; color: HighlightText; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .demo__state { transition: background-color var(--dur-short) linear; }
 }
