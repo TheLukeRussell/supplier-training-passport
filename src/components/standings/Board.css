@@ -50,7 +50,8 @@
   line-height: 1;
   white-space: nowrap;
 }
-.board__row.is-you .board__rank { color: var(--color-accent); }
+.board__row.is-you .board__rank { color: var(--color-board-signal); }
+.board .tag--you { background: var(--color-board-signal); color: var(--color-board-signal-ink); }
 
 .board__rep { font-weight: 700; }
 .board__rep .tag { margin-left: var(--space-xs); }
@@ -82,14 +83,14 @@
 /* The cut line. */
 .board__cut td {
   padding: var(--space-xs) 0;
-  border-bottom: 2px dashed var(--color-accent);
+  border-bottom: 2px dashed var(--color-board-signal);
 }
 .board__cut-label {
   display: inline-block;
   padding: var(--space-3xs) var(--space-xs);
   border-radius: var(--radius-input);
-  background: var(--color-accent);
-  color: var(--color-accent-ink);
+  background: var(--color-board-signal);
+  color: var(--color-board-signal-ink);
   font-size: var(--text-sm);
   font-weight: 700;
 }
@@ -108,7 +109,7 @@
   text-transform: uppercase;
 }
 .board-empty__text { color: var(--color-field-muted); }
-.board-empty__action { margin-top: var(--space-xs); background: var(--color-accent); color: var(--color-accent-ink); border-color: var(--color-accent); }
+.board-empty__action { margin-top: var(--space-xs); background: var(--color-board-signal); color: var(--color-board-signal-ink); border-color: var(--color-board-signal); }
 @media (hover: hover) { .board-empty__action:hover { background: var(--color-field-ink); } }
 
 /* Phones: one block per rep. Rank down the left, name and rate on top, the

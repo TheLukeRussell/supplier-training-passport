@@ -29,7 +29,7 @@
   border-radius: var(--radius-page);
   background: var(--color-field);
   color: var(--color-field-ink);
-  --color-focus: var(--color-focus-on-field);
+  --color-focus: var(--color-board-signal);
 }
 
 @media (max-width: 40rem) {

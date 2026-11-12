@@ -42,7 +42,6 @@ export function StandingsScreen() {
     <div className="standings container">
       <header className="standings__head">
         <h1 className="standings__title">Standings</h1>
-        <span className="accent-bar" aria-hidden="true" />
         <p className="standings__sub">
           Ranked by rate: trainings attended out of trainings invited to. The dashed line on the board is the President's Club line.
         </p>
