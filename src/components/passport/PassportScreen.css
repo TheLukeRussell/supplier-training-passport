@@ -92,7 +92,7 @@
 .passport__turn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
 
 @media (max-width: 59.99rem) {
-  .passport { grid-template-areas: "book" "bar"; }
+  .passport { grid-template-areas: "book" "bar"; --picker-line: 28px; }
   .passport__stage { grid-area: book; }
   .passport__controls {
     grid-area: bar;
@@ -107,7 +107,7 @@
   }
   /* The page label takes the bottom line of the bar's middle, under the
      picker. A long label on a narrow phone wraps and the bar grows. */
-  .passport__where { align-self: end; padding-top: 26px; font-size: var(--text-xs); line-height: 16px; }
+  .passport__where { align-self: end; padding-top: var(--picker-line); font-size: var(--text-xs); line-height: 16px; }
 
   /* The picker lies over the bar: same grid cell, stuck the same way, a
      layer up. It's the bar's height less its padding, so it moves with
@@ -128,7 +128,7 @@
   }
   .passport .picker__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   .passport .picker__box { max-width: 100%; pointer-events: auto; }
-  .passport .picker__select { height: 28px; font-size: var(--text-sm); }
+  .passport .picker__select { height: var(--picker-line); font-size: var(--text-sm); }
 }
 
 /* Short phones, which is most of them once Safari's bars are counted. The

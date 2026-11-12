@@ -1,7 +1,7 @@
-/* The "Passport of" picker. A quiet control: the name in bold with a
-   chevron, and no box until you point at it. On a wide screen it sits small
-   above the book. On a phone PassportScreen.css lays it over the page bar,
-   on the line above the page label, so it costs no height. */
+/* The "Passport of" picker: a small field with the name in bold and a
+   chevron. On a wide screen it sits above the book. On a phone
+   PassportScreen.css lays it over the page bar, on the line above the page
+   label, so it costs no height. */
 
 .picker {
   display: flex;
@@ -26,10 +26,10 @@
   right: var(--space-sm);
   width: 7px;
   height: 7px;
-  margin-top: -6px;
   border: solid var(--color-ink);
   border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
+  /* Up a touch, so the point of the V sits on the middle of the name. */
+  transform: translateY(-70%) rotate(45deg);
   pointer-events: none;
 }
 
@@ -43,9 +43,9 @@
   height: 36px;
   margin: 0;
   padding: 0 calc(var(--space-sm) + 16px) 0 var(--space-sm);
-  border: 1px solid transparent;
+  border: 1px solid var(--color-muted);
   border-radius: var(--radius-input);
-  background: transparent;
+  background: var(--color-page);
   color: var(--color-ink);
   font: 700 var(--text-md)/1.2 var(--font-body);
   text-overflow: ellipsis;
