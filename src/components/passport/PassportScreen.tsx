@@ -97,14 +97,13 @@ export function PassportScreen() {
 
   const row = board.find((r) => r.rep.id === rep.id)!
   const rankedCount = board.filter((r) => r.rank !== null).length
-  const tied = row.rank !== null && board.filter((r) => r.rank === row.rank).length > 1
   const landing = app.landing.has(rep.email)
 
   const render = (p: number, still: boolean) => {
     if (p === 0) return <Cover rep={rep} still={still} onOpen={() => goToView(viewForPage(DATA_PAGE, spread))} />
     if (p === 1) return <NotesPage />
     if (p === BACK_COVER) return <BackCover rep={rep} still={still} onFront={() => goToView(0)} />
-    if (p === 2) return <DataPage rep={rep} row={row} rankedCount={rankedCount} tied={tied} ctx={ctx} />
+    if (p === 2) return <DataPage rep={rep} row={row} rankedCount={rankedCount} ctx={ctx} />
     return (
       <VisaPage
         page={p}

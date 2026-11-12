@@ -15,11 +15,10 @@ interface Props {
   rep: Rep
   row: StandingRow
   rankedCount: number
-  tied: boolean
   ctx: Context
 }
 
-export function DataPage({ rep, row, rankedCount, tied, ctx }: Props) {
+export function DataPage({ rep, row, rankedCount, ctx }: Props) {
   const { stats, rank } = row
   const percent = stats.rate === null ? null : percentOf(stats.rate)
   const message = lineMessage(stats, ctx)
@@ -131,7 +130,7 @@ export function DataPage({ rep, row, rankedCount, tied, ctx }: Props) {
                   <span className="data__of">
                     {' '}
                     of {rankedCount}
-                    {tied ? ', tied' : ''}
+                    {row.tied ? ', tied' : ''}
                   </span>
                 </span>
               )}

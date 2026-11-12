@@ -154,7 +154,6 @@ export function Board({ rows, viewAsId, team, query, onClear }: Props) {
         <tbody ref={bodyRef} role="rowgroup">
           {rows.map((row, i) => {
             const you = row.rep.id === viewAsId
-            const tied = row.rank !== null && rows.filter((r) => r.rank === row.rank).length > 1
             const status = row.rank === null ? 'Unranked' : row.above ? 'Above' : 'Below'
             return (
               <Fragment key={row.rep.id}>
@@ -172,8 +171,8 @@ export function Board({ rows, viewAsId, team, query, onClear }: Props) {
                       </>
                     ) : (
                       <>
-                        {tied && <span className="visually-hidden">Tied </span>}
-                        {tied ? 'T' : ''}
+                        {row.tied && <span className="visually-hidden">Tied </span>}
+                        {row.tied ? 'T' : ''}
                         {row.rank}
                       </>
                     )}
