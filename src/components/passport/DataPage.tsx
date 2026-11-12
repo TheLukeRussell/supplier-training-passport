@@ -135,9 +135,9 @@ export function DataPage({ rep, row, rankedCount, tied, ctx }: Props) {
               {stats.next ? (
                 <>
                   <span className="data__next-name">{stats.next.supplier}</span>
-                  <span>
+                  <span className="data__next-date">
                     {shortDate(stats.next.date)}
-                    {stats.next.date === ctx.today && <span className="tag tag--today data__today">Today</span>}
+                    {stats.next.date === ctx.today && <span className="tag tag--today">Today</span>}
                   </span>
                 </>
               ) : (
