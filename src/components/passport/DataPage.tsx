@@ -76,7 +76,7 @@ export function DataPage({ rep, row, rankedCount, ctx }: Props) {
         <dl className="data__fields">
           <div className="data__field">
             <dt>Team</dt>
-            <dd>{rep.team}</dd>
+            <dd className="data__team">{rep.team}</dd>
           </div>
           <div className="data__field">
             <dt>Rep ID</dt>

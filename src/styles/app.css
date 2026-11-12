@@ -151,7 +151,8 @@
 .seg input:disabled + label { opacity: 0.55; cursor: not-allowed; }
 
 @media (max-width: 40rem) {
-  /* Five team choices fit one row on a phone with a little less padding. */
+  /* Six team choices take two rows on a phone, even at 320px, with a
+     little less padding. */
   .seg label { padding: 0 var(--space-xs); }
 }
 

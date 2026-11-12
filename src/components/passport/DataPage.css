@@ -68,6 +68,9 @@
   line-height: 1.05;
 }
 .data__id { font-variant-numeric: tabular-nums; }
+/* "Communications" is a hair too wide for half the page on a 320px phone.
+   Hyphenate it there instead of breaking off a bare "s". */
+.data__team { -webkit-hyphens: auto; hyphens: auto; }
 /* The names are display type, so they keep display leading rather than the
    field rule's 1.3. */
 .data__names .data__name { line-height: 1.05; }

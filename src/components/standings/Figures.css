@@ -1,9 +1,12 @@
 /* Three figures that compare, parted by hairlines. Big scoreboard numerals,
    the unit right after so each number says what it counts. */
 
+/* Columns start from their content, then share what's left, so a long team
+   name in a unit ("across ranked Communications reps") takes room from
+   the short ones instead of wrapping. */
 .figures {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, auto);
   margin: 0;
 }
 

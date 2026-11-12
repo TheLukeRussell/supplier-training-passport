@@ -138,7 +138,8 @@
 }
 
 /* Phones: one block per rep. Rank down the left, name and rate on top, the
-   rest as small labelled pairs underneath. */
+   team under the name, then stamps and streak. Rate, status and movement
+   stack down the right. */
 @media (max-width: 47.99rem) {
   /* Kept for screen readers, but every header cell collapses too, so none of
      them lays out past the edge of a phone. */
@@ -150,13 +151,15 @@
     /* Fixed shares, so the columns line up from row to row. Values never
        split ("10 of 11" stays together); on the narrowest phones the label
        wraps above its value instead of running into the next column. The
-       last column is fixed too, wide enough for "Unranked" and "100%", so
-       a wide rate or status can't nudge one row's middle columns over. */
-    grid-template-columns: 3rem minmax(0, 1fr) minmax(0, 1.3fr) 4rem;
+       team gets both middle columns, since "Communications" alone is wider
+       than one of them. The last column is fixed too, wide enough for
+       "Unranked" and "100%", so a wide rate or status can't nudge one
+       row's middle columns over. */
+    grid-template-columns: 3rem minmax(0, 1.3fr) minmax(0, 1fr) 4rem;
     grid-template-areas:
       "rank rep rep rate"
-      "rank team stamps status"
-      "rank change streak streak";
+      "rank team team status"
+      "rank stamps streak change";
     gap: var(--space-2xs) var(--space-xs);
     padding: var(--space-sm) var(--space-xs);
     border-bottom: 1px solid var(--color-board-rule);
@@ -170,7 +173,7 @@
   .board__team { grid-area: team; }
   .board__stamps { grid-area: stamps; }
   .board__status { grid-area: status; text-align: right; }
-  .board__change { grid-area: change; }
+  .board__change { grid-area: change; text-align: right; }
   .board__streak { grid-area: streak; }
   .board__team, .board__stamps, .board__streak, .board__status, .board__change { font-size: var(--text-sm); }
   /* Here the values are Ink and the little labels are the quiet part. */

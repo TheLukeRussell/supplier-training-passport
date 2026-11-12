@@ -65,7 +65,8 @@
 .podium__name:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 .podium__name:active { opacity: 0.85; }
 
-.podium__meta { font-size: var(--text-sm); color: var(--color-board-muted); }
+/* A long team name hyphenates on a narrow step instead of running past it. */
+.podium__meta { font-size: var(--text-sm); color: var(--color-board-muted); overflow-wrap: break-word; -webkit-hyphens: auto; hyphens: auto; }
 .podium__rate {
   margin-top: auto;
   font-family: var(--font-display);

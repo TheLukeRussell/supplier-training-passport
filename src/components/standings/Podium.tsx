@@ -31,7 +31,8 @@ export function Podium({ rows, team }: Props) {
 
   return (
     <div className="podium">
-      <h2 className="podium__title">{team ? `${team}’s top three` : 'Top three'}</h2>
+      {/* "Top three in Communications" reads better than "Communications’s". */}
+      <h2 className="podium__title">{team ? `Top three in ${team}` : 'Top three'}</h2>
       <ol className="podium__steps">
         {/* The T comes from the full board, so a team's podium marks the
             same ties the All board does. */}
@@ -45,7 +46,8 @@ export function Podium({ rows, team }: Props) {
             <Link className="podium__name" to={`/passport/${row.rep.id}?page=${DATA_PAGE}`}>
               {row.rep.name}
             </Link>
-            <p className="podium__meta">{row.rep.team}</p>
+            {/* On a team filter the heading already says which team. */}
+            {!team && <p className="podium__meta">{row.rep.team}</p>}
             <p className="podium__rate">
               {percentOf(row.stats.rate ?? 0)}%
               <span className="podium__stamps">
