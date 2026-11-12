@@ -39,3 +39,11 @@ export const FOUR: FakeTraining[] = [
   { id: 't3', date: '2027-03-11' },
   { id: 't4', date: '2027-04-13' },
 ]
+
+// Six trainings with the last one on the demo's today, so there's enough
+// history to rank people (it takes three recorded) and still see them move.
+export const SIX: FakeTraining[] = [
+  ...FOUR,
+  { id: 't5', date: '2027-05-12' },
+  { id: 't6', date: '2027-06-17' },
+]

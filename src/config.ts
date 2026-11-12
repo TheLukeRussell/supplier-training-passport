@@ -5,6 +5,11 @@
 // This is a placeholder until leadership sets the real number.
 export const LINE = 0.75
 
+// Nobody gets a rank until this many of their trainings are recorded. One
+// or two is too few to mean anything: a new hire at 1 of 1 shouldn't tie
+// for first, and one at 0 of 1 shouldn't sit dead last.
+export const MIN_RECORDED = 3
+
 // The demo pretends today is this date. It's a training day, so passports
 // show a mix of stamped, missed and upcoming slots.
 export const DEMO_TODAY = '2027-06-17'

@@ -1,6 +1,7 @@
 // Standings math: rank reps by rate, share ranks on ties, work out how far
 // each rep moved since the last training, and the figures at the top.
 
+import { MIN_RECORDED } from '../config'
 import type { Model, Rep } from './model'
 import { isRecorded, meetsLine, recordedTrainings, repStats, tally, type Context, type RepStats } from './rules'
 
@@ -15,12 +16,12 @@ export function compareRates(a: Tally, b: Tally): number {
   return b.attended * a.recorded - a.attended * b.recorded
 }
 
-// Rank everyone who has something recorded. Ties share a rank (1, 2, 2, 4)
-// so nobody drops a spot because of the alphabet. Reps with nothing recorded
-// yet get null and sit at the bottom.
-export function rankTallies(items: { id: string; name: string; tally: Tally }[]): Map<string, number | null> {
+// Rank everyone with at least `min` trainings recorded. Ties share a rank
+// (1, 2, 2, 4) so nobody drops a spot because of the alphabet. Anyone short
+// of that gets null and sits at the bottom, unranked.
+export function rankTallies(items: { id: string; name: string; tally: Tally }[], min = MIN_RECORDED): Map<string, number | null> {
   const ranked = items
-    .filter((item) => item.tally.recorded > 0)
+    .filter((item) => item.tally.recorded >= Math.max(min, 1))
     .sort((a, b) => compareRates(a.tally, b.tally) || a.name.localeCompare(b.name))
   const ranks = new Map<string, number | null>()
   ranked.forEach((item, index) => {
@@ -38,8 +39,9 @@ export interface StandingRow {
   rep: Rep
   stats: RepStats
   rank: number | null
+  tied: boolean // shares its rank with someone, anywhere on the full board
   change: Change
-  above: boolean
+  above: boolean // ranked and at or over the line
 }
 
 function ranksFor(model: Model, counts: (trainingId: string) => boolean) {
@@ -69,6 +71,11 @@ export function standings(model: Model, ctx: Context): StandingRow[] {
   const beforeRanks = ranksFor(model, (id) => id !== latest?.id && recorded.some((t) => t.id === id))
   const hasHistory = recorded.length > 1
 
+  // How many reps hold each rank, so a tie reads the same on a team filter
+  // as it does on the full board.
+  const holders = new Map<number, number>()
+  for (const rank of nowRanks.values()) if (rank !== null) holders.set(rank, (holders.get(rank) ?? 0) + 1)
+
   const rows = model.reps.map((rep): StandingRow => {
     const stats = repStats(model, rep, ctx)
     const rank = nowRanks.get(rep.id) ?? null
@@ -76,8 +83,10 @@ export function standings(model: Model, ctx: Context): StandingRow[] {
       rep,
       stats,
       rank,
+      tied: rank !== null && holders.get(rank)! > 1,
       change: changeFor(rank, beforeRanks.get(rep.id) ?? null, hasHistory),
-      above: meetsLine(stats.rate, ctx.line),
+      // Unranked reps don't count toward the line on the board, even at 1 of 1.
+      above: rank !== null && meetsLine(stats.rate, ctx.line),
     }
   })
 
@@ -99,8 +108,9 @@ export interface Figures {
 }
 
 // The three numbers at the top of Standings, for whatever rows are showing.
+// Only ranked reps count toward the line and the average.
 export function figuresFor(rows: StandingRow[], model: Model, ctx: Context): Figures {
-  const ranked = rows.filter((row) => row.stats.rate !== null)
+  const ranked = rows.filter((row) => row.rank !== null)
   const sum = ranked.reduce((total, row) => total + (row.stats.rate ?? 0), 0)
   return {
     above: rows.filter((row) => row.above).length,
