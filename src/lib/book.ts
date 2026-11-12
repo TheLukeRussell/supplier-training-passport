@@ -9,6 +9,8 @@ import type { Training } from './model'
 export const PAGE_COUNT = 6 // inside pages
 export const DATA_PAGE = 2
 export const BACK_COVER = PAGE_COUNT + 1
+// How long a page turn takes, matching --dur-turn.
+export const TURN_MS = 640
 
 export interface PageInfo {
   page: number

@@ -3,7 +3,7 @@
 // get there (or just swaps, under reduced motion).
 
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
-import { ALL_PAGES, pagesInView, viewCount } from '../../lib/book'
+import { ALL_PAGES, TURN_MS, pagesInView, viewCount } from '../../lib/book'
 import './Book.css'
 
 interface Props {
@@ -22,7 +22,6 @@ interface Turn {
   spread: boolean
 }
 
-const TURN_MS = 640
 const EASE = 'cubic-bezier(0.65, 0, 0.35, 1)'
 
 export function Book({ view, spread, reduced, render }: Props) {

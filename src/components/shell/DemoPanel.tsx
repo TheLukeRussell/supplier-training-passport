@@ -2,13 +2,13 @@
 // attendance, reset (with undo), and preview the loading, empty and error
 // states. None of this ships in the real version.
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 import { TEAMS } from '../../config'
 import { firstName, shortDate } from '../../lib/format'
-import { pageForTraining } from '../../lib/book'
+import { TURN_MS, pageForTraining, parsePage, viewForPage } from '../../lib/book'
 import { useApp, type Preview } from '../../state/AppState'
-import { useReducedMotion } from '../../state/useMedia'
+import { useReducedMotion, useSpread } from '../../state/useMedia'
 import './DemoPanel.css'
 
 interface Props {
@@ -26,9 +26,12 @@ const PREVIEWS: { value: Preview; label: string }[] = [
 export function DemoPanel({ open, onClose }: Props) {
   const app = useApp()
   const reduced = useReducedMotion()
+  const spread = useSpread()
   const { ready } = app
   const navigate = useNavigate()
-  const { pathname } = useLocation()
+  const { pathname, search } = useLocation()
+  // True from the click until the turn lands and today actually gets recorded.
+  const [turning, setTurning] = useState(false)
   // On a passport, "the current rep" is the one whose passport is open,
   // which may not be the rep in the View as box.
   const passportId = /^\/passport\/([^/]+)/.exec(pathname)?.[1]
@@ -51,17 +54,34 @@ export function DemoPanel({ open, onClose }: Props) {
   }
 
   const onRecord = () => {
-    app.record(passportRep?.id)
+    if (turning) return
+    const repId = passportRep?.id
+    if (!ready?.today || !pathname.startsWith('/passport')) {
+      app.record(repId)
+      return
+    }
     // Recording from a passport turns to the page with today's slot, so you
     // actually see the stamp land. On a phone this panel pushes the book down
     // the screen, so bring the book up first and the turn plays in view.
-    if (ready?.today && pathname.startsWith('/passport')) {
-      const book = document.querySelector('.passport')
-      if (book && book.getBoundingClientRect().top > window.innerHeight * 0.4) {
-        book.scrollIntoView({ block: 'start', behavior: reduced ? 'auto' : 'smooth' })
-      }
-      navigate(`${pathname}?page=${pageForTraining(ready.today)}`, { replace: true })
+    const book = document.querySelector('.passport')
+    if (book && book.getBoundingClientRect().top > window.innerHeight * 0.4) {
+      book.scrollIntoView({ block: 'start', behavior: reduced ? 'auto' : 'smooth' })
     }
+    const target = pageForTraining(ready.today)
+    const there = viewForPage(parsePage(new URLSearchParams(search).get('page')), spread) === viewForPage(target, spread)
+    navigate(`${pathname}?page=${target}`, { replace: true })
+    // Record only once the page has turned. Recording first showed the new
+    // numbers and today's stamp on the moving paper, then the stamper came
+    // down on a slot that was already inked.
+    if (there || reduced) {
+      app.record(repId)
+      return
+    }
+    setTurning(true)
+    window.setTimeout(() => {
+      app.record(repId)
+      setTurning(false)
+    }, TURN_MS + 80)
   }
 
   return (
@@ -95,7 +115,7 @@ export function DemoPanel({ open, onClose }: Props) {
 
         {ready && (
           <div className="demo__record">
-            <button type="button" className="btn" onClick={onRecord} disabled={app.recorded || !ready.today}>
+            <button type="button" className="btn" onClick={onRecord} disabled={app.recorded || turning || !ready.today}>
               Record today’s attendance
             </button>
             <p className="demo__help" aria-live="polite">

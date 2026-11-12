@@ -40,12 +40,18 @@ export function VisaPage({ page, model, rep, ctx, stats, landing, onLanded, onOp
     const month = Number(t.date.slice(5, 7))
     return month >= first && month <= last
   })
-  const states = trainings.map((t) => slotState(model, rep, t, ctx))
-  const invitedHere = states.some((s) => s !== 'not-invited')
+  const recorded = trainings.map((t) => slotState(model, rep, t, ctx))
+  const invitedHere = recorded.some((s) => s !== 'not-invited')
 
   const todayIndex = trainings.findIndex((t) => t.date === ctx.today)
   const today = todayIndex === -1 ? null : trainings[todayIndex]
-  const note = today ? endorsement(stats, states[todayIndex], today) : null
+  // A stamp that hasn't landed yet stays off the paper while it's moving
+  // (and off the hidden sizer copy): today's slot looks the way it did
+  // before recording and the endorsement keeps its room but stays hidden.
+  // The stamper is the only thing that ever inks it.
+  const waiting = landing && still && today !== null && recorded[todayIndex] === 'stamped'
+  const states = waiting ? recorded.map((s, i) => (i === todayIndex ? 'today' : s)) : recorded
+  const note = today && !waiting ? endorsement(stats, states[todayIndex], today) : null
   // Until today is recorded there's no endorsement yet, but the page keeps
   // the room for one (and the slot keeps room for its stamp, see VisaSlot),
   // so recording never makes the book grow mid-turn.
