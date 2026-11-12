@@ -7,8 +7,8 @@ import { describe, expect, it } from 'vitest'
 import { DEMO_SEED, DEMO_TODAY, DEMO_TODAY_SHARE, LINE, MIN_RECORDED, SUPPLIERS, TEAMS } from '../config'
 import type { AttendanceRow } from '../data/types'
 import { pickDefaultRep, pickTodayAttendees } from './demo'
-import { buildModel, findRep, withAttendance, type Rep } from './model'
-import { standings } from './ranking'
+import { buildModel, entryFor, findRep, withAttendance, type Rep } from './model'
+import { figuresFor, standings } from './ranking'
 import { repStats, type Context } from './rules'
 
 const rows: AttendanceRow[] = JSON.parse(readFileSync(join(process.cwd(), 'public/data/attendance.json'), 'utf8'))
@@ -83,11 +83,42 @@ describe('sample data', () => {
     expect(share).toBeLessThan(0.6)
   })
 
-  it('opens the demo as a rep who crosses the line once today is recorded', () => {
+  it('opens the demo as Hannah, 15th, who crosses the line once today is recorded', () => {
     const rep = pickDefaultRep(model, ctx)!
+    expect(rep.name).toBe('Hannah Kowalski')
+    expect(rowOf(board, rep.name).rank).toBe(15)
     expect(repStats(model, rep, ctx).toLine.kind).toBe('needs')
     const after = recordAs(rep)
     expect(repStats(after.model, rep, after.ctx).toLine.kind).toBe('above')
+    expect(rowOf(after.board, rep.name)).toMatchObject({ rank: 13, tied: true, above: true })
+  })
+})
+
+describe("after Record on Hannah's passport", () => {
+  const hannah = pickDefaultRep(model, ctx)!
+  const after = recordAs(hannah)
+
+  it('puts more reps above the line, and nobody who was above falls under it', () => {
+    const before = figuresFor(board, model, ctx)
+    const now = figuresFor(after.board, after.model, after.ctx)
+    expect(now.above).toBeGreaterThan(before.above)
+    expect(now.averageRate!).toBeGreaterThanOrEqual(before.averageRate!)
+    const fell = board.filter((r) => r.above && !rowOf(after.board, r.rep.name).above).map((r) => r.rep.name)
+    expect(fell).toEqual([])
+  })
+
+  it('keeps the story: Jordan perfect in 1st, Marcus and Priya tied 2nd', () => {
+    expect(rowOf(after.board, 'Jordan Hale')).toMatchObject({ rank: 1, tied: false })
+    expect(rowOf(after.board, 'Jordan Hale').stats.rate).toBe(1)
+    expect(rowOf(after.board, 'Marcus Bell')).toMatchObject({ rank: 2, tied: true })
+    expect(rowOf(after.board, 'Priya Natarajan')).toMatchObject({ rank: 2, tied: true })
+  })
+
+  it('marks about two thirds of the reps invited today', () => {
+    const invited = model.reps.filter((r) => entryFor(model, r, today.id).invited)
+    const share = after.emails.length / invited.length
+    expect(share).toBeGreaterThan(0.6)
+    expect(share).toBeLessThan(0.72)
   })
 })
 
@@ -105,6 +136,7 @@ describe('the new hire after Record', () => {
     const row = rowOf(after, clara.name)
     expect([row.stats.attended, row.stats.recorded]).toEqual([1, 1])
     expect(row).toMatchObject({ rank: null, above: false, change: { kind: 'none' } })
+    // Nobody else's rank is touched by her stamp.
     expect(after.filter((r) => r.rank === 1).map((r) => r.rep.name)).toEqual(['Jordan Hale'])
   })
 })

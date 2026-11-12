@@ -82,14 +82,21 @@ test('the demo flow works end to end', async ({ page }, info) => {
   await expect(page.locator('.stamper')).toHaveCount(0, { timeout: 5000 })
   await page.goto('./#/passport/hannah-kowalski?page=2')
   await expect(shown(page).getByText('Right on the line', { exact: true })).toBeVisible()
+  await expect(shown(page).locator('.data__stat').filter({ hasText: 'Rank' })).toContainText('13th of 29, tied')
 
-  // Standings picked it up.
+  // Standings picked it up. One more rep is above the line, and the new
+  // hire, who missed today, is still unranked rather than last.
   await page.getByRole('link', { name: 'Standings' }).click()
   const hannah = page.locator('[data-rep="hannah-kowalski"]')
-  await expect(hannah.locator('.board__rank')).toHaveText('13')
+  await expect(hannah.locator('.board__rank')).toHaveText('Tied T13')
   await expect(hannah.locator('.board__status')).toHaveText('Above')
   await expect(hannah).toContainText('You')
+  await expect(page.locator('.figures__value').nth(0)).toHaveText('15')
+  await expect(page.locator('.figures__unit').nth(0)).toHaveText('of 29 ranked reps')
   await expect(page.locator('.figures__value').nth(2)).toHaveText('12')
+  const clara = page.locator('[data-rep="clara-dubois"]')
+  await expect(clara.locator('.board__stamps')).toHaveText('0 of 1')
+  await expect(clara.locator('.board__status')).toHaveText('Unranked')
 
   // Filter by team, then search for nobody.
   await page.locator('label[for="team-west"]').click()
@@ -98,6 +105,10 @@ test('the demo flow works end to end', async ({ page }, info) => {
   await expect(page.locator('[data-rep]')).toHaveCount(8)
   const teams = await page.locator('[data-rep] .board__team').allTextContents()
   expect(teams.every((t) => t.includes('West'))).toBe(true)
+  // Naomi is the only West rep at 4th, but she's tied with two Canada reps
+  // on the full board, so she keeps her T here and on the podium.
+  await expect(page.locator('[data-rep="naomi-feld"] .board__rank')).toHaveText('Tied T4')
+  await expect(page.locator('.podium__step--first .podium__rank')).toHaveText('Rank T4')
   await page.getByLabel('Search by name').fill('zzz')
   await expect(page.getByText('Nobody named “zzz” on West')).toBeVisible()
   await page.getByRole('button', { name: 'Clear search' }).click()
@@ -112,6 +123,7 @@ test('the demo flow works end to end', async ({ page }, info) => {
   await page.getByRole('button', { name: 'Reset demo' }).click()
   await expect(page.getByRole('button', { name: 'Undo' })).toBeVisible()
   await expect(page.locator('.figures__value').nth(2)).toHaveText('11')
+  await expect(page.locator('.figures__value').nth(0)).toHaveText('14')
   await expect(page.getByRole('button', { name: "Record today’s attendance" })).toBeEnabled()
   await page.getByRole('button', { name: 'Undo' }).click()
   await expect(page.locator('.figures__value').nth(2)).toHaveText('12')
@@ -119,13 +131,19 @@ test('the demo flow works end to end', async ({ page }, info) => {
   await expect(page.locator('.figures__value').nth(2)).toHaveText('11')
 
   // Recording from someone else's passport stamps that passport, not the
-  // rep in the View as box, and Standings then highlights them.
+  // rep in the View as box, and Standings then highlights them. The new
+  // hire's first stamp puts her at 1 of 1, which still isn't a rank.
   await page.goto('./#/passport/clara-dubois?page=4')
   await page.getByRole('button', { name: /^Record today.s attendance/ }).click()
   await expect(page.getByRole('button', { name: /^Pioneer, Thu, Jun 17, virtual\. Attended/ })).toBeVisible()
   await expect(shown(page).locator('.visa__endorse')).toContainText('Stamped')
+  await page.goto('./#/passport/clara-dubois?page=2')
+  await expect(shown(page).locator('.data__stat').filter({ hasText: 'Rank' })).toContainText('Not yet 2 more trainings to go')
   await page.getByRole('link', { name: 'Standings' }).click()
-  await expect(page.locator('[data-rep="clara-dubois"]')).toContainText('You')
+  await expect(clara).toContainText('You')
+  await expect(clara.locator('.board__status')).toHaveText('Unranked')
+  await expect(page.locator('.podium__step--first .podium__name')).toHaveText('Jordan Hale')
+  await expect(page.locator('.podium__rank').first()).toHaveText('Rank 1')
 })
 
 test('the app still works when storage is blocked', async ({ page }) => {
@@ -142,6 +160,7 @@ test('the app still works when storage is blocked', async ({ page }) => {
   await expect(page.getByText('This browser is blocking storage')).toBeVisible()
   await page.getByRole('button', { name: "Record today’s attendance" }).click()
   await expect(page.locator('.figures__value').nth(2)).toHaveText('12')
+  await expect(page.locator('.figures__value').nth(0)).toHaveText('15')
 })
 
 // Grab-to-tilt. With a mouse, drag the cover: it tilts, the foil lights up,

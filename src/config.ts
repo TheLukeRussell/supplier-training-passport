@@ -42,7 +42,10 @@ export const DEMO_TODAY_SHARE = 0.65
 
 // Seeds for anything random. Same seed, same sample data, every time.
 export const DATA_SEED = 2027
-export const DEMO_SEED = 617
+// DEMO_SEED picks who else shows up today. With 2122 nobody falls under the
+// line today, so the count goes up when Hannah crosses instead of down.
+export const DEMO_SEED = 2122
 
-// Key for demo changes in localStorage.
-export const STORAGE_KEY = 'stp-demo-v1'
+// Key for demo changes in localStorage. A saved recording keeps the names of
+// who showed up, so bump this when DEMO_SEED changes or the old ones come back.
+export const STORAGE_KEY = 'stp-demo-v2'
