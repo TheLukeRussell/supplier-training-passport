@@ -52,3 +52,9 @@
   .standings__search { width: 100%; }
   .scoreboard { gap: var(--space-lg); padding: var(--space-lg) var(--space-sm) var(--space-sm); margin-inline: calc(-1 * var(--space-xs)); }
 }
+
+/* High contrast: the picked team takes the system highlight, the same as
+   the shared rule in app.css, which this file's own fill would beat. */
+@media (forced-colors: active) {
+  .standings__tools .seg input:checked + label { background: Highlight; border-color: Highlight; color: HighlightText; }
+}
