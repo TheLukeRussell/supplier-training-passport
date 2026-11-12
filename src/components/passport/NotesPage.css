@@ -1,6 +1,10 @@
 /* Inside cover: three rules as a real numbered list, then a key that uses
    the same slot styles the visa pages do. */
 
+/* The laminate runs all the way down to the page number, not just under the
+   key, so the whole page catches the light. */
+.page--notes .laminated { flex: 1; }
+
 .notes__title {
   font-size: var(--text-2xl);
   font-weight: var(--display-weight);

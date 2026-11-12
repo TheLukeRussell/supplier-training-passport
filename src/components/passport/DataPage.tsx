@@ -8,6 +8,7 @@ import { mrzLines } from '../../lib/mrz'
 import type { Rep } from '../../lib/model'
 import type { StandingRow } from '../../lib/ranking'
 import { percentOf, type Context } from '../../lib/rules'
+import { Laminate } from './Laminate'
 import { Page } from './Page'
 import './DataPage.css'
 
@@ -41,7 +42,7 @@ export function DataPage({ rep, row, rankedCount, tied, ctx }: Props) {
           zone. It lays out just like the page body, and it's the box the
           laminate covers, so the film stops short of the strip and the
           page number. */}
-      <div className="data__viz">
+      <Laminate>
         <header className="data__head">
           <h2 className="data__title">Passport</h2>
           <dl className="data__codes">
@@ -153,13 +154,7 @@ export function DataPage({ rep, row, rankedCount, tied, ctx }: Props) {
           <p className="data__line-sub">{message.sub}</p>
           <p className="data__line-note">The line is {Math.round(LINE * 100)}% for now (placeholder).</p>
         </div>
-
-        {/* The laminate: a clear film printed with fine gold waves that
-            only catch the light while the page tilts or turns. Paint only. */}
-        <span className="data__laminate" aria-hidden="true">
-          <span className="data__light" />
-        </span>
-      </div>
+      </Laminate>
 
       {/* Two lines of 44 on a wide page. On a phone the spans run inline and
           break anywhere, so the strip wraps to three lines and stays 16px. */}

@@ -1,0 +1,157 @@
+/* The laminate on the inside cover and the data page. A real data page sits
+   under a clear film printed with fine security lines that you barely see
+   straight on and that light up as you tilt the page. This is that film, in
+   the cover's gold, and the same film goes on the inside cover so the first
+   spread catches the light on both sides. Visa pages stay matte. */
+
+/* The part of the page the film covers. Same column, same gap as the page
+   body around it, so nothing moves. It's its own stacking layer, so the film
+   can sit over the paper but under the type. */
+.laminated {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  gap: inherit;
+  min-width: 0;
+}
+
+/* The film. It's built inside out: a faint gold fill and a band of light
+   lie on the paper (.laminate__gold), and over them sits a sheet of the
+   paper's own colour with the waves cut out of it. Through the cuts you
+   see the gold, so at rest the print is just there and the band lights it
+   up as it passes. That looks the same as gold waves masked onto the
+   paper, but nothing that moves sits under a mask. With the band inside a
+   masked box, Chrome redrew the whole masked box every frame, and with a
+   film on both pages of a spread it dropped to about 30fps.
+   The sheet never moves and never changes. Only the band does, by
+   transform, and it fades by opacity. While the book is held, useTilt.ts
+   writes --tilt-x, --tilt-y (-1 to 1) and --shine (0 to 1) on the band
+   alone. Any style change on the masked sheet, even a custom property,
+   makes Safari repaint it.
+   It sits on the paper, under the type. Gold on the off-white paper only
+   darkens it, and every letter, the photo box, the Today tag and the line
+   box paint over it, so it never touches the text itself. No blend mode:
+   Chrome makes one expensive while the book tilts.
+   Paint only: no room, no clicks. */
+.laminate {
+  /* How dark the band gets at full shine. Grey labels on lit paper are the
+     closest call, and they stay well above AA. */
+  --lam-peak: 0.5;
+  position: absolute;
+  /* Out to the edges of the paper (the page's own padding, see Page.css),
+     starting below its rounded top corners so the square sheet never pokes
+     past them, and a little way into the gap below, above the strip or the
+     page number. */
+  inset: calc(var(--radius-page) - var(--space-lg)) calc(-1 * var(--space-lg)) calc(-1 * var(--space-xs));
+  pointer-events: none;
+  z-index: -1;
+}
+/* The gold under the sheet, clipped a hair inside it. Where the two edges
+   met, the tilted sheet's soft edge let a thin line of the band through. */
+.laminate__gold {
+  position: absolute;
+  inset: 2px;
+  overflow: clip;
+  background-color: color-mix(in srgb, var(--color-foil) 7%, transparent);
+}
+/* The sheet: paper everywhere except the waves, which fade in at the top
+   and out again at the bottom, so the film has no hard edge. */
+.laminate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: var(--color-page);
+  -webkit-mask:
+    linear-gradient(var(--color-ink) 0 0),
+    var(--laminate-waves) 0 0 / 160px 96px repeat,
+    linear-gradient(transparent, var(--color-ink) var(--space-md) calc(100% - var(--space-md)), transparent);
+  -webkit-mask-composite: xor, source-in;
+  mask:
+    linear-gradient(var(--color-ink) 0 0),
+    var(--laminate-waves) 0 0 / 160px 96px repeat,
+    linear-gradient(transparent, var(--color-ink) var(--space-md) calc(100% - var(--space-md)), transparent);
+  mask-composite: exclude, intersect;
+}
+/* The hidden sizer's copies have no film at all. */
+.book__sizer .laminate { display: none; }
+
+/* The light: a band of gold at the cover foil's 105deg, sitting where the
+   cover's band sits. Its middle (--lam-mid along the gradient) is half a
+   page in at rest and moves 0.7 of a page (--lam-travel) per unit of tilt
+   left and right, 0.3 up and down, the same way the cover ramp moves, so
+   both read as one light. */
+.laminate__light {
+  --lam-mid: 50%;
+  --lam-travel: 100%;
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(105deg, transparent calc(var(--lam-mid) - 26cqi), var(--color-foil) calc(var(--lam-mid) - 5cqi) calc(var(--lam-mid) + 5cqi), transparent calc(var(--lam-mid) + 26cqi));
+  opacity: calc(var(--shine, 0) * var(--lam-peak));
+  transform: translateX(calc((var(--tilt-x, 0) * -0.7 + var(--tilt-y, 0) * -0.3) * var(--lam-travel)));
+}
+
+/* On a spread the inside cover and the data page lie side by side, and one
+   light falls across both, so it's one band and not two. Its middle sits on
+   the spine at rest and moves 0.7 of a spread per unit of tilt, not a page.
+   Each page draws that same band in its own box, which stays a page wide
+   (a wider box made Safari paint it in pieces as it moved). The box is
+   centred on the band: shifted half a page right on the inside cover and
+   half a page left on the data page, so at rest both centre on the spine,
+   and each film shows its own half.
+   The two films are different heights, so a band through the middle of
+   each box would jog at the spine. Measured from the top left corner
+   instead, which both boxes share, it lines up exactly: 0.664 pages along
+   the gradient from that corner runs through the box's middle halfway down
+   a page that's 7/5 as tall as it's wide. A page is 100cqi plus its
+   padding and its 1px borders, and the 3px nudges make up for the border
+   and the gold's inset. Turning faces keep the single page light. */
+.book--spread .book__slot .laminate__light {
+  --lam-page: calc(100cqi + 2 * var(--space-lg) + 2px);
+  --lam-mid: calc(var(--lam-page) * 0.664);
+  --lam-travel: calc(2 * var(--lam-page));
+  left: calc(50% + 3px);
+  right: auto;
+  width: 100%;
+}
+.book--spread .book__slot--right .laminate__light { left: calc(-50% - 3px); }
+
+/* Held or turning, the band gets its own layer, so moving it is just the
+   compositor sliding a picture under the sheet. Never in the sizer. */
+.is-lit .book__slot .laminate__light,
+.book__face .laminate__light { will-change: transform, opacity; }
+
+/* The glint on a turn, like the cover foil's: the band sweeps across the
+   page once, left to right, during the half of the turn this face is toward
+   you. The front of the leaf early, its back (or a phone page swinging back
+   in) late. It's no brighter than a held page at full shine. */
+@keyframes laminate-glint-early {
+  0% { transform: translateX(-100%); opacity: 0; }
+  15%, 35% { opacity: var(--lam-peak); }
+  50%, 100% { transform: translateX(100%); opacity: 0; }
+}
+@keyframes laminate-glint-late {
+  0%, 50% { transform: translateX(-100%); opacity: 0; }
+  65%, 85% { opacity: var(--lam-peak); }
+  100% { transform: translateX(100%); opacity: 0; }
+}
+.book__face .laminate__light { animation: laminate-glint-early var(--dur-turn) linear both; }
+.book__face--back .laminate__light,
+.book__leaf.is-incoming .book__face--front .laminate__light { animation-name: laminate-glint-late; }
+
+@media (max-width: 40rem) {
+  .laminate { inset: calc(var(--radius-page) - var(--space-md)) calc(-1 * var(--space-md)) calc(-1 * var(--space-xs)); }
+}
+
+/* Reduced motion: the band holds still in the middle (of the spread, on a
+   spread) and only brightens as the page tilts. Pages don't turn there, and
+   no glint either way. */
+@media (prefers-reduced-motion: reduce) {
+  .laminate__light { transform: none; }
+  .book__face .laminate__light { animation: none; }
+}
+
+/* High contrast modes get the plain page. */
+@media (forced-colors: active) {
+  .laminate { display: none; }
+}

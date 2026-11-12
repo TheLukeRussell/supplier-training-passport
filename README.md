@@ -10,7 +10,7 @@ Live demo: https://thelukerussell.github.io/supplier-training-passport/
 
 **Passport.** It's an actual passport book: two-page spreads on a laptop, one page at a time on a phone. There's a front cover, an inside cover with the rules, and a data page with your rate, rank, next training, what it takes to hit the line and a machine-readable strip at the bottom like a real one. After that come four visa pages (one per quarter) and a back cover. Every training you made it to is a stamp, and every slot says whether it was virtual or in person. Tap a slot for the details. Swipe, use the arrow buttons, or use the left and right keys to turn pages.
 
-You can also grab the passport and tilt it to watch the gold foil catch the light. Drag it with the mouse, or on a phone press and hold, then drag. Let go and it drops back flat. The data page has a clear film printed with fine gold lines, like the laminate on a real passport. You barely see it until you tilt the page, then the lines light up.
+You can also grab the passport and tilt it to watch the gold foil catch the light. Drag it with the mouse, or on a phone press and hold, then drag. Let go and it drops back flat. The inside cover and the data page have a clear film printed with fine gold lines, like the laminate on a real passport. You barely see it until you tilt the book, then the lines light up. On a laptop it's one band of light running across both pages.
 
 **Standings.** The scoreboard. Three numbers at the top, a podium for the top three, then everybody, with the President's Club line drawn across the board. Filter by team, search by name, and tap anyone to open their passport.
 
