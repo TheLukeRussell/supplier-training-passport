@@ -2,15 +2,15 @@
 
 A clickable demo of the 2027 Supplier Training Passport. Starting in 2027, attending a set share of supplier trainings is part of qualifying for President's Club. Reps need to see where they stand, and leadership needs one view of everybody. This is the experience I want to build, mocked up so we can click through it before building the real thing.
 
-No sign-in, no backend. Everything runs on sample data, and every name and number in it is made up. It wears the ScanSource brand: the logo in the top bar and on the back cover, and the brand palette and type throughout.
+No sign-in, no backend. Everything runs on sample data, and every name and number in it is made up. It wears the ScanSource brand: the logo in the top bar and in gold foil on the back cover, and the brand palette and type on the pages and the standings. The passport covers are navy leather with gold foil, like a real passport, on purpose not brand colours.
 
 Live demo: https://thelukerussell.github.io/supplier-training-passport/
 
 ## What's in it
 
-- **Passport.** A literal passport book. Two-page spreads on a laptop, one page at a time on a phone. Front cover with your score on it, an inside cover that explains the rules, a data page (rate, rank, next training, what it takes to reach the line, and a machine-readable strip along the bottom), four visa pages, one per quarter, and a back cover. Every training you attended is a stamp, and every slot says whether the training is virtual or in person. Tap any slot for the details. Turn pages by swiping, with the arrow buttons, or with the left and right keys.
+- **Passport.** A literal passport book. Two-page spreads on a laptop, one page at a time on a phone. A navy leather front cover with gold foil that catches the light as it turns, an inside cover that explains the rules, a data page (rate, rank, next training, what it takes to reach the line, and a machine-readable strip along the bottom), four visa pages, one per quarter, and a leather back cover with the logo in gold foil. Every training you attended is a stamp, and every slot says whether the training is virtual or in person. Tap any slot for the details. Turn pages by swiping, with the arrow buttons, or with the left and right keys.
 - **Standings.** The scoreboard. Three figures up top, the top three on a podium, and the full board with the President's Club line drawn across it. Filter by team, search by name, tap anyone to open their passport.
-- **Demo panel.** The dashed "Demo" button in the top bar. Switch who you're viewing as, record today's attendance, reset (you can undo it), and preview the loading, empty and error states. Recording today is the fun part: a stamper comes down on today's slot, the page takes the hit, and a note gets written under the stamps with your new count. Standings rows slide to their new ranks too. None of this is meant to ship.
+- **Demo panel.** The dashed "Demo" button in the top bar. Switch who you're viewing as, record today's attendance, reset (you can undo it), and preview the loading, empty and error states. Recording today is the fun part: a stamper swings in, hovers over today's slot and presses the stamp in, the page takes the hit, and a note gets written under the stamps with your new count. Standings rows slide to their new ranks too. None of this is meant to ship.
 
 ## Run it
 

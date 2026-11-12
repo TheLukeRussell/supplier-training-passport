@@ -1,6 +1,6 @@
 // The words for where a rep stands. The data page gets a head and a line
-// under it, the cover gets a two-part score, and today's visa page gets an
-// endorsement once attendance is recorded. Kept here so the wording follows
+// under it, and today's visa page gets an endorsement once attendance is
+// recorded. Kept here so the wording follows
 // the rules exactly and the tests can check it.
 
 import { stampDate } from './format'
@@ -47,12 +47,6 @@ export function lineMessage(stats: RepStats, ctx: Context): { head: string; sub:
     head: toLine.onLine ? 'Right on the line' : 'Above the line',
     sub: cushion === 0 ? 'Miss the next one and you drop below it.' : `You could miss the next ${cushion === 1 ? 'one' : cushion} and still be above it.`,
   }
-}
-
-// The cover's score, in two parts so each gets its own line.
-export function coverLine(stats: RepStats): { count: string; standing: string } {
-  const count = stats.attended === 0 ? 'No stamps yet.' : `${stats.attended} ${stats.attended === 1 ? 'stamp' : 'stamps'}.`
-  return { count, standing: `${standing(stats)}.` }
 }
 
 // Written on today's visa page once today's attendance is recorded, like an

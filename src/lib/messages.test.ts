@@ -1,7 +1,7 @@
 // Tests for the wording of where a rep stands.
 
 import { describe, expect, it } from 'vitest'
-import { coverLine, endorsement, lineMessage, standing } from './messages'
+import { endorsement, lineMessage, standing } from './messages'
 import type { Context, RepStats, ToLine } from './rules'
 
 const ctx: Context = { today: '2027-06-17', todayRecorded: false, line: 0.75 }
@@ -43,16 +43,15 @@ describe('lineMessage', () => {
   })
 })
 
-describe('standing and coverLine', () => {
+describe('standing', () => {
   it('names where a rep stands', () => {
     expect(standing(stats(8, 11, 13, { kind: 'needs', n: 1 }))).toBe('One from the line')
     expect(standing(stats(5, 8, 12, { kind: 'needs', n: 4 }))).toBe('4 from the line')
     expect(standing(stats(3, 8, 11, { kind: 'out-of-reach', left: 11 }))).toBe('The line is out of reach this year')
   })
-  it('splits the cover score into the count and the standing', () => {
-    expect(coverLine(stats(8, 11, 13, { kind: 'needs', n: 1 }))).toEqual({ count: '8 stamps.', standing: 'One from the line.' })
-    expect(coverLine(stats(1, 1, 12, { kind: 'above', onLine: false }))).toEqual({ count: '1 stamp.', standing: 'Above the line.' })
-    expect(coverLine(stats(0, 0, 13, { kind: 'needs', n: 1 })).count).toBe('No stamps yet.')
+  it('says when a rep is above or on the line', () => {
+    expect(standing(stats(9, 10, 12, { kind: 'above', onLine: false }))).toBe('Above the line')
+    expect(standing(stats(6, 8, 12, { kind: 'above', onLine: true }))).toBe('Right on the line')
   })
 })
 

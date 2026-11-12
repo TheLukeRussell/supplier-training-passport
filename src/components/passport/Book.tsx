@@ -145,7 +145,7 @@ export function Book({ view, spread, reduced, render }: Props) {
           )}
         </div>
       ))}
-      <div ref={leafRef} className={`book__leaf book__leaf--${side}`} aria-hidden="true" inert>
+      <div ref={leafRef} className={`book__leaf book__leaf--${side}${!spread && !forward ? ' is-incoming' : ''}`} aria-hidden="true" inert>
         <div className="book__face book__face--front">{front === null ? null : render(front, true)}</div>
         {back !== null && <div className="book__face book__face--back">{render(back, true)}</div>}
       </div>
