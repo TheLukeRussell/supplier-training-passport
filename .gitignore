@@ -10,6 +10,18 @@ dist
 # Local tooling, keep it out of the repo
 .hallmark/
 
+# The real attendance export has real names and emails, and this repo is
+# public. Spreadsheets and env files never get committed, so dropping the
+# export in here by mistake can't leak it. The sample data is JSON.
+*.csv
+*.xls
+*.xlsx
+.env
+.env.*
+
+# Test coverage reports
+coverage/
+
 # Playwright output
 test-results/
 playwright-report/
