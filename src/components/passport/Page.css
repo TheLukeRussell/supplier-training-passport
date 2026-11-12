@@ -1,5 +1,8 @@
 /* The paper every inside page is printed on. Pages are at least passport
-   proportions (5 by 7) and grow if their content needs more room. */
+   proportions (5 wide by 7 tall) and grow if their content needs more room.
+   That minimum is a min-height in container units (cqi, the book's width)
+   rather than aspect-ratio: Safari can hold an aspect-ratio grid item to its
+   ratio and let the content spill out the bottom. */
 
 .page {
   container: page / inline-size;
@@ -7,17 +10,12 @@
   flex-direction: column;
   gap: var(--space-md);
   min-width: 0;
-  aspect-ratio: 5 / 7;
+  min-height: 140cqi;
   padding: var(--space-lg) var(--space-lg) var(--space-md);
   border: 1px solid var(--color-rule);
   border-radius: var(--radius-page);
   background: var(--color-page);
   box-shadow: var(--shadow-card);
-}
-
-.page__head {
-  font-size: var(--text-sm);
-  color: var(--color-ink-2);
 }
 
 .page__body {
@@ -28,17 +26,26 @@
   min-width: 0;
 }
 
-/* Page number at the outer foot, like a printed book. */
+/* The running foot: page number on the outer edge, section name at the
+   inner edge, like a printed book, so "3" and "Visas" never read as one
+   phrase. Left-hand pages mirror it. */
 .page__folio {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-xs);
+  color: var(--color-muted);
+}
+.book__slot--left .page__folio { flex-direction: row; }
+.page__number {
   font-family: var(--font-display);
   font-weight: var(--display-weight);
   font-size: var(--text-lg);
   line-height: 1;
   font-variant-numeric: tabular-nums;
-  color: var(--color-muted);
-  text-align: right;
 }
-.book__slot--left .page__folio { text-align: left; }
+.page__running { font-size: var(--text-sm); }
 
 @media (max-width: 40rem) {
   .page { padding: var(--space-md) var(--space-md) var(--space-sm); }

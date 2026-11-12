@@ -61,9 +61,3 @@
 .notes__swatch--stamp { border: 3px double var(--color-stamp-2); color: var(--color-stamp-2); transform: rotate(-3deg); }
 .notes__swatch--missed { border-color: var(--color-miss); color: var(--color-miss); }
 .notes__swatch--upcoming { border-color: var(--color-muted); }
-
-.notes__sample {
-  margin-top: auto;
-  font-size: var(--text-sm);
-  color: var(--color-ink-2);
-}

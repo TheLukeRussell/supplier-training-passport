@@ -3,15 +3,16 @@
 // get there (or just swaps, under reduced motion).
 
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
-import { pagesInView } from '../../lib/book'
+import { ALL_PAGES, pagesInView, viewCount } from '../../lib/book'
 import './Book.css'
 
 interface Props {
   view: number
   spread: boolean
   reduced: boolean
-  // Render one page. `still` is true while a turn is running, so a page can
-  // hold off on its own animation (the stamp) until the paper stops moving.
+  // Render one page. `still` is true while a turn is running (and for the
+  // hidden sizer copies), so a page can hold off on its own animation, the
+  // stamp, until the paper stops moving.
   render: (page: number, still: boolean) => ReactNode
 }
 
@@ -73,13 +74,31 @@ export function Book({ view, spread, reduced, render }: Props) {
     return () => animation.cancel()
   }, [turn, spread])
 
-  const closed = spread && (turn ? turn.to : shown) === 0
-  const className = `book${spread ? ' book--spread' : ' book--single'}${closed ? ' is-closed' : ''}${turn ? ' is-turning' : ''}`
+  // Closed at the front, the cover sits on the right; closed at the back, the
+  // back cover sits on the left. Book.css slides the book to centre either.
+  const target = turn ? turn.to : shown
+  const closedFront = spread && target === 0
+  const closedBack = spread && target === viewCount(spread) - 1
+  const className = `book${spread ? ' book--spread' : ' book--single'}${closedFront ? ' is-closed' : ''}${closedBack ? ' is-closed-back' : ''}${turn ? ' is-turning' : ''}`
+
+  // The sizer: every page, stacked invisibly in one grid cell, so the book is
+  // always as tall as its tallest page. Without it a phone book jumps from
+  // the cover's height to the data page's height the moment you open it.
+  const sizer = (
+    <div className="book__sizer" aria-hidden="true" inert>
+      {ALL_PAGES.map((page) => (
+        <div key={page} className="book__sizer-page">
+          {render(page, true)}
+        </div>
+      ))}
+    </div>
+  )
 
   if (!turn) {
     const pages = pagesInView(shown, spread)
     return (
       <div className={className}>
+        {sizer}
         {pages.map((page, i) => (
           <div key={i} className={`book__slot book__slot--${slotSide(i, spread)}`}>
             {page === null ? null : (
@@ -116,6 +135,7 @@ export function Book({ view, spread, reduced, render }: Props) {
 
   return (
     <div className={className}>
+      {sizer}
       {base.map((page, i) => (
         <div key={i} className={`book__slot book__slot--${slotSide(i, spread)}`}>
           {page === null ? null : (

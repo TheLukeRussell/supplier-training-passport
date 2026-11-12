@@ -8,6 +8,9 @@
   gap: var(--space-sm);
 }
 
+/* A little less air above the book so a spread and its label fit a laptop. */
+.main:has(> .passport) { padding-top: var(--space-md); }
+
 .passport__stage { min-width: 0; }
 
 .passport__controls {
@@ -45,17 +48,25 @@
 .passport__turn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
 
 @media (min-width: 60rem) {
+  /* --reach is half the open spread, the same sum Book.css uses for the
+     book's width, in container units (cqi) so it means the same thing inside
+     left and inside translate. The buttons sit just outside it, centred on
+     the book's height (the space above the label row). When the book is
+     closed only one page shows, so the buttons slide in by half a page, at
+     the same pace as the book's own slide. */
+  .passport { container-type: inline-size; --reach: min(50cqi - 48px - var(--space-md), var(--page-width)); }
   .passport__controls { width: 100%; grid-template-columns: minmax(0, 1fr); }
-  /* Pull the buttons out to the sides of the book, centred on its height
-     (the space above the label row). */
   .passport__turn {
     position: absolute;
     top: 0;
     bottom: var(--space-xl);
     margin-block: auto;
   }
-  .passport__turn:first-child { left: var(--gutter); }
-  .passport__turn:last-child { right: var(--gutter); }
+  .passport__turn:first-child { left: calc(var(--gutter) + 50cqi - var(--reach) - 48px - var(--space-md)); }
+  .passport__turn:last-child { right: calc(var(--gutter) + 50cqi - var(--reach) - 48px - var(--space-md)); }
+  .passport__turn { transition: background-color var(--dur-micro) var(--ease-out), translate var(--dur-turn) var(--ease-in-out); }
+  .passport.is-closed .passport__turn:first-child { translate: calc(var(--reach) / 2) 0; }
+  .passport.is-closed .passport__turn:last-child { translate: calc(var(--reach) / -2) 0; }
 }
 
 .passport-missing {

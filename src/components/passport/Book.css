@@ -5,7 +5,12 @@
   position: relative;
   display: grid;
   margin-inline: auto;
-  perspective: 2400px;
+  /* Pages size their minimum height off the book's width (see Page.css). */
+  container-type: inline-size;
+  /* A long perspective keeps the turning page from ballooning toward you.
+     At 6000px a page swells about 8% at the top of its swing; a shorter
+     distance made it spill well past the top and bottom of the book. */
+  perspective: 6000px;
   /* Vertical scrolling still works; horizontal drags become swipes. */
   touch-action: pan-y;
   transition: transform var(--dur-turn) var(--ease-in-out);
@@ -16,20 +21,37 @@
   width: min(100% - 2 * (48px + var(--space-md)), calc(var(--page-width) * 2));
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
+/* Each page is half the spread, so 7/5 of half the width. */
+.book--spread .page { min-height: 70cqi; }
 
-/* Closed on a wide screen, the cover sits in the right slot. Sliding the
-   whole book left by half a page centres it. Opening slides it back. */
+/* Closed on a wide screen, the front cover sits in the right slot and the
+   back cover in the left. Sliding the whole book by half a page centres
+   either one. Opening or closing slides it back. */
 .book--spread.is-closed { transform: translateX(-25%); }
+.book--spread.is-closed-back { transform: translateX(25%); }
 
 .book--single { width: min(100%, var(--page-width)); }
 
-.book__slot {
-  position: relative;
-  display: grid;
-  min-width: 0;
-}
+/* Everything shares row 1. The slots sit in their columns; the sizer sits
+   under the left (or only) slot. */
+.book__slot { position: relative; display: grid; min-width: 0; grid-row: 1; }
+.book__slot--left, .book__slot--single { grid-column: 1; }
+.book__slot--right { grid-column: 2; }
+
+/* Every page stacked in one invisible cell. The row grows to the tallest
+   page, and the visible pages stretch to the row, so turning never changes
+   the book's height. */
+.book__sizer { display: grid; grid-row: 1; grid-column: 1; min-width: 0; visibility: hidden; pointer-events: none; }
+.book__sizer-page { display: grid; grid-area: 1 / 1; min-width: 0; }
+/* Full column width, natural height: that's the height being measured. */
+.book__sizer-page > .page { justify-self: stretch; }
 
 .book__sheet { display: grid; min-width: 0; }
+
+/* Stretch both ways on purpose so every page, the turning one too, fills
+   the book's row and ends at the same edge. */
+.book__sheet > .page,
+.book__face > .page { align-self: stretch; justify-self: stretch; }
 
 /* Square the spine edge of each page so the spread reads as one book. */
 .book--spread .book__slot--left .page { border-radius: var(--radius-page) 0 0 var(--radius-page); }

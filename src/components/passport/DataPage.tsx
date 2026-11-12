@@ -2,11 +2,12 @@
 // line, what it takes to get there, and the machine-readable strip.
 
 import { EXPIRY_DATE, ISSUE_DATE, LINE } from '../../config'
-import { givenNames, initials, longDate, ordinal, shortDate, surname } from '../../lib/format'
+import { givenNames, initials, ordinal, shortDate, stampDate, surname } from '../../lib/format'
+import { lineMessage } from '../../lib/messages'
 import { mrzLines } from '../../lib/mrz'
 import type { Rep } from '../../lib/model'
 import type { StandingRow } from '../../lib/ranking'
-import { bestRateOf, cushionOf, percentOf, type Context } from '../../lib/rules'
+import { percentOf, type Context } from '../../lib/rules'
 import { Page } from './Page'
 import './DataPage.css'
 
@@ -18,41 +19,10 @@ interface Props {
   ctx: Context
 }
 
-// The one sentence that matters most on this page, plus the line under it.
-function lineMessage(row: StandingRow, ctx: Context): { head: string; sub: string } {
-  const { stats } = row
-  const { toLine, attended, recorded, left } = stats
-  if (toLine.kind === 'needs') {
-    const reach = percentOf((attended + toLine.n) / (recorded + toLine.n))
-    return {
-      head: `Attend the next ${toLine.n} to reach the line`,
-      sub: toLine.n === 1 ? `One more stamp takes you to ${reach}%.` : `${toLine.n} in a row takes you to ${reach}%.`,
-    }
-  }
-  if (toLine.kind === 'out-of-reach') {
-    const best = bestRateOf(attended, recorded, left)
-    return {
-      head: 'Out of reach this year',
-      sub:
-        left > 0 && best !== null
-          ? `Even all ${left} trainings left only gets you to ${percentOf(best)}%.`
-          : 'There are no trainings left this year.',
-    }
-  }
-  const cushion = cushionOf(attended, recorded, left, ctx.line)
-  return {
-    head: toLine.onLine ? 'Right on the line' : 'Above the line',
-    sub:
-      cushion === 0
-        ? 'Miss the next one and you drop below it.'
-        : `You could miss the next ${cushion === 1 ? 'one' : cushion} and still be above it.`,
-  }
-}
-
 export function DataPage({ rep, row, rankedCount, tied, ctx }: Props) {
   const { stats, rank } = row
   const percent = stats.rate === null ? null : percentOf(stats.rate)
-  const message = lineMessage(row, ctx)
+  const message = lineMessage(stats, ctx)
   const status = row.above ? 'above' : 'below'
   const [mrz1, mrz2] = mrzLines({
     name: rep.name,
@@ -81,38 +51,41 @@ export function DataPage({ rep, row, rankedCount, tied, ctx }: Props) {
         </dl>
       </header>
 
+      {/* Names sit beside the photo box like a real bio page. Everything else
+          runs the full width underneath so IDs and dates never squeeze. */}
       <div className="data__bio">
-        {/* Where the photo would go. Initials only, no pictures in this demo. */}
         <div className="data__photo" aria-hidden="true">
           {initials(rep.name)}
         </div>
-        <dl className="data__fields">
-          <div className="data__field data__field--wide">
+        <dl className="data__names">
+          <div className="data__field">
             <dt>Surname</dt>
             <dd className="data__name">{surname(rep.name)}</dd>
           </div>
-          <div className="data__field data__field--wide">
+          <div className="data__field">
             <dt>Given names</dt>
             <dd className="data__name">{givenNames(rep.name)}</dd>
           </div>
-          <div className="data__field">
-            <dt>Team</dt>
-            <dd>{rep.team}</dd>
-          </div>
-          <div className="data__field">
-            <dt>Rep ID</dt>
-            <dd className="data__id">{rep.id}</dd>
-          </div>
-          <div className="data__field">
-            <dt>Date of issue</dt>
-            <dd>{longDate(ISSUE_DATE)}</dd>
-          </div>
-          <div className="data__field">
-            <dt>Date of expiry</dt>
-            <dd>{longDate(EXPIRY_DATE)}</dd>
-          </div>
         </dl>
       </div>
+      <dl className="data__fields">
+        <div className="data__field">
+          <dt>Team</dt>
+          <dd>{rep.team}</dd>
+        </div>
+        <div className="data__field">
+          <dt>Rep ID</dt>
+          <dd className="data__id">{rep.id}</dd>
+        </div>
+        <div className="data__field">
+          <dt>Date of issue</dt>
+          <dd className="data__date">{stampDate(ISSUE_DATE)}</dd>
+        </div>
+        <div className="data__field">
+          <dt>Date of expiry</dt>
+          <dd className="data__date">{stampDate(EXPIRY_DATE)}</dd>
+        </div>
+      </dl>
 
       <dl className="data__stats">
         <div className="data__stat">
@@ -169,6 +142,7 @@ export function DataPage({ rep, row, rankedCount, tied, ctx }: Props) {
         </div>
       </dl>
 
+      {/* The line's number lives here, with the placeholder note beside it. */}
       <div className={`data__line data__line--${status}`} role="status">
         <p className="data__line-head">{message.head}</p>
         <p className="data__line-sub">{message.sub}</p>

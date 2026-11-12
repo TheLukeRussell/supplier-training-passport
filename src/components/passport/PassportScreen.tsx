@@ -4,10 +4,11 @@
 
 import { useCallback, useEffect, useRef, useState, type PointerEvent } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router'
-import { DATA_PAGE, pageForView, parsePage, viewCount, viewForPage, viewLabel } from '../../lib/book'
+import { BACK_COVER, DATA_PAGE, pageForView, parsePage, viewCount, viewForPage, viewLabel } from '../../lib/book'
 import { findRep, type Training } from '../../lib/model'
 import { useApp } from '../../state/AppState'
 import { useReducedMotion, useSpread } from '../../state/useMedia'
+import { BackCover } from './BackCover'
 import { Book } from './Book'
 import { Cover } from './Cover'
 import { DataPage } from './DataPage'
@@ -31,6 +32,12 @@ export function PassportScreen() {
   const swiped = useRef(false)
 
   const rep = findRep(model, repId)
+  // Stable, so the stamp moment's timer isn't restarted by every re-render.
+  const repEmail = rep?.email
+  const { landed } = app
+  const onLanded = useCallback(() => {
+    if (repEmail) landed(repEmail)
+  }, [landed, repEmail])
   const page = parsePage(params.get('page'))
   const view = viewForPage(page, spread)
   const last = viewCount(spread) - 1
@@ -88,11 +95,11 @@ export function PassportScreen() {
   const rankedCount = board.filter((r) => r.rank !== null).length
   const tied = row.rank !== null && board.filter((r) => r.rank === row.rank).length > 1
   const landing = app.landing.has(rep.email)
-  const onLanded = () => app.landed(rep.email)
 
   const render = (p: number, still: boolean) => {
-    if (p === 0) return <Cover rep={rep} still={still} onOpen={() => goToView(viewForPage(DATA_PAGE, spread))} />
+    if (p === 0) return <Cover rep={rep} stats={row.stats} still={still} onOpen={() => goToView(viewForPage(DATA_PAGE, spread))} />
     if (p === 1) return <NotesPage />
+    if (p === BACK_COVER) return <BackCover rep={rep} still={still} onFront={() => goToView(0)} />
     if (p === 2) return <DataPage rep={rep} row={row} rankedCount={rankedCount} tied={tied} ctx={ctx} />
     return (
       <VisaPage
@@ -131,7 +138,7 @@ export function PassportScreen() {
   }
 
   return (
-    <div className="passport container">
+    <div className={`passport container${spread && (view === 0 || view === last) ? ' is-closed' : ''}`}>
       <h1 className="visually-hidden">{rep.name}'s passport</h1>
       <div
         className="passport__stage"
