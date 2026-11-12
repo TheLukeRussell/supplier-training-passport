@@ -12,7 +12,39 @@
 /* A little less air above the book so a spread and its label fit a laptop. */
 .main:has(> .passport) { padding-top: var(--space-md); }
 
-.passport__stage { min-width: 0; }
+.passport__stage {
+  min-width: 0;
+  /* Grab-to-tilt (see useTilt.ts). How far the book can lean each way, and
+     how far away the eye is. A spread is wider, so it leans less. */
+  --tilt-reach-x: 12deg;
+  --tilt-reach-y: 18deg;
+  --tilt-depth: 1800px;
+  /* A long press on a phone picks the book up instead of opening a menu. */
+  -webkit-touch-callout: none;
+}
+
+/* While it's held or settling, useTilt sets the stage's transform every
+   frame. Its own layer makes that a compositor-only change. At rest there's
+   no transform at all, so nothing here touches the layout. The origin is
+   the middle of the stage, which is the middle of whatever's showing. */
+.passport__stage.is-lit { will-change: transform; }
+
+/* Dragging the book shouldn't select its text. Only while it's held, so the
+   rest of the time the text can still be selected and copied. Set on the
+   stage alone, since it carries down to everything inside. */
+.passport__stage.is-held { -webkit-user-select: none; user-select: none; }
+
+/* The hand shows on the book itself: the pages, and the cover around its
+   Open label, which keeps the pointer since a click there opens it. While
+   held it's a closed hand everywhere. Only the things that set their own
+   cursor are named, so picking the book up doesn't restyle every page. */
+@media (hover: hover) and (pointer: fine) {
+  .book__slot .page,
+  .passport__stage .cover__open::before { cursor: grab; }
+  .passport__stage.is-held,
+  .passport__stage.is-held :is(.page, .cover__open, .slot),
+  .passport__stage.is-held .cover__open::before { cursor: grabbing; }
+}
 
 .passport__controls {
   display: grid;
@@ -62,6 +94,8 @@
 }
 
 @media (min-width: 60rem) {
+  .passport__stage { --tilt-reach-x: 8deg; --tilt-reach-y: 12deg; }
+
   /* --reach is half the open spread, the same sum Book.css uses for the
      book's width, in container units (cqi) so it means the same thing inside
      left and inside translate. The buttons sit just outside it, centred on
@@ -98,4 +132,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .passport__turn { transition: none; }
+  /* The book stays flat (useTilt skips the transform too). Dragging a
+     cover still moves the light across the foil. */
+  .passport__stage.is-lit { transform: none !important; }
 }

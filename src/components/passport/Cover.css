@@ -132,13 +132,50 @@
   mask: var(--logo) center / contain no-repeat;
 }
 
-/* The glint. While a cover is on the turning leaf, its foil (lettering and
-   the logo) is painted with a gold ramp that has a narrow pale band in the
-   middle, and the band sweeps across as the leather swings, like light
-   catching real foil. The leaf only shows a face for half the turn (it goes
-   edge-on halfway), so the sweep runs at an even pace through the half where
-   that face is toward you: the front face early, the back face late, and a
-   phone page swinging back in, late. At rest the foil is plain solid gold. */
+/* The foil ramp: gold, a darker edge, a pale band, a darker edge, gold
+   again, with a fainter band trailing it, the way real foil throws more than
+   one highlight. --shine sets how bright the bands get. A turning cover is
+   fully lit. A held book lights up as it tilts (useTilt.ts sets --shine and
+   the tilt right on the foil that's showing), so the moment you grab it the
+   ramp is still plain gold. */
+.foil, .cover__mark {
+  --foil-band: color-mix(in oklab, var(--color-foil-glint) calc(var(--shine, 0) * 100%), var(--color-foil));
+  --foil-band-soft: color-mix(in oklab, var(--color-foil-glint) calc(var(--shine, 0) * 60%), var(--color-foil));
+  --foil-edge: color-mix(in oklab, var(--color-foil-deep) calc(var(--shine, 0) * 100%), var(--color-foil));
+}
+/* The small foil lines skip the darker edge so they never dip below AA. */
+.cover__program, .cover__back-note { --foil-edge: var(--color-foil); }
+.book__face .cover { --shine: 1; }
+
+/* While the foil is lit, the lettering and the logo are painted with the
+   ramp instead of flat gold. Held, the band slides across as you tilt left
+   and right, a bit with up and down too. On the moving leaf a turn's
+   keyframes below take over. */
+.book__face .foil, .book__face .cover__mark,
+.is-lit .book__slot .foil, .is-lit .book__slot .cover__mark {
+  background-size: 300% 100%;
+  background-position: calc(50% + var(--tilt-x, 0) * 35% + var(--tilt-y, 0) * 15%) 0;
+}
+/* Held, the foil repaints every frame. On its own layer that's just the
+   letters, not the leather grain and the edge shadow under them. */
+.is-lit .book__slot .foil, .is-lit .book__slot .cover__mark { will-change: transform; }
+.book__face .cover__mark, .is-lit .book__slot .cover__mark {
+  background-image: linear-gradient(105deg, var(--color-foil) 0 22%, var(--foil-band-soft) 28%, var(--color-foil) 34% 38%, var(--foil-edge) 43%, var(--foil-band) 48% 52%, var(--foil-edge) 57%, var(--color-foil) 62% 100%);
+}
+/* The lettering clips the same ramp to its letters. The pressed-in shadow
+   goes, since it would print over a clipped background. */
+.book__face .foil, .is-lit .book__slot .foil {
+  background-image: linear-gradient(105deg, var(--color-foil) 0 22%, var(--foil-band-soft) 28%, var(--color-foil) 34% 38%, var(--foil-edge) 43%, var(--foil-band) 48% 52%, var(--foil-edge) 57%, var(--color-foil) 62% 100%);
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  text-shadow: none;
+}
+
+/* The glint on a turn. The leaf only shows a face for half the turn (it
+   goes edge-on halfway), so the band sweeps at an even pace through the half
+   where that face is toward you: the front face early, the back face late,
+   and a phone page swinging back in, late. */
 @keyframes foil-glint-early {
   0% { background-position: 100% 0; }
   50%, 100% { background-position: 0% 0; }
@@ -148,19 +185,7 @@
   100% { background-position: 0% 0; }
 }
 .book__face .foil,
-.book__face .cover__mark {
-  background-size: 300% 100%;
-  background-position: 100% 0;
-  animation: foil-glint-early var(--dur-turn) linear both;
-}
-.book__face .cover__mark { background-image: linear-gradient(105deg, var(--color-foil) 0 44%, var(--color-foil-glint) 50%, var(--color-foil) 56% 100%); }
-.book__face .foil {
-  background-image: linear-gradient(105deg, var(--color-foil) 0 44%, var(--color-foil-glint) 50%, var(--color-foil) 56% 100%);
-  color: transparent;
-  -webkit-background-clip: text;
-  background-clip: text;
-  text-shadow: none;
-}
+.book__face .cover__mark { animation: foil-glint-early var(--dur-turn) linear both; }
 .book__face--back .foil,
 .book__face--back .cover__mark,
 .book__leaf.is-incoming .book__face--front .foil,

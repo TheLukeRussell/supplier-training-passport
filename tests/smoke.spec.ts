@@ -144,6 +144,70 @@ test('the app still works when storage is blocked', async ({ page }) => {
   await expect(page.locator('.figures__value').nth(2)).toHaveText('12')
 })
 
+// Grab-to-tilt. With a mouse, drag the cover: it tilts, the foil lights up,
+// and when you let go it settles flat with nothing left behind. The drag
+// isn't a click, but a click after it still opens the passport. On a phone
+// (Chrome only, since it needs real touch input), hold, wobble a pixel the
+// way a resting finger does, then drag up: it stays held and the page
+// doesn't scroll. A still tap that's a little slow still opens a slot.
+test('the passport can be picked up and tilted', async ({ page, browserName }, info) => {
+  const phone = info.project.name.startsWith('phone')
+  test.skip(phone && browserName !== 'chromium', 'real touch input needs Chrome')
+  const stage = page.locator('.passport__stage')
+  const settled = async () => {
+    await expect(stage).not.toHaveClass(/is-lit/, { timeout: 4000 })
+    expect(await stage.evaluate((el) => el.style.transform)).toBe('')
+    expect(await page.locator('.book__slot .foil, .book__slot .cover__mark').evaluateAll((els) => els.map((el) => (el as HTMLElement).style.length))).not.toContain(3)
+  }
+
+  if (!phone) {
+    await page.goto('./')
+    const cover = shown(page).locator('.cover')
+    await expect(cover).toBeVisible()
+    const box = (await cover.boundingBox())!
+    const x = box.x + box.width / 2
+    const y = box.y + box.height / 2
+    await page.mouse.move(x, y)
+    await page.mouse.down()
+    await page.mouse.move(x + 80, y + 20, { steps: 8 })
+    await expect(stage).toHaveClass(/is-held/)
+    await expect.poll(() => stage.evaluate((el) => el.style.transform)).toContain('rotateY')
+    await expect.poll(() => shown(page).locator('.cover__year').evaluate((el) => Number(el.style.getPropertyValue('--shine')))).toBeGreaterThan(0.5)
+    await page.mouse.up()
+    await settled()
+    await expect(page).toHaveURL(/#\/passport\/hannah-kowalski$/)
+    await page.mouse.click(x, y)
+    await expect(page).toHaveURL(/page=2/)
+    return
+  }
+
+  const cdp = await page.context().newCDPSession(page)
+  const touch = (type: 'touchStart' | 'touchMove' | 'touchEnd', x = 0, y = 0) =>
+    cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y }] })
+  await page.goto('./#/passport/hannah-kowalski?page=3')
+  const slot = shown(page).getByRole('button', { name: /^Zebra, Tue, Jan 12/ })
+  await expect(slot).toBeVisible()
+  const box = (await slot.boundingBox())!
+  const x = box.x + box.width / 2
+  const y = box.y + box.height / 2
+  await touch('touchStart', x, y)
+  await page.waitForTimeout(100)
+  await touch('touchMove', x + 1, y)
+  await page.waitForTimeout(400)
+  for (let i = 1; i <= 10; i++) await touch('touchMove', x + 1, y - i * 12)
+  await expect(stage).toHaveClass(/is-held/)
+  expect(await page.evaluate(() => window.scrollY)).toBe(0)
+  await touch('touchEnd')
+  await settled()
+  await expect(page.getByRole('dialog')).toBeHidden()
+
+  // Lift the finger right after the book is picked up, still without moving.
+  await touch('touchStart', x, y)
+  await page.waitForFunction(() => document.querySelector('.passport__stage')!.classList.contains('is-held'), null, { polling: 'raf' })
+  await touch('touchEnd')
+  await expect(page.getByRole('dialog').getByRole('heading', { name: 'Zebra' })).toBeVisible()
+})
+
 // Phones only. Every page of two passports (the default rep and the new hire)
 // fits on its paper, the paper fits on the screen under the top bar, and the
 // turn buttons are on screen. Recording today mustn't make the book grow.

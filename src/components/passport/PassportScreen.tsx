@@ -1,6 +1,7 @@
 // The Passport screen: the book for one rep, the page controls under it, and
 // the training detail slip. The page lives in the URL (?page=4), so a link
-// can open straight to a visa page.
+// can open straight to a visa page. The book can be picked up and tilted too
+// (see useTilt.ts).
 
 import { useCallback, useEffect, useRef, useState, type PointerEvent } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router'
@@ -14,6 +15,7 @@ import { Cover } from './Cover'
 import { DataPage } from './DataPage'
 import { NotesPage } from './NotesPage'
 import { SlotDetail } from './SlotDetail'
+import { useTilt } from './useTilt'
 import { VisaPage } from './VisaPage'
 import './PassportScreen.css'
 
@@ -30,6 +32,8 @@ export function PassportScreen() {
   const [detail, setDetail] = useState<Training | null>(null)
   const swipe = useRef<{ x: number; y: number; id: number } | null>(null)
   const swiped = useRef(false)
+  const tilt = useTilt(reduced)
+  const { ref: tiltRef, onPointerMove: onTiltMove, onLostPointerCapture: onTiltLost } = tilt
 
   const rep = findRep(model, repId)
   // Stable, so the stamp moment's timer isn't restarted by every re-render.
@@ -116,24 +120,35 @@ export function PassportScreen() {
     )
   }
 
+  // The click a swipe or a tilt leaves behind arrives right away. Swallow it
+  // so a slot doesn't open, and if none comes, forget about it so the next
+  // real tap still works.
+  const swallowClick = () => {
+    swiped.current = true
+    window.setTimeout(() => (swiped.current = false), 350)
+  }
+
   // Swipes: track one pointer, and on release decide if it was a sideways
-  // drag. If it was, swallow the click that follows so a slot doesn't open.
+  // drag. The same pointer can pick the book up and tilt it (useTilt), and a
+  // tilt is never a swipe.
   const onPointerDown = (event: PointerEvent) => {
     swiped.current = false
+    tilt.onPointerDown(event)
     if (event.pointerType === 'mouse') return
     swipe.current = { x: event.clientX, y: event.clientY, id: event.pointerId }
   }
   const onPointerUp = (event: PointerEvent) => {
     const start = swipe.current
     swipe.current = null
+    if (tilt.onPointerUp(event)) {
+      swallowClick()
+      return
+    }
     if (!start || start.id !== event.pointerId) return
     const dx = event.clientX - start.x
     const dy = event.clientY - start.y
     if (Math.abs(dx) < SWIPE_PX || Math.abs(dx) < Math.abs(dy) * 1.5) return
-    // The click a swipe leaves behind arrives right away. If none comes,
-    // forget about it so the next real tap still works.
-    swiped.current = true
-    window.setTimeout(() => (swiped.current = false), 350)
+    swallowClick()
     goToView(dx < 0 ? view + 1 : view - 1)
   }
 
@@ -141,10 +156,16 @@ export function PassportScreen() {
     <div className={`passport container${spread && (view === 0 || view === last) ? ' is-closed' : ''}`}>
       <h1 className="visually-hidden">{rep.name}’s passport</h1>
       <div
+        ref={tiltRef}
         className="passport__stage"
         onPointerDown={onPointerDown}
+        onPointerMove={onTiltMove}
         onPointerUp={onPointerUp}
-        onPointerCancel={() => (swipe.current = null)}
+        onPointerCancel={(event) => {
+          swipe.current = null
+          tilt.onPointerCancel(event)
+        }}
+        onLostPointerCapture={onTiltLost}
         onClickCapture={(event) => {
           if (swiped.current) {
             event.preventDefault()
