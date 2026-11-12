@@ -1,6 +1,6 @@
 // The Standings screen: three figures, the podium, and the full board with
 // the President's Club line drawn across it. Team filter and name search
-// live in the URL (#/standings?team=west&q=kai) so a filtered view can be shared.
+// live in the URL (#/standings?team=netsec&q=kai) so a filtered view can be shared.
 
 import { useState } from 'react'
 import { useSearchParams } from 'react-router'

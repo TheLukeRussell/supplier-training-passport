@@ -17,8 +17,9 @@ export interface StampLook {
 
 const MAX_TILT = 9
 
-// Twelve suppliers, six shapes, three inks. Stepping the ink by one extra for
-// the second half of the list means no two suppliers share a shape and ink.
+// Six shapes and three inks make 18 looks. Stepping the ink by one extra each
+// time the shapes come round again means no two of the first 18 suppliers
+// share a shape and ink, so new ones go at the end of the list.
 // A supplier we've never heard of still gets a stable look from its name.
 export function stampLook(supplier: string, repEmail: string, trainingId: string): StampLook {
   const listed = (SUPPLIERS as readonly string[]).indexOf(supplier)

@@ -19,7 +19,7 @@ test('the demo flow works end to end', async ({ page }, info) => {
   await expect(where(page)).toHaveText('Cover')
   await page.getByRole('button', { name: 'Open passport' }).click()
   await expect(shown(page).getByText('Attend the next one to reach the line')).toBeVisible()
-  await expect(shown(page).getByText('15th')).toBeVisible()
+  await expect(shown(page).getByText('28th')).toBeVisible()
 
   // Turn every page forward to the back cover, then all the way back to the front.
   const seen = new Set<string>()
@@ -78,41 +78,42 @@ test('the demo flow works end to end', async ({ page }, info) => {
   await expect(page).toHaveURL(/page=4/)
   await expect(page.getByRole('button', { name: /^Pioneer, Thu, Jun 17, virtual\. Attended/ })).toBeVisible()
   await expect(page.getByRole('button', { name: "Record today’s attendance" })).toBeDisabled()
-  await expect(shown(page).locator('.visa__endorse')).toHaveText('Stamped 17 JUN 2027. 9 of 12, 75%. Right on the line.')
+  await expect(shown(page).locator('.visa__endorse')).toHaveText('Stamped 17 JUN 2027. 6 of 8, 75%. Right on the line.')
   await expect(page.locator('.stamper')).toHaveCount(0, { timeout: 5000 })
   await page.goto('./#/passport/hannah-kowalski?page=2')
   await expect(shown(page).getByText('Right on the line', { exact: true })).toBeVisible()
-  await expect(shown(page).locator('.data__stat').filter({ hasText: 'Rank' })).toContainText('13th of 29, tied')
+  await expect(shown(page).locator('.data__stat').filter({ hasText: 'Rank' })).toContainText('24th of 59, tied')
 
   // Standings picked it up. One more rep is above the line, and the new
   // hire, who missed today, is still unranked rather than last.
   await page.getByRole('link', { name: 'Standings' }).click()
   const hannah = page.locator('[data-rep="hannah-kowalski"]')
-  await expect(hannah.locator('.board__rank')).toHaveText('Tied T13')
+  await expect(hannah.locator('.board__rank')).toHaveText('Tied T24')
   await expect(hannah.locator('.board__status')).toHaveText('Above')
   await expect(hannah).toContainText('You')
-  await expect(page.locator('.figures__value').nth(0)).toHaveText('15')
-  await expect(page.locator('.figures__unit').nth(0)).toHaveText('of 29 ranked reps')
+  await expect(page.locator('.figures__value').nth(0)).toHaveText('30')
+  await expect(page.locator('.figures__unit').nth(0)).toHaveText('of 59 ranked reps')
   await expect(page.locator('.figures__value').nth(2)).toHaveText('12')
   const clara = page.locator('[data-rep="clara-dubois"]')
   await expect(clara.locator('.board__stamps')).toHaveText('0 of 1')
   await expect(clara.locator('.board__status')).toHaveText('Unranked')
 
   // Filter by team, then search for nobody.
-  await page.locator('label[for="team-west"]').click()
-  await expect(page).toHaveURL(/team=west/)
+  await page.locator('label[for="team-federal"]').click()
+  await expect(page).toHaveURL(/team=federal/)
   // Wait for the board itself to narrow before reading it.
-  await expect(page.locator('[data-rep]')).toHaveCount(8)
+  await expect(page.locator('[data-rep]')).toHaveCount(12)
   const teams = await page.locator('[data-rep] .board__team').allTextContents()
-  expect(teams.every((t) => t.includes('West'))).toBe(true)
-  // Naomi is the only West rep at 4th, but she's tied with two Canada reps
-  // on the full board, so she keeps her T here and on the podium.
-  await expect(page.locator('[data-rep="naomi-feld"] .board__rank')).toHaveText('Tied T4')
+  expect(teams.every((t) => t.includes('Federal'))).toBe(true)
+  await expect(page.locator('.figures__unit').nth(0)).toHaveText('of 11 ranked Federal reps')
+  // Liam is the only Federal rep at 4th, but he's tied with three NetSec
+  // reps on the full board, so he keeps his T here and on the podium.
+  await expect(page.locator('[data-rep="liam-tremblay"] .board__rank')).toHaveText('Tied T4')
   await expect(page.locator('.podium__step--first .podium__rank')).toHaveText('Rank T4')
   await page.getByLabel('Search by name').fill('zzz')
-  await expect(page.getByText('Nobody named “zzz” on West')).toBeVisible()
+  await expect(page.getByText('Nobody named “zzz” on Federal')).toBeVisible()
   await page.getByRole('button', { name: 'Clear search' }).click()
-  await expect(page.locator('[data-rep]')).toHaveCount(8)
+  await expect(page.locator('[data-rep]')).toHaveCount(12)
 
   // Selecting a rep opens their passport.
   await page.getByRole('link', { name: 'Ethan Park' }).first().click()
@@ -123,7 +124,7 @@ test('the demo flow works end to end', async ({ page }, info) => {
   await page.getByRole('button', { name: 'Reset demo' }).click()
   await expect(page.getByRole('button', { name: 'Undo' })).toBeVisible()
   await expect(page.locator('.figures__value').nth(2)).toHaveText('11')
-  await expect(page.locator('.figures__value').nth(0)).toHaveText('14')
+  await expect(page.locator('.figures__value').nth(0)).toHaveText('27')
   await expect(page.getByRole('button', { name: "Record today’s attendance" })).toBeEnabled()
   await page.getByRole('button', { name: 'Undo' }).click()
   await expect(page.locator('.figures__value').nth(2)).toHaveText('12')
@@ -160,7 +161,7 @@ test('the app still works when storage is blocked', async ({ page }) => {
   await expect(page.getByText('This browser is blocking storage')).toBeVisible()
   await page.getByRole('button', { name: "Record today’s attendance" }).click()
   await expect(page.locator('.figures__value').nth(2)).toHaveText('12')
-  await expect(page.locator('.figures__value').nth(0)).toHaveText('15')
+  await expect(page.locator('.figures__value').nth(0)).toHaveText('30')
 })
 
 // Keyboard and screen reader basics. The arrow keys turn pages even after
@@ -468,8 +469,8 @@ test('the picker opens another rep on the same page', async ({ page }, info) => 
   await page.goto('./#/passport/hannah-kowalski?page=3')
   const picker = page.getByLabel('Passport of')
   await expect(picker).toHaveValue('hannah-kowalski')
-  await expect(picker.locator('optgroup')).toHaveCount(4)
-  await expect(picker.locator('option')).toHaveCount(30)
+  await expect(picker.locator('optgroup')).toHaveCount(5)
+  await expect(picker.locator('option')).toHaveCount(60)
   const before = await where(page).textContent()
 
   await picker.selectOption('jordan-hale')

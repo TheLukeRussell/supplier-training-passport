@@ -11,7 +11,7 @@ export interface FakeTraining {
 
 // marks: one character per training. a = attended, m = missed (invited),
 // - = not invited.
-export function rowsFor(trainings: FakeTraining[], reps: Record<string, string>, team = 'East'): AttendanceRow[] {
+export function rowsFor(trainings: FakeTraining[], reps: Record<string, string>, team = 'POSB'): AttendanceRow[] {
   const rows: AttendanceRow[] = []
   for (const [name, marks] of Object.entries(reps)) {
     trainings.forEach((training, i) => {

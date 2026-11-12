@@ -16,11 +16,13 @@ interface Props {
   onClose: () => void
 }
 
+// "All teams", "POSB and Federal", or "POSB, NetSec and Federal".
 function invitedTeams(model: Model, training: Training): string {
   const teams = TEAMS.filter((team) => model.reps.some((rep) => rep.team === team && entryFor(model, rep, training.id).invited))
-  if (teams.length === TEAMS.length) return 'All four teams'
+  if (teams.length === TEAMS.length) return 'All teams'
   if (teams.length === 0) return 'Nobody yet'
-  return teams.join(' and ')
+  if (teams.length === 1) return teams[0]
+  return `${teams.slice(0, -1).join(', ')} and ${teams.at(-1)}`
 }
 
 export function SlotDetail({ training, model, rep, ctx, onClose }: Props) {

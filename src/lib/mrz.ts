@@ -15,11 +15,13 @@ export interface MrzInput {
 
 const LINE_LENGTH = 44
 
+// Three letters per team, where a real passport puts the nationality.
 const TEAM_CODES: Record<string, string> = {
-  East: 'EST',
-  Central: 'CTL',
-  West: 'WST',
-  Canada: 'CAN',
+  Communications: 'COM',
+  POSB: 'POS',
+  NetSec: 'NET',
+  Cisco: 'CSC',
+  Federal: 'FED',
 }
 
 // Uppercase A to Z only. Accents come off (Amelie, not Am<lie), and anything

@@ -27,11 +27,38 @@ function recordAs(rep: Rep) {
 }
 
 describe('sample data', () => {
-  it('has 30 reps on four teams and 24 trainings', () => {
-    expect(model.reps).toHaveLength(30)
-    expect(new Set(model.reps.map((r) => r.team))).toEqual(new Set(TEAMS))
+  it('has 60 reps, 12 on each of the five teams, and 24 trainings', () => {
+    expect(model.reps).toHaveLength(60)
+    for (const team of TEAMS) expect(model.reps.filter((r) => r.team === team), team).toHaveLength(12)
     expect(model.trainings).toHaveLength(24)
-    expect(rows).toHaveLength(30 * 24)
+    expect(rows).toHaveLength(60 * 24)
+  })
+
+  it('invites everyone to virtual trainings and only some teams in person', () => {
+    const teamsAt = (id: string) => new Set(rows.filter((r) => r.training_id === id && r.invited).map((r) => r.team))
+    for (const t of model.trainings) {
+      if (t.format === 'virtual') expect(teamsAt(t.id).size, t.title).toBe(TEAMS.length)
+      else expect(teamsAt(t.id).size, t.title).toBeLessThan(TEAMS.length)
+    }
+    // Every team gets at least one in-person session this year.
+    const inPerson = model.trainings.filter((t) => t.format === 'in person')
+    for (const team of TEAMS) expect(inPerson.some((t) => teamsAt(t.id).has(team)), team).toBe(true)
+  })
+
+  it('gives each team its own invite count before today', () => {
+    const invites = Object.fromEntries(
+      TEAMS.map((team) => {
+        const rep = model.reps.find((r) => r.team === team && r.name !== 'Clara Dubois')!
+        return [team, repStats(model, rep, ctx).recorded]
+      }),
+    )
+    expect(invites).toEqual({ Communications: 7, POSB: 10, NetSec: 8, Cisco: 7, Federal: 8 })
+  })
+
+  it('only runs Cisco after today, so the history before it never changed', () => {
+    const cisco = model.trainings.filter((t) => t.supplier === 'Cisco')
+    expect(cisco.map((t) => t.format)).toEqual(['virtual', 'in person'])
+    expect(cisco.every((t) => t.date > DEMO_TODAY)).toBe(true)
   })
 
   it('only uses example.com emails and the listed suppliers', () => {
@@ -83,14 +110,15 @@ describe('sample data', () => {
     expect(share).toBeLessThan(0.6)
   })
 
-  it('opens the demo as Hannah, 15th, who crosses the line once today is recorded', () => {
+  it('opens the demo as Hannah, 28th, who crosses the line once today is recorded', () => {
     const rep = pickDefaultRep(model, ctx)!
     expect(rep.name).toBe('Hannah Kowalski')
-    expect(rowOf(board, rep.name).rank).toBe(15)
-    expect(repStats(model, rep, ctx).toLine.kind).toBe('needs')
+    expect(rep.team).toBe('Communications')
+    expect(rowOf(board, rep.name)).toMatchObject({ rank: 28, tied: true })
+    expect(repStats(model, rep, ctx)).toMatchObject({ attended: 5, recorded: 7, toLine: { kind: 'needs', n: 1 } })
     const after = recordAs(rep)
-    expect(repStats(after.model, rep, after.ctx).toLine.kind).toBe('above')
-    expect(rowOf(after.board, rep.name)).toMatchObject({ rank: 13, tied: true, above: true })
+    expect(repStats(after.model, rep, after.ctx)).toMatchObject({ attended: 6, recorded: 8, toLine: { kind: 'above', onLine: true } })
+    expect(rowOf(after.board, rep.name)).toMatchObject({ rank: 24, tied: true, above: true })
   })
 })
 
@@ -112,6 +140,13 @@ describe("after Record on Hannah's passport", () => {
     expect(rowOf(after.board, 'Jordan Hale').stats.rate).toBe(1)
     expect(rowOf(after.board, 'Marcus Bell')).toMatchObject({ rank: 2, tied: true })
     expect(rowOf(after.board, 'Priya Natarajan')).toMatchObject({ rank: 2, tied: true })
+  })
+
+  it("ties Federal's top rep with NetSec reps, so the Federal filter still shows a T", () => {
+    const federal = after.board.filter((r) => r.rep.team === 'Federal' && r.rank !== null)
+    expect(federal[0]).toMatchObject({ rep: { name: 'Liam Tremblay' }, rank: 4, tied: true })
+    expect(federal.filter((r) => r.rank === 4)).toHaveLength(1)
+    expect(after.board.filter((r) => r.rank === 4).every((r) => r.rep.team === 'Federal' || r.rep.team === 'NetSec')).toBe(true)
   })
 
   it('marks about two thirds of the reps invited today', () => {

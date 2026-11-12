@@ -88,9 +88,9 @@ describe('standings', () => {
   })
 
   it('keeps the tie when the board is filtered down to one of them', () => {
-    const twoTeams = buildModel([...rowsFor(SIX, { Ana: 'aaaaa-', Ben: 'maaaa-' }), ...rowsFor(SIX, { Cy: 'aaaam-' }, 'West')])
-    const west = standings(twoTeams, ctx6).filter((r) => r.rep.team === 'West')
-    expect(west.map((r) => [r.rep.name, r.rank, r.tied])).toEqual([['Cy', 2, true]])
+    const twoTeams = buildModel([...rowsFor(SIX, { Ana: 'aaaaa-', Ben: 'maaaa-' }), ...rowsFor(SIX, { Cy: 'aaaam-' }, 'NetSec')])
+    const netsec = standings(twoTeams, ctx6).filter((r) => r.rep.team === 'NetSec')
+    expect(netsec.map((r) => [r.rep.name, r.rank, r.tied])).toEqual([['Cy', 2, true]])
   })
 
   it('works out movement against the training before', () => {

@@ -18,9 +18,12 @@ export const PROGRAM_YEAR = 2027
 export const ISSUE_DATE = '2027-01-01'
 export const EXPIRY_DATE = '2027-12-31'
 
-export const TEAMS = ['East', 'Central', 'West', 'Canada'] as const
+// Teams are business units, each selling its own set of suppliers. In-person
+// trainings only invite the teams that sell that supplier.
+export const TEAMS = ['Communications', 'POSB', 'NetSec', 'Cisco', 'Federal'] as const
 
-// The suppliers running trainings this year. Keep them in this one array.
+// The suppliers running trainings this year. Keep them in this one array, and
+// add new ones at the end: a supplier's place in it picks its stamp.
 export const SUPPLIERS = [
   'Zebra',
   'Honeywell',
@@ -34,6 +37,7 @@ export const SUPPLIERS = [
   'Panasonic',
   'Brady',
   'Pioneer',
+  'Cisco',
 ] as const
 
 // When the demo records today's attendance, roughly this share of everyone
@@ -42,10 +46,11 @@ export const DEMO_TODAY_SHARE = 0.65
 
 // Seeds for anything random. Same seed, same sample data, every time.
 export const DATA_SEED = 2027
-// DEMO_SEED picks who else shows up today. With 2122 nobody falls under the
-// line today, so the count goes up when Hannah crosses instead of down.
-export const DEMO_SEED = 2122
+// DEMO_SEED picks who else shows up today. With 1670 it's 40 of the 60
+// invited, nobody falls under the line, and the count goes up when Hannah
+// crosses instead of down.
+export const DEMO_SEED = 1670
 
 // Key for demo changes in localStorage. A saved recording keeps the names of
 // who showed up, so bump this when DEMO_SEED changes or the old ones come back.
-export const STORAGE_KEY = 'stp-demo-v2'
+export const STORAGE_KEY = 'stp-demo-v3'

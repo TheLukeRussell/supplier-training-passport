@@ -1,6 +1,7 @@
 // Tests for the machine-readable strip.
 
 import { describe, expect, it } from 'vitest'
+import { TEAMS } from '../config'
 import { checkDigit, mrzLines } from './mrz'
 
 describe('checkDigit', () => {
@@ -17,11 +18,11 @@ describe('checkDigit', () => {
 describe('mrzLines', () => {
   const base = {
     name: 'Hannah Kowalski',
-    team: 'East',
-    attended: 8,
-    recorded: 11,
-    percent: 72,
-    rank: 15,
+    team: 'Communications',
+    attended: 5,
+    recorded: 7,
+    percent: 71,
+    rank: 28,
     issue: '2027-01-01',
     expiry: '2027-12-31',
   }
@@ -39,15 +40,20 @@ describe('mrzLines', () => {
   it('packs the stats into line two', () => {
     const two = mrzLines(base)[1]
     expect(two.startsWith('HKOWALSKI')).toBe(true)
-    expect(two).toContain('EST270101')
-    expect(two).toContain('A08I11R072K15')
+    expect(two).toContain('COM270101')
+    expect(two).toContain('A05I07R071K28')
   })
 
   it('strips accents and fills unranked stats', () => {
-    const [one, two] = mrzLines({ ...base, name: 'Amélie Gagnon', team: 'Canada', attended: 0, recorded: 0, percent: null, rank: null })
+    const [one, two] = mrzLines({ ...base, name: 'Amélie Gagnon', team: 'Federal', attended: 0, recorded: 0, percent: null, rank: null })
     expect(one).toContain('GAGNON<<AMELIE')
-    expect(two).toContain('CAN')
+    expect(two).toContain('FED')
     expect(two).toContain('A00I00R<<<K<<')
+  })
+
+  it('gives every team its own three letters', () => {
+    const codes = TEAMS.map((team) => mrzLines({ ...base, team })[1].slice(10, 13))
+    expect(codes).toEqual(['COM', 'POS', 'NET', 'CSC', 'FED'])
   })
 
   it('handles hyphens and long names without going over 44', () => {

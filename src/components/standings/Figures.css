@@ -36,7 +36,7 @@
 .figures__unit { color: var(--color-ink-2); }
 
 /* Phones: one figure per row, the label over the number, so a long unit
-   like "across ranked Central reps" has the whole width to sit on one line. */
+   like "across ranked Communications reps" has the whole width to sit on one line. */
 @media (max-width: 40rem) {
   .figures { grid-template-columns: minmax(0, 1fr); }
   .figures__item { display: flex; flex-direction: column; align-items: flex-start; gap: 0; padding: var(--space-xs) 0; border-left: 0; border-top: 1px solid var(--color-rule); }

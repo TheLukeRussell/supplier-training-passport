@@ -20,33 +20,36 @@ interface PlannedTraining {
 }
 
 // About two a month, all weekdays. Virtual ones invite everyone. In-person
-// ones are regional, so only a couple of teams get invited. That's also why
-// invite counts differ by team, which gives us a rep sitting exactly on the line.
+// ones only invite the teams that sell that supplier: POSB sells Zebra,
+// Honeywell, Datalogic, Brady, Pioneer and Panasonic, NetSec sells HPE Aruba,
+// Juniper, Extreme, Cambium and ASSA ABLOY, Communications sells HP Poly, and
+// Federal gets the Honeywell and ASSA ABLOY sessions too. That's why invite
+// counts differ by team, which gives us a rep sitting exactly on the line.
 const PLAN: PlannedTraining[] = [
   { date: '2027-01-12', supplier: 'Zebra', format: 'virtual', teams: 'all' },
-  { date: '2027-01-28', supplier: 'Honeywell', format: 'in person', teams: ['East', 'Central'] },
+  { date: '2027-01-28', supplier: 'Honeywell', format: 'in person', teams: ['POSB', 'Federal'] },
   { date: '2027-02-10', supplier: 'HPE Aruba', format: 'virtual', teams: 'all' },
   { date: '2027-02-23', supplier: 'Juniper', format: 'virtual', teams: 'all' },
-  { date: '2027-03-11', supplier: 'Datalogic', format: 'in person', teams: ['East', 'West'] },
+  { date: '2027-03-11', supplier: 'Datalogic', format: 'in person', teams: ['POSB'] },
   { date: '2027-03-24', supplier: 'Extreme Networks', format: 'virtual', teams: 'all' },
   { date: '2027-04-13', supplier: 'HP Poly', format: 'virtual', teams: 'all' },
-  { date: '2027-04-29', supplier: 'Cambium', format: 'in person', teams: ['East', 'Canada'] },
+  { date: '2027-04-29', supplier: 'Cambium', format: 'in person', teams: ['NetSec'] },
   { date: '2027-05-12', supplier: 'ASSA ABLOY', format: 'virtual', teams: 'all' },
   { date: '2027-05-25', supplier: 'Panasonic', format: 'virtual', teams: 'all' },
-  { date: '2027-06-03', supplier: 'Brady', format: 'in person', teams: ['East', 'Central'] },
+  { date: '2027-06-03', supplier: 'Brady', format: 'in person', teams: ['POSB'] },
   { date: '2027-06-17', supplier: 'Pioneer', format: 'virtual', teams: 'all' }, // demo "today"
   { date: '2027-07-14', supplier: 'Zebra', format: 'virtual', teams: 'all' },
   { date: '2027-07-27', supplier: 'Honeywell', format: 'virtual', teams: 'all' },
-  { date: '2027-08-12', supplier: 'HPE Aruba', format: 'in person', teams: ['West', 'Canada'] },
-  { date: '2027-08-25', supplier: 'Juniper', format: 'virtual', teams: 'all' },
+  { date: '2027-08-12', supplier: 'HPE Aruba', format: 'in person', teams: ['NetSec'] },
+  { date: '2027-08-25', supplier: 'Cisco', format: 'virtual', teams: 'all' },
   { date: '2027-09-14', supplier: 'Datalogic', format: 'virtual', teams: 'all' },
-  { date: '2027-09-30', supplier: 'Extreme Networks', format: 'in person', teams: ['East', 'Central'] },
-  { date: '2027-10-13', supplier: 'HP Poly', format: 'virtual', teams: 'all' },
-  { date: '2027-10-26', supplier: 'Cambium', format: 'virtual', teams: 'all' },
-  { date: '2027-11-11', supplier: 'ASSA ABLOY', format: 'in person', teams: ['Canada', 'East'] },
+  { date: '2027-09-30', supplier: 'Extreme Networks', format: 'in person', teams: ['NetSec'] },
+  { date: '2027-10-13', supplier: 'HP Poly', format: 'in person', teams: ['Communications'] },
+  { date: '2027-10-26', supplier: 'Cisco', format: 'in person', teams: ['Cisco'] },
+  { date: '2027-11-11', supplier: 'ASSA ABLOY', format: 'in person', teams: ['NetSec', 'Federal'] },
   { date: '2027-11-23', supplier: 'Panasonic', format: 'virtual', teams: 'all' },
   { date: '2027-12-08', supplier: 'Brady', format: 'virtual', teams: 'all' },
-  { date: '2027-12-14', supplier: 'Pioneer', format: 'in person', teams: ['Central', 'West'] },
+  { date: '2027-12-14', supplier: 'Pioneer', format: 'in person', teams: ['POSB'] },
 ]
 
 interface PlannedRep {
@@ -55,46 +58,80 @@ interface PlannedRep {
   // How many of their recorded (pre-today) trainings they attended. The seed
   // decides which ones they missed. Picked by hand so the board tells a story:
   // a perfect record, a two-way tie for second, one rep exactly on the line,
-  // roughly half above it, and a few who can't get there this year.
+  // a bit under half above it, and a few who can't get there this year.
   attended: number
   startDate?: string
 }
 
-// Invites before today: East 11, Central 9, West 8, Canada 8.
+// Invites before today: POSB 10, NetSec 8, Federal 8, Communications 7, Cisco 7.
+// Only Communications and Cisco reps can cross the line on one more stamp
+// (5 of 7 to 6 of 8). The demo opens on the first of those by name, so keep
+// any other 5 of 7 sorting after Hannah.
 const REPS: PlannedRep[] = [
-  { name: 'Priya Natarajan', team: 'East', attended: 10 },
-  { name: 'Marcus Bell', team: 'East', attended: 10 },
-  { name: 'Elena Ruiz', team: 'East', attended: 9 },
-  { name: 'Owen Fitzgerald', team: 'East', attended: 9 },
-  { name: 'Hannah Kowalski', team: 'East', attended: 8 }, // 8 of 11, crosses the line today
-  { name: 'Devon Price', team: 'East', attended: 7 },
-  { name: 'Sofia Marchetti', team: 'East', attended: 6 },
-  { name: 'Caleb Turner', team: 'East', attended: 5 },
+  { name: 'Owen Fitzgerald', team: 'Communications', attended: 6 },
+  { name: 'Sofia Marchetti', team: 'Communications', attended: 6 },
+  { name: 'Talia Ross', team: 'Communications', attended: 6 },
+  { name: 'Victor Huang', team: 'Communications', attended: 6 },
+  { name: 'Rosa Delgado', team: 'Communications', attended: 6 },
+  { name: 'Devon Price', team: 'Communications', attended: 6 },
+  { name: 'Hannah Kowalski', team: 'Communications', attended: 5 }, // 5 of 7, crosses the line today
+  { name: 'Imani Carter', team: 'Communications', attended: 6 },
+  { name: 'Wren Castillo', team: 'Communications', attended: 5 },
+  { name: 'Caleb Turner', team: 'Communications', attended: 3 },
+  { name: 'Mira Kapoor', team: 'Communications', attended: 3 },
+  { name: 'Jonah Becker', team: 'Communications', attended: 2 },
 
-  { name: 'Jordan Hale', team: 'Central', attended: 9 }, // perfect record
-  { name: 'Aisha Bello', team: 'Central', attended: 8 },
-  { name: 'Ryan Lindqvist', team: 'Central', attended: 7 },
-  { name: 'Grace Nakamura', team: 'Central', attended: 7 },
-  { name: 'Tyler Brooks', team: 'Central', attended: 7 },
-  { name: 'Leah Abramson', team: 'Central', attended: 6 },
-  { name: 'Mateo Silva', team: 'Central', attended: 5 },
-  { name: 'Brianna Cole', team: 'Central', attended: 4 },
+  { name: 'Jordan Hale', team: 'POSB', attended: 10 }, // perfect record
+  { name: 'Priya Natarajan', team: 'POSB', attended: 9 },
+  { name: 'Marcus Bell', team: 'POSB', attended: 9 },
+  { name: 'Elena Ruiz', team: 'POSB', attended: 8 },
+  { name: 'Paige Holloway', team: 'POSB', attended: 8 },
+  { name: 'Grace Nakamura', team: 'POSB', attended: 8 },
+  { name: 'Felix Andersson', team: 'POSB', attended: 7 },
+  { name: 'Kendra Wallace', team: 'POSB', attended: 7 },
+  { name: 'Mateo Silva', team: 'POSB', attended: 6 },
+  { name: 'Omar Haddad', team: 'POSB', attended: 6 },
+  { name: 'Tessa Lund', team: 'POSB', attended: 5 },
+  { name: 'Cole Ashby', team: 'POSB', attended: 4 },
 
-  { name: 'Kai Morales', team: 'West', attended: 7 },
-  { name: 'Naomi Feld', team: 'West', attended: 7 },
-  { name: 'Ethan Park', team: 'West', attended: 6 }, // 6 of 8, exactly on the line
-  { name: 'Lucia Romero', team: 'West', attended: 5 },
-  { name: 'Isaac Patel', team: 'West', attended: 5 },
-  { name: 'Megan Doyle', team: 'West', attended: 4 },
-  { name: 'Andre Thomas', team: 'West', attended: 4 },
-  { name: 'Chloe Whitaker', team: 'West', attended: 3 },
+  { name: 'Kai Morales', team: 'NetSec', attended: 7 },
+  { name: 'Naomi Feld', team: 'NetSec', attended: 7 },
+  { name: 'Rahul Mehta', team: 'NetSec', attended: 7 },
+  { name: 'Sam Whitlock', team: 'NetSec', attended: 7 },
+  { name: 'Harper Lindgren', team: 'NetSec', attended: 7 },
+  { name: 'Ryan Lindqvist', team: 'NetSec', attended: 5 },
+  { name: 'Isaac Patel', team: 'NetSec', attended: 5 },
+  { name: 'Declan Shea', team: 'NetSec', attended: 5 },
+  { name: 'Andre Thomas', team: 'NetSec', attended: 4 },
+  { name: 'Lena Hoffmann', team: 'NetSec', attended: 4 },
+  { name: 'Gabriel Okafor', team: 'NetSec', attended: 3 },
+  { name: 'Yuki Tanaka', team: 'NetSec', attended: 3 },
 
-  { name: 'Liam Tremblay', team: 'Canada', attended: 7 },
-  { name: 'Amélie Gagnon', team: 'Canada', attended: 7 },
-  { name: 'Noah Singh', team: 'Canada', attended: 5 },
-  { name: 'Zoe MacLeod', team: 'Canada', attended: 4 },
-  { name: 'Ben Okoro', team: 'Canada', attended: 3 },
-  { name: 'Clara Dubois', team: 'Canada', attended: 0, startDate: '2027-06-01' }, // new hire, no stamps yet
+  { name: 'Tyler Brooks', team: 'Cisco', attended: 6 },
+  { name: 'Theo Vance', team: 'Cisco', attended: 6 },
+  { name: 'Janelle Moss', team: 'Cisco', attended: 6 },
+  { name: 'Arjun Rao', team: 'Cisco', attended: 6 },
+  { name: 'Lucia Romero', team: 'Cisco', attended: 6 },
+  { name: 'Brianna Cole', team: 'Cisco', attended: 6 },
+  { name: 'Leah Abramson', team: 'Cisco', attended: 6 },
+  { name: 'Malik Grant', team: 'Cisco', attended: 5 },
+  { name: 'Bea Sorensen', team: 'Cisco', attended: 4 },
+  { name: 'Megan Doyle', team: 'Cisco', attended: 3 },
+  { name: 'Diego Serrano', team: 'Cisco', attended: 3 },
+  { name: 'Chloe Whitaker', team: 'Cisco', attended: 2 },
+
+  { name: 'Liam Tremblay', team: 'Federal', attended: 7 },
+  { name: 'Ethan Park', team: 'Federal', attended: 6 }, // 6 of 8, exactly on the line
+  { name: 'Aisha Bello', team: 'Federal', attended: 5 },
+  { name: 'Amélie Gagnon', team: 'Federal', attended: 5 },
+  { name: 'Desmond Reyes', team: 'Federal', attended: 5 },
+  { name: 'Noah Singh', team: 'Federal', attended: 4 },
+  { name: 'Ingrid Solberg', team: 'Federal', attended: 4 },
+  { name: 'Zoe MacLeod', team: 'Federal', attended: 4 },
+  { name: 'Fiona Brennan', team: 'Federal', attended: 3 },
+  { name: 'Ben Okoro', team: 'Federal', attended: 3 },
+  { name: 'Nadia Kerr', team: 'Federal', attended: 2 },
+  { name: 'Clara Dubois', team: 'Federal', attended: 0, startDate: '2027-06-01' }, // new hire, no stamps yet
 ]
 
 const TITLES = {
@@ -127,9 +164,14 @@ check(PLAN.length === 24, 'expected 24 trainings')
 check(PLAN.every((t) => t.date.startsWith('2027-') && isWeekday(t.date)), 'every training must be a 2027 weekday')
 check(PLAN.some((t) => t.date === DEMO_TODAY), 'one training has to land on DEMO_TODAY')
 for (const supplier of SUPPLIERS) {
-  check(PLAN.filter((t) => t.supplier === supplier).length === 2, `${supplier} should run twice`)
+  check(PLAN.some((t) => t.supplier === supplier), `${supplier} should run at least once`)
 }
-check(REPS.length === 30, 'expected 30 reps')
+check(PLAN.every((t) => t.teams === 'all' || t.teams.length > 0), 'every in-person training needs a team')
+for (const team of TEAMS) {
+  check(REPS.filter((r) => r.team === team).length >= 10, `${team} needs at least 10 reps`)
+}
+check(REPS.length === 60, 'expected 60 reps')
+check(new Set(REPS.map((r) => emailFor(r.name))).size === REPS.length, 'two reps share an email')
 
 const trainings = PLAN.map((t, i) => {
   const seen = PLAN.slice(0, i).some((p) => p.supplier === t.supplier)
