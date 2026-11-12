@@ -1,5 +1,7 @@
 /* Loading skeletons, the empty state and the error state. The skeletons sit
-   still on purpose: motion is saved for the three moments that earn it. */
+   still on purpose: motion is saved for the three moments that earn it.
+   Each one is the outline of the screen on its way: a closed navy cover or
+   an open spread for a passport, a white sheet with rows for Standings. */
 
 .state {
   display: grid;
@@ -13,43 +15,70 @@
   box-shadow: var(--shadow-card);
 }
 
+/* Wide enough that "No attendance yet" sits on one line on a laptop. */
 .state__title {
   font-size: var(--text-section);
   font-weight: var(--display-weight);
   line-height: 1.02;
   text-transform: uppercase;
-  max-width: 18ch;
+  max-width: 20ch;
 }
 
 .state__text { max-width: 52ch; color: var(--color-ink-2); }
 
 .skeleton { margin-inline: auto; }
 
+/* The passport: the picker's spot, then the book. On a wide screen the
+   pages shrink with a short window, the way the real book does. */
 .skeleton--book {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, var(--page-width)));
-  justify-content: center;
+  justify-items: center;
+  gap: var(--space-sm);
+  --skeleton-page: var(--page-width);
 }
-.skeleton__page { aspect-ratio: 5 / 7; border-radius: var(--radius-page) 0 0 var(--radius-page); background: var(--color-paper-2); }
-.skeleton__page--cover { border-radius: 0 var(--radius-page) var(--radius-page) 0; background: var(--color-paper-3); }
+.skeleton__spread {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, var(--skeleton-page)));
+  justify-content: center;
+  width: 100%;
+}
+.skeleton__page {
+  width: 100%;
+  aspect-ratio: 5 / 7;
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-page) 0 0 var(--radius-page);
+  background: var(--color-page);
+}
+.skeleton__page + .skeleton__page { border-radius: 0 var(--radius-page) var(--radius-page) 0; border-left-color: var(--color-paper-3); }
+.skeleton__page--cover { width: min(100%, var(--skeleton-page)); border-color: var(--color-leather-edge); border-radius: var(--radius-page); background: var(--color-leather); }
 
 .skeleton--board { display: grid; gap: var(--space-lg); }
 .skeleton__bar { height: 56px; border-radius: var(--radius-card); background: var(--color-paper-2); }
 .skeleton__bar--title { width: min(320px, 70%); height: 48px; }
+.skeleton__bar--picker { width: 180px; height: 36px; }
 .skeleton__figures { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-lg); }
+/* The scoreboard's white sheet with its hairline, and rows in the Fog band. */
 .skeleton__panel {
   display: grid;
   gap: var(--space-xs);
   padding: var(--space-lg);
-  border-radius: var(--radius-page);
-  background: var(--color-paper-3);
+  border: var(--rule-hair) solid var(--color-board-rule);
+  border-radius: var(--radius-card);
+  background: var(--color-board);
+  box-shadow: var(--shadow-card);
 }
-.skeleton__row { height: 44px; border-radius: var(--radius-card); background: var(--color-paper-2); }
+.skeleton__row { height: 44px; border-radius: var(--radius-card); background: var(--color-board-below); }
 
+@media (min-width: 60rem) {
+  .skeleton--book { --skeleton-page: min(var(--page-width), (100dvh - 220px) * 5 / 7); }
+}
+
+/* Phones show one page at a time, with the picker down in the page bar. */
 @media (max-width: 59.99rem) {
-  .skeleton--book { grid-template-columns: minmax(0, var(--page-width)); }
-  .skeleton__page:first-child { display: none; }
-  .skeleton__page--cover { border-radius: var(--radius-page); }
+  .skeleton__bar--picker { display: none; }
+  .skeleton__spread { grid-template-columns: minmax(0, var(--page-width)); }
+  .skeleton__page:first-child { border-radius: var(--radius-page); }
+  .skeleton__page + .skeleton__page { display: none; }
 }
 
 @media (max-width: 40rem) {

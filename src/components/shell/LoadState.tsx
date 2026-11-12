@@ -2,6 +2,8 @@
 // what's coming, an empty state if the file has no rows, and an error with a
 // way to try again.
 
+import { useSearchParams } from 'react-router'
+import { BACK_COVER, parsePage } from '../../lib/book'
 import { useApp } from '../../state/AppState'
 import './LoadState.css'
 
@@ -11,6 +13,11 @@ interface Props {
 
 export function LoadState({ screen }: Props) {
   const { status, error, retry } = useApp()
+  const [params] = useSearchParams()
+  // A passport link to a cover opens on the closed book, so its outline is
+  // one cover, not an open spread.
+  const page = parsePage(params.get('page'))
+  const closed = page === 0 || page === BACK_COVER
 
   if (status === 'error') {
     return (
@@ -54,9 +61,16 @@ export function LoadState({ screen }: Props) {
         Loading attendance data
       </p>
       {screen === 'passport' ? (
-        <div className="skeleton skeleton--book" aria-hidden="true">
-          <div className="skeleton__page" />
-          <div className="skeleton__page skeleton__page--cover" />
+        <div className={`skeleton skeleton--book${closed ? ' skeleton--closed' : ''}`} aria-hidden="true">
+          <div className="skeleton__bar skeleton__bar--picker" />
+          {closed ? (
+            <div className="skeleton__page skeleton__page--cover" />
+          ) : (
+            <div className="skeleton__spread">
+              <div className="skeleton__page" />
+              <div className="skeleton__page" />
+            </div>
+          )}
         </div>
       ) : (
         <div className="skeleton skeleton--board" aria-hidden="true">
