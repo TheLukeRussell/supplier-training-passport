@@ -96,7 +96,7 @@ The sample data comes from `scripts/generate-data.ts`. It's seeded, so `npm run 
 
 Every push to `main` runs `.github/workflows/deploy.yml`. It installs, typechecks, runs the unit tests, builds, and publishes `dist/` to GitHub Pages with the official Pages actions. Vite's base path is `/supplier-training-passport/` to match the repo name, and the routes live after the `#`, so Pages doesn't need a 404 workaround.
 
-Search engines are told to stay out (`robots.txt` and a noindex tag).
+The noindex tag in `index.html` is what keeps the site out of search. There's a `robots.txt` too, but crawlers only read one at the root of the domain, so on a project site like this it never gets read.
 
 ## Where things are
 
