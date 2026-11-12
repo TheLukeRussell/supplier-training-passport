@@ -173,7 +173,11 @@
   .board__team { grid-area: team; }
   .board__stamps { grid-area: stamps; }
   .board__status { grid-area: status; text-align: right; }
-  .board__change { grid-area: change; text-align: right; }
+  /* A flex box, so an arrow and "Same" make the same height. As inline
+     text the arrow sat on the baseline and added 2px, so rows changed
+     height on Record and the row slide started a little off, more so the
+     longer the board. */
+  .board__change { grid-area: change; display: flex; justify-content: flex-end; }
   .board__streak { grid-area: streak; }
   .board__team, .board__stamps, .board__streak, .board__status, .board__change { font-size: var(--text-sm); }
   /* Here the values are Ink and the little labels are the quiet part. */
