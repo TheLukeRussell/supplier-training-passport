@@ -39,6 +39,9 @@ export function StandingsScreen() {
   const search = (value: string) => {
     setQuery(value)
     update('q', value || null)
+    // Clear search goes away with the empty state, so an empty search puts
+    // focus back in the box. Typing it empty leaves it there anyway.
+    if (!value) document.getElementById('search')?.focus()
   }
 
   // The figures follow the team filter. Search only narrows the board.
