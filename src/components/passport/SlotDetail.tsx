@@ -29,7 +29,13 @@ export function SlotDetail({ training, model, rep, ctx, onClose }: Props) {
   useEffect(() => {
     const dialog = ref.current
     if (!dialog) return
-    if (training && !dialog.open) dialog.showModal()
+    if (training && !dialog.open) {
+      dialog.showModal()
+      // Start on the heading, not Close. On a short screen (200% zoom, a
+      // phone on its side) focusing Close scrolled the slip past its title.
+      dialog.querySelector<HTMLElement>('#slip-title')?.focus()
+      dialog.scrollTop = 0
+    }
     if (!training && dialog.open) dialog.close()
   }, [training])
 
@@ -66,7 +72,7 @@ export function SlotDetail({ training, model, rep, ctx, onClose }: Props) {
     >
       {training && (
         <div className="slip__inner">
-          <h2 id="slip-title" className="slip__title">
+          <h2 id="slip-title" className="slip__title" tabIndex={-1}>
             {training.supplier}
           </h2>
           <p className="slip__lead">{training.title}</p>
@@ -90,7 +96,7 @@ export function SlotDetail({ training, model, rep, ctx, onClose }: Props) {
           </dl>
           <p className="slip__status">{status}</p>
           <form method="dialog" className="slip__actions">
-            <button type="submit" className="btn" autoFocus>
+            <button type="submit" className="btn">
               Close
             </button>
           </form>

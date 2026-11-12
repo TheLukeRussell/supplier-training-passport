@@ -93,6 +93,12 @@
   }
 }
 
+/* Tabbing scrolls a slot just into view, which on a phone (or at 200% zoom)
+   left the sticky bar over its bottom. Keep focus clear of the bar. */
+@media (max-width: 59.99rem) {
+  html:has(.passport__controls) { scroll-padding-bottom: 5rem; }
+}
+
 @media (min-width: 60rem) {
   .passport__stage { --tilt-reach-x: 8deg; --tilt-reach-y: 12deg; }
 

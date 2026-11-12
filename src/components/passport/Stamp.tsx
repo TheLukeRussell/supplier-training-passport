@@ -137,16 +137,25 @@ export function Stamp({ supplier, date, repEmail, trainingId, landing = false }:
   }, [supplier, date])
 
   // Make sure the stamp is on screen when it lands, with room above it for
-  // the stamper coming down and clear of the sticky page bar on a phone. A
-  // jump, not a smooth scroll, and only when it's needed: centring a stamp
-  // that was already in view made the page lurch as the stamper arrived.
+  // the stamper coming down, and the endorsement that writes in under it a
+  // moment later too, both clear of the sticky page bar on a phone. A jump,
+  // not a smooth scroll, and only when it's needed: centring a stamp that
+  // was already in view made the page lurch as the stamper arrived. On a
+  // short screen (200% zoom, a phone on its side) the endorsement used to
+  // land under the bar.
   useEffect(() => {
     const el = ref.current
     if (!landing || !el) return
     const box = el.getBoundingClientRect()
     const bar = document.querySelector('.passport__controls')
-    const floor = bar && getComputedStyle(bar).position === 'sticky' ? bar.getBoundingClientRect().top : window.innerHeight
-    if (box.top < STAMPER_ROOM || box.bottom > floor) el.scrollIntoView({ block: 'center' })
+    const floor = Math.min(window.innerHeight, bar && getComputedStyle(bar).position === 'sticky' ? bar.getBoundingClientRect().top : Infinity)
+    const note = el.closest('.page')?.querySelector('.visa__endorse:not(.visa__endorse--reserve)')
+    const top = box.top - STAMPER_ROOM
+    const bottom = Math.max(box.bottom, note?.getBoundingClientRect().bottom ?? -Infinity)
+    if (top >= 0 && bottom <= floor) return
+    // Both fit: scroll just far enough. If not, the stamp wins.
+    if (bottom - top <= floor) window.scrollBy(0, top < 0 ? top : bottom - floor)
+    else el.scrollIntoView({ block: 'center' })
   }, [landing])
 
   const two = lines.length === 2
