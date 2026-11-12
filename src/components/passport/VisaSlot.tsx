@@ -29,6 +29,12 @@ const STATUS: Record<SlotState, string> = {
   'not-invited': 'Not on your list',
 }
 
+// The stamper uses the same ink and lands at the same tilt as the stamp.
+function stamperLook(training: Training, repEmail: string) {
+  const { ink, rotate } = stampLook(training.supplier, repEmail, training.id)
+  return { ink, tilt: rotate }
+}
+
 export function VisaSlot({ training, state, repEmail, landing, onOpen, focusable }: Props) {
   const format = training.format === 'virtual' ? 'Virtual' : 'In person'
   const label = `${training.supplier}, ${shortDate(training.date)}, ${format.toLowerCase()}. ${STATUS[state]}. Show details`
@@ -44,7 +50,7 @@ export function VisaSlot({ training, state, repEmail, landing, onOpen, focusable
       {state === 'stamped' ? (
         <span className="slot__stamp">
           <Stamp supplier={training.supplier} date={training.date} repEmail={repEmail} trainingId={training.id} landing={landing} />
-          {landing && <Stamper ink={stampLook(training.supplier, repEmail, training.id).ink} />}
+          {landing && <Stamper {...stamperLook(training, repEmail)} />}
         </span>
       ) : (
         <span className="slot__blank">

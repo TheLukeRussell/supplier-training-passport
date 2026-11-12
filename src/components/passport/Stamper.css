@@ -1,62 +1,104 @@
-/* The stamper's one trip. Everything keys off --dur-press so the ink, the
-   page thump and the endorsement line all hit at the same moment:
-     0 to 16%   it swings in from above, tilted and a bit big (closer to you)
-     16 to 40%  it drops onto the slot, speeding up as it falls
-     40%        impact: the ink appears underneath and the page thumps
-     40 to 54%  it squashes into the paper and recovers
-     54 to 100% it lifts off up and away and fades, showing the stamp
-   Transform and opacity only. Under reduced motion it never renders. */
+/* The stamper's one trip, keyed to --dur-press (1400ms) so the ink, the
+   page thump and the endorsement all hit together. We look down on the
+   page, so height mostly shows as size (bigger is closer to you) and as the
+   shadow, with only a little upward offset:
+     0 to 30%   swings in from the right, slowing into a hover over its slot
+     30 to 38%  a small wind-up, lifting a touch
+     38 to 46%  the press: it speeds up all the way down, like a real hand
+     46%        contact. The ink is laid down underneath, the page thumps
+     46 to 58%  squashes into the paper and settles
+     58 to 64%  holds a beat while the ink takes
+     64 to 100% lifts off and drifts away, fading out at the end
+   Each stretch has its own easing, chosen so the speed never jumps where
+   one stretch hands over to the next: it eases into the hover and out of
+   it, accelerates into the hit, and eases off the page. The shadow runs
+   the same clock. Transform and opacity only. Never shown under reduced
+   motion. */
 
 .stamper {
   position: absolute;
+  inset: 0;
+  z-index: var(--z-raised);
+  pointer-events: none;
+}
+
+/* The shadow stays on the page plane: wide and faint while the stamp is
+   high, small and dark at contact. */
+.stamper__shadow {
+  position: absolute;
+  left: calc(50% - 70px);
+  top: calc(50% - 46px);
+  width: 140px;
+  height: 92px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--color-stamper-shadow), transparent);
+  opacity: 0;
+  animation: stamper-shadow var(--dur-press) both;
+}
+
+.stamper__tool {
+  position: absolute;
   left: calc(50% - 75px);
   bottom: 4%;
-  z-index: var(--z-raised);
   width: 150px;
-  pointer-events: none;
+  height: auto;
+  overflow: visible;
   transform-origin: 50% 100%;
   animation: stamper-press var(--dur-press) both;
 }
 
-.stamper__tool { width: 100%; height: auto; overflow: visible; }
 .stamper__knob, .stamper__neck { fill: var(--color-ink); }
+.stamper__knob-shine { fill: var(--color-ink-2); }
 .stamper__block { fill: var(--color-field); }
+.stamper__block-shine { fill: var(--color-field-3); }
 
 .stamper--ink-1 .stamper__pad { fill: var(--color-stamp-1); }
 .stamper--ink-2 .stamper__pad { fill: var(--color-stamp-2); }
 .stamper--ink-3 .stamper__pad { fill: var(--color-stamp-3); }
-.stamper--ink-4 .stamper__pad { fill: var(--color-stamp-4); }
 
 @keyframes stamper-press {
   0% {
     opacity: 0;
-    transform: translate(30%, -150%) rotate(-16deg) scale(1.3);
-    animation-timing-function: var(--ease-out);
+    transform: translate(34%, -62%) rotate(calc(var(--tilt, 0deg) - 16deg)) scale(1.38);
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   }
-  16% {
-    opacity: 1;
-    transform: translate(14%, -95%) rotate(-9deg) scale(1.2);
-    animation-timing-function: var(--ease-in);
+  10% { opacity: 1; }
+  30% {
+    transform: translate(2%, -16%) rotate(calc(var(--tilt, 0deg) - 4deg)) scale(1.18);
+    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
   }
-  40% {
-    transform: translate(0, 0) rotate(0deg) scale(1);
-    animation-timing-function: var(--ease-out);
+  38% {
+    transform: translate(0, -24%) rotate(calc(var(--tilt, 0deg) - 2deg)) scale(1.22);
+    animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
   }
-  47% {
-    transform: translate(0, 3%) scale(1.06, 0.84);
-    animation-timing-function: var(--ease-out);
+  46% {
+    transform: translate(0, 0) rotate(var(--tilt, 0deg)) scale(1);
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   }
-  56% {
-    opacity: 1;
-    transform: translate(0, 0) scale(1);
-    animation-timing-function: var(--ease-in-out);
+  51% {
+    transform: translate(0, 2%) rotate(var(--tilt, 0deg)) scale(1.05, 0.88);
+    animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
   }
+  58%, 64% {
+    transform: translate(0, 0) rotate(var(--tilt, 0deg)) scale(1);
+    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+  }
+  80% { opacity: 1; }
   100% {
     opacity: 0;
-    transform: translate(-22%, -170%) rotate(12deg) scale(1.2);
+    transform: translate(-10%, -58%) rotate(calc(var(--tilt, 0deg) + 9deg)) scale(1.3);
   }
 }
 
+@keyframes stamper-shadow {
+  0% { opacity: 0; transform: scale(1.9); animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); }
+  30% { opacity: 0.2; transform: scale(1.35); animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1); }
+  38% { opacity: 0.16; transform: scale(1.45); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+  46%, 64% { opacity: 0.5; transform: scale(0.9); animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1); }
+  100% { opacity: 0; transform: scale(1.8); }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .stamper { display: none; animation: none; }
+  .stamper { display: none; }
+  .stamper__tool, .stamper__shadow { animation: none; }
 }

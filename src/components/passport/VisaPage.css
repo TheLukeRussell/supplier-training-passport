@@ -30,12 +30,13 @@
   .visa__grid { grid-template-columns: minmax(0, 1fr); }
 }
 
-/* The page takes the hit when the stamper lands at 40% of its trip: a
-   5px dip and back, like paper on a desk. Transform only. */
+/* The page takes the hit when the stamper lands at 46% of its trip: a
+   small dip and a slight give, then back, like paper on a desk.
+   Transform only. */
 @keyframes visa-thump {
-  0%, 40% { transform: none; }
-  44% { transform: translateY(5px); }
-  54%, 100% { transform: none; }
+  0%, 46% { transform: none; animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1); }
+  49% { transform: translateY(3px) scale(0.997); animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1); }
+  60%, 100% { transform: none; }
 }
 .page--visa.is-thumping { animation: visa-thump var(--dur-press) both; }
 
@@ -63,7 +64,8 @@
   from { clip-path: inset(0 100% 0 0); }
   to { clip-path: inset(0 0 0 0); }
 }
-.visa__endorse.is-writing { animation: endorse-write 520ms var(--ease-out) calc(var(--dur-press) * 0.92) both; }
+/* It starts writing as the stamper lifts away. */
+.visa__endorse.is-writing { animation: endorse-write 620ms cubic-bezier(0.45, 0, 0.55, 1) calc(var(--dur-press) * 0.8) both; }
 
 @media (prefers-reduced-motion: reduce) {
   .page--visa.is-thumping, .visa__endorse.is-writing { animation: none; }

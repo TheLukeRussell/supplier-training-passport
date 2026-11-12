@@ -27,8 +27,8 @@ interface Props {
 }
 
 // How long the whole stamp moment runs: the stamper's trip (--dur-press,
-// 1100ms) plus the endorsement writing itself in after it lifts.
-const MOMENT_MS = 1700
+// 1400ms) with the endorsement writing itself in from 80% of the way, 620ms.
+const MOMENT_MS = 1900
 
 export function VisaPage({ page, model, rep, ctx, stats, landing, onLanded, onOpen, still }: Props) {
   const reduced = useReducedMotion()

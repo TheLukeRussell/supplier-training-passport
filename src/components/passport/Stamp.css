@@ -32,12 +32,14 @@
 }
 
 /* The ink, timed to the stamper (Stamper.css). Nothing shows until the
-   stamper hits the page at 40%; then the impression is there at once and
-   spreads the last few percent as the rubber presses in. */
+   stamper meets the page at 46%. Then the impression is there at once, a
+   hair small and soft, and spreads and sharpens as the rubber presses in,
+   like ink soaking into paper. Hidden under the stamper for most of that;
+   the lift is the reveal. */
 @keyframes stamp-ink {
-  0%, 39.9% { opacity: 0; transform: rotate(var(--tilt, 0deg)) scale(0.94); }
-  40% { opacity: 1; transform: rotate(var(--tilt, 0deg)) scale(0.94); animation-timing-function: var(--ease-out); }
-  58%, 100% { opacity: 1; transform: rotate(var(--tilt, 0deg)) scale(1); }
+  0%, 45.9% { opacity: 0; transform: rotate(var(--tilt, 0deg)) scale(0.96); filter: blur(0.8px); }
+  46% { opacity: 1; transform: rotate(var(--tilt, 0deg)) scale(0.96); filter: blur(0.8px); animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1); }
+  64%, 100% { opacity: 1; transform: rotate(var(--tilt, 0deg)) scale(1); filter: blur(0); }
 }
 
 .stamp.is-landing { animation: stamp-ink var(--dur-press) both; }
