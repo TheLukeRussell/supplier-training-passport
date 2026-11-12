@@ -1,0 +1,65 @@
+/* The "Passport of" picker. A quiet control: the name in bold with a
+   chevron, and no box until you point at it. On a wide screen it sits small
+   above the book. On a phone PassportScreen.css lays it over the page bar,
+   on the line above the page label, so it costs no height. */
+
+.picker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xs);
+  min-width: 0;
+}
+
+.picker__label {
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+  white-space: nowrap;
+}
+
+/* Holds the chevron, since a select can't draw one of its own. */
+.picker__box { position: relative; display: inline-grid; min-width: 0; }
+.picker__box::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: var(--space-sm);
+  width: 7px;
+  height: 7px;
+  margin-top: -6px;
+  border: solid var(--color-ink);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+.picker__select {
+  appearance: none;
+  /* As wide as the name that's showing, so the chevron sits right after
+     it. Where that isn't supported it's as wide as the longest name. */
+  field-sizing: content;
+  min-width: 0;
+  max-width: 100%;
+  height: 36px;
+  margin: 0;
+  padding: 0 calc(var(--space-sm) + 16px) 0 var(--space-sm);
+  border: 1px solid transparent;
+  border-radius: var(--radius-input);
+  background: transparent;
+  color: var(--color-ink);
+  font: 700 var(--text-md)/1.2 var(--font-body);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--dur-micro) var(--ease-out);
+}
+@media (hover: hover) { .picker__select:hover { background: var(--color-paper-2); } }
+.picker__select:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 0; }
+.picker__select:active { background: var(--color-paper-3); }
+.picker__select:disabled { opacity: 0.55; cursor: not-allowed; }
+/* The open list keeps normal type. */
+.picker__select option, .picker__select optgroup { font-size: var(--text-md); color: var(--color-ink); }
+
+@media (prefers-reduced-motion: reduce) {
+  .picker__select { transition: none; }
+}

@@ -281,7 +281,7 @@ test('every passport page fits on a phone screen', async ({ page }, info) => {
 })
 
 // Laptops and projectors. On a short wide window the book scales down so the
-// whole spread with its page numbers, the label and both arrows
+// picker, the whole spread with its page numbers, the label and both arrows
 // fit with no scrolling. Under the scale a click still opens the cover, the
 // arrows still turn, and a recorded stamp still lands on today's slot.
 test('a spread fits a short laptop or projector screen', async ({ page }, info) => {
@@ -297,11 +297,13 @@ test('a spread fits a short laptop or projector screen', async ({ page }, info) 
         vh: window.innerHeight,
         scroll: document.documentElement.scrollHeight - window.innerHeight,
         lowest: Math.max(...bottoms),
+        picker: box(document.getElementById('passport-of'))!.top,
         arrows: arrows.every((b) => b.top >= 0 && b.bottom <= window.innerHeight && b.left >= 0 && b.right <= window.innerWidth),
       }
     })
     expect(r.lowest, `${label}: the spread or its label runs off the bottom`).toBeLessThanOrEqual(r.vh)
     expect(r.scroll, `${label}: the page scrolls`).toBeLessThanOrEqual(0)
+    expect(r.picker, `${label}: the picker is off the top`).toBeGreaterThanOrEqual(0)
     expect(r.arrows, `${label}: an arrow is off screen`).toBe(true)
   }
 
@@ -328,6 +330,37 @@ test('a spread fits a short laptop or projector screen', async ({ page }, info) 
   await page.getByRole('button', { name: 'Record today’s attendance' }).click()
   await expect(page.getByRole('button', { name: /^Pioneer, Thu, Jun 17, virtual\. Attended/ })).toBeVisible()
   await expect(shown(page).locator('.visa__endorse')).toContainText('Stamped')
+})
+
+// The Passport of picker opens anyone's passport on the page you're on. It
+// doesn't change who you are: the Passport tab and View as still point at you.
+test('the picker opens another rep on the same page', async ({ page }, info) => {
+  const phone = info.project.name.startsWith('phone')
+  await page.goto('./#/passport/hannah-kowalski?page=3')
+  const picker = page.getByLabel('Passport of')
+  await expect(picker).toHaveValue('hannah-kowalski')
+  await expect(picker.locator('optgroup')).toHaveCount(4)
+  await expect(picker.locator('option')).toHaveCount(30)
+  const before = await where(page).textContent()
+
+  await picker.selectOption('jordan-hale')
+  await expect(page).toHaveURL(/#\/passport\/jordan-hale\?page=3$/)
+  await expect(picker).toHaveValue('jordan-hale')
+  await expect(where(page)).toHaveText(before!)
+  await expect(page.locator('.book.is-turning')).toHaveCount(0)
+  await expect(shown(page).getByText(/January to March/i).first()).toBeVisible()
+
+  await expect(page.getByRole('link', { name: 'Passport', exact: true })).toHaveAttribute('href', '#/passport/hannah-kowalski')
+  await page.getByRole('button', { name: 'Demo', exact: true }).click()
+  await expect(page.locator('#view-as')).toHaveValue('hannah-kowalski')
+
+  // On a phone it lives in the page bar, so it adds no height.
+  if (phone) {
+    const bar = (await page.locator('.passport__controls').boundingBox())!
+    const box = (await picker.boundingBox())!
+    expect(box.y).toBeGreaterThanOrEqual(bar.y)
+    expect(box.y + box.height).toBeLessThanOrEqual(bar.y + bar.height)
+  }
 })
 
 // Pinched in on a phone, a sideways drag pans across the page instead of

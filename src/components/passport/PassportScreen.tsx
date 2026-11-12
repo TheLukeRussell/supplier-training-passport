@@ -14,6 +14,7 @@ import { Book } from './Book'
 import { Cover } from './Cover'
 import { DataPage } from './DataPage'
 import { NotesPage } from './NotesPage'
+import { PassportPicker } from './PassportPicker'
 import { SlotDetail } from './SlotDetail'
 import { isPinchZoomed, usePinchZoom } from './usePinchZoom'
 import { useTilt } from './useTilt'
@@ -159,6 +160,7 @@ export function PassportScreen() {
   return (
     <div className={`passport container${spread && (view === 0 || view === last) ? ' is-closed' : ''}${zoomed ? ' is-zoomed' : ''}`}>
       <h1 className="visually-hidden">{rep.name}’s passport</h1>
+      <PassportPicker model={model} rep={rep} page={page} />
       <div
         ref={tiltRef}
         className="passport__stage"
