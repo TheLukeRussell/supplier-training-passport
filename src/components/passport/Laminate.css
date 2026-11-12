@@ -92,9 +92,27 @@
   --lam-max: calc(100% - 2px);
   position: absolute;
   inset: 0;
-  background-image: linear-gradient(105deg, transparent calc(var(--lam-mid) - 26cqi), var(--color-foil) calc(var(--lam-mid) - 5cqi) calc(var(--lam-mid) + 5cqi), transparent calc(var(--lam-mid) + 26cqi));
   opacity: calc(var(--shine, 0) * var(--lam-peak));
   transform: translateX(clamp(var(--lam-min), calc((var(--tilt-x, 0) * -0.7 + var(--tilt-y, 0) * -0.3) * var(--lam-travel)), var(--lam-max)));
+}
+/* The band itself: a strip just as wide as the light (52cqi, gold in the
+   middle 10), tilted 15deg to match the 105deg ramp, lying on the line where
+   the band's middle runs. The box around it moves; only the strip paints.
+   A page-sized gradient in each box made Chrome draw two whole pages of
+   light every frame on a spread, and it dropped to about 30fps.
+   On a single page the line runs through the box's middle. The strip is
+   long enough to cross the box at that slant (1/cos 15deg is 1.0353) with
+   8cqi spare at each end for its corners. */
+.laminate__light::before {
+  content: "";
+  position: absolute;
+  left: calc(50% - 26cqi);
+  top: calc(50% - (103.53% + 16cqi) / 2);
+  width: 52cqi;
+  height: calc(103.53% + 16cqi);
+  transform-origin: 50% 50%;
+  transform: rotate(15deg);
+  background-image: linear-gradient(90deg, transparent, var(--color-foil) 21cqi 31cqi, transparent);
 }
 
 /* On a spread the inside cover and the data page lie side by side, and one
@@ -126,6 +144,15 @@
   --lam-min: calc(-50% + 5px);
   --lam-max: calc(150% + 1px);
   left: calc(-50% - 3px);
+}
+/* On a spread the band's line is set from the box's top left corner
+   (--lam-mid along the 105deg ramp), so the strip hangs from where that line
+   meets the box's top edge: --lam-mid / cos 15deg in from the left. It
+   starts 8cqi above so its top corner still covers the band there. */
+.book--spread .book__slot .laminate__light::before {
+  left: calc(var(--lam-mid) / 0.9659 - 26cqi);
+  top: -8cqi;
+  transform-origin: 50% 8cqi;
 }
 
 /* Held or turning, the band gets its own layer, so moving it is just the
