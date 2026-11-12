@@ -163,7 +163,9 @@ export function DataPage({ rep, row, rankedCount, tied, ctx }: Props) {
 
       {/* Two lines of 44 on a wide page. On a phone the spans run inline and
           break anywhere, so the strip wraps to three lines and stays 16px. */}
-      <p className="data__mrz" aria-label={`Machine-readable zone for ${rep.name}`}>
+      {/* role="img" so screen readers use the label instead of reading out
+          88 characters of chevrons. */}
+      <p className="data__mrz" role="img" aria-label={`Machine-readable zone for ${rep.name}`}>
         <span>{mrz1}</span>
         <span>{mrz2}</span>
       </p>
