@@ -112,9 +112,9 @@ export function PassportScreen() {
   // Swipes: track one pointer, and on release decide if it was a sideways
   // drag. If it was, swallow the click that follows so a slot doesn't open.
   const onPointerDown = (event: PointerEvent) => {
+    swiped.current = false
     if (event.pointerType === 'mouse') return
     swipe.current = { x: event.clientX, y: event.clientY, id: event.pointerId }
-    swiped.current = false
   }
   const onPointerUp = (event: PointerEvent) => {
     const start = swipe.current
@@ -123,7 +123,10 @@ export function PassportScreen() {
     const dx = event.clientX - start.x
     const dy = event.clientY - start.y
     if (Math.abs(dx) < SWIPE_PX || Math.abs(dx) < Math.abs(dy) * 1.5) return
+    // The click a swipe leaves behind arrives right away. If none comes,
+    // forget about it so the next real tap still works.
     swiped.current = true
+    window.setTimeout(() => (swiped.current = false), 350)
     goToView(dx < 0 ? view + 1 : view - 1)
   }
 
