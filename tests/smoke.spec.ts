@@ -117,6 +117,15 @@ test('the demo flow works end to end', async ({ page }, info) => {
   await expect(page.locator('.figures__value').nth(2)).toHaveText('12')
   await page.getByRole('button', { name: 'Reset demo' }).click()
   await expect(page.locator('.figures__value').nth(2)).toHaveText('11')
+
+  // Recording from someone else's passport stamps that passport, not the
+  // rep in the View as box, and Standings then highlights them.
+  await page.goto('./#/passport/clara-dubois?page=4')
+  await page.getByRole('button', { name: /^Record today.s attendance/ }).click()
+  await expect(page.getByRole('button', { name: /^Pioneer, Thu, Jun 17, virtual\. Attended/ })).toBeVisible()
+  await expect(shown(page).locator('.visa__endorse')).toContainText('Stamped')
+  await page.getByRole('link', { name: 'Standings' }).click()
+  await expect(page.locator('[data-rep="clara-dubois"]')).toContainText('You')
 })
 
 test('the app still works when storage is blocked', async ({ page }) => {

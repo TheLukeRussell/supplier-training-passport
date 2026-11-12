@@ -27,6 +27,11 @@ export function DemoPanel({ open, onClose }: Props) {
   const { ready } = app
   const navigate = useNavigate()
   const { pathname } = useLocation()
+  // On a passport, "the current rep" is the one whose passport is open,
+  // which may not be the rep in the View as box.
+  const passportId = /^\/passport\/([^/]+)/.exec(pathname)?.[1]
+  const passportRep = (ready && passportId && ready.model.reps.find((rep) => rep.id === passportId)) || null
+  const recordRep = passportRep ?? ready?.viewAs
 
   useEffect(() => {
     if (!open) return
@@ -44,7 +49,7 @@ export function DemoPanel({ open, onClose }: Props) {
   }
 
   const onRecord = () => {
-    app.record()
+    app.record(passportRep?.id)
     // Recording from a passport turns to the page with today's slot, so you
     // actually see the stamp land.
     if (ready?.today && pathname.startsWith('/passport')) {
@@ -90,7 +95,7 @@ export function DemoPanel({ open, onClose }: Props) {
               {app.recorded
                 ? `Recorded for ${shortDate(ready.ctx.today)}. Reset to run it again.`
                 : ready.today
-                  ? `Marks ${firstName(ready.viewAs.name)} at today's ${ready.today.supplier} training, plus about two thirds of everyone else invited.`
+                  ? `Marks ${firstName(recordRep!.name)} at today's ${ready.today.supplier} training, plus about two thirds of everyone else invited.`
                   : 'No training lands on the demo date, so there is nothing to record.'}
             </p>
           </div>

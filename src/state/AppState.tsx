@@ -28,7 +28,9 @@ interface AppValue {
   retry: () => void
   ready: Ready | null
   setViewAs: (repId: string) => void
-  record: () => void
+  // Marks today's attendance. Pass the rep whose passport is open so they
+  // get the stamp; with no rep it uses whoever you're viewing as.
+  record: (repId?: string) => void
   recorded: boolean
   reset: () => void
   undoReset: () => void
@@ -103,15 +105,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const setViewAs = useCallback((repId: string) => setSaved((s) => ({ ...s, viewAs: repId })), [])
 
-  const record = useCallback(() => {
+  const record = useCallback((repId?: string) => {
     if (!ready || !ready.today || ready.ctx.todayRecorded || !baseModel) return
-    const emails = pickTodayAttendees(baseModel, ready.today, ready.viewAs, DEMO_TODAY_SHARE, DEMO_SEED)
+    // The rep being recorded is the one whose passport is open, when there
+    // is one. They become the rep you're viewing as, so Standings highlights
+    // the same person whose stamp just landed.
+    const rep = (repId && findRep(baseModel, repId)) || ready.viewAs
+    const emails = pickTodayAttendees(baseModel, ready.today, rep, DEMO_TODAY_SHARE, DEMO_SEED)
     // Remember the board order from right before, so Standings can slide
     // each row from where it was to where it lands.
     setSlideFrom(ready.board.map((row) => row.rep.id))
     setLanding(new Set(emails))
     setUndo(null)
-    setSaved((s) => ({ ...s, viewAs: ready.viewAs.id, recorded: { trainingId: ready.today!.id, emails } }))
+    setSaved((s) => ({ ...s, viewAs: rep.id, recorded: { trainingId: ready.today!.id, emails } }))
   }, [ready, baseModel])
 
   // Reset keeps a copy of what it wiped so Undo can put it back.
