@@ -1,0 +1,151 @@
+/* The board. A real table on wide screens; on phones each row restacks into
+   a labelled block so nothing scrolls sideways. Below-the-line rows sit on a
+   darker band, and the line itself is a row of its own. */
+
+.board-wrap { display: grid; gap: var(--space-sm); }
+
+.board__title {
+  font-size: var(--text-2xl);
+  font-weight: var(--display-weight);
+  line-height: 1.02;
+  text-transform: uppercase;
+}
+
+.board {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.board thead th {
+  padding: 0 var(--space-sm) var(--space-xs);
+  border-bottom: 1px solid var(--color-field-rule);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-field-muted);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.board__row {
+  position: relative;
+  background: var(--color-field);
+  transition: background-color var(--dur-micro) var(--ease-out);
+}
+.board__row > * {
+  padding: var(--space-xs) var(--space-sm);
+  border-bottom: 1px solid var(--color-field-rule);
+  text-align: left;
+  vertical-align: middle;
+}
+.board__row.is-below { background: var(--color-field-2); }
+.board__row.is-you { background: var(--color-field-3); }
+@media (hover: hover) { .board__row:hover { background: var(--color-field-3); } }
+
+.board__rank {
+  width: 4.5rem;
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  font-size: var(--text-2xl);
+  line-height: 1;
+  white-space: nowrap;
+}
+.board__row.is-you .board__rank { color: var(--color-accent); }
+
+.board__rep { font-weight: 700; }
+.board__rep .tag { margin-left: var(--space-xs); }
+
+/* The name is the link; it stretches over the whole row so any tap opens
+   the passport. */
+.board__link { text-decoration: none; }
+.board__link::after { content: ""; position: absolute; inset: 0; }
+@media (hover: hover) { .board__row:hover .board__link { text-decoration: underline; } }
+.board__link:focus-visible { outline: none; }
+.board__link:focus-visible::after { outline: 2px solid var(--color-focus); outline-offset: -2px; }
+.board__link:active { opacity: 0.85; }
+
+.board__rate {
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  font-size: var(--text-xl);
+  line-height: 1;
+}
+
+.board__status { white-space: nowrap; }
+.board__row.is-below .board__status { color: var(--color-miss-on-field); font-weight: 700; }
+
+.move { display: inline-flex; align-items: center; gap: var(--space-2xs); white-space: nowrap; }
+.move svg { width: 12px; height: 12px; fill: currentColor; flex-shrink: 0; }
+.move--up { color: var(--color-accent); font-weight: 700; }
+.move--down { color: var(--color-miss-on-field); font-weight: 700; }
+.move--same, .move--new { color: var(--color-field-muted); font-size: var(--text-sm); }
+
+/* The cut line. */
+.board__cut td {
+  padding: var(--space-xs) 0;
+  border-bottom: 2px dashed var(--color-accent);
+}
+.board__cut-label {
+  display: inline-block;
+  padding: var(--space-3xs) var(--space-xs);
+  border-radius: var(--radius-input);
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.board-empty {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-xs);
+  padding: var(--space-lg) 0;
+}
+.board-empty__title {
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  font-size: var(--text-2xl);
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+.board-empty__text { color: var(--color-field-muted); }
+.board-empty__action { margin-top: var(--space-xs); background: var(--color-accent); color: var(--color-accent-ink); border-color: var(--color-accent); }
+@media (hover: hover) { .board-empty__action:hover { background: var(--color-field-ink); } }
+
+/* Phones: one block per rep. Rank down the left, name and rate on top, the
+   rest as small labelled pairs underneath. */
+@media (max-width: 47.99rem) {
+  .board thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .board, .board tbody { display: block; }
+  .board__row {
+    display: grid;
+    grid-template-columns: 3.25rem minmax(0, 1fr) minmax(0, 1fr) auto;
+    grid-template-areas:
+      "rank rep rep rate"
+      "rank team stamps status"
+      "rank change streak streak";
+    gap: var(--space-2xs) var(--space-sm);
+    padding: var(--space-sm) var(--space-xs);
+    border-bottom: 1px solid var(--color-field-rule);
+  }
+  .board__row > * { padding: 0; border: 0; }
+  .board__rank { grid-area: rank; width: auto; align-self: start; }
+  .board__rep { grid-area: rep; }
+  .board__rate { grid-area: rate; text-align: right; }
+  .board__team { grid-area: team; }
+  .board__stamps { grid-area: stamps; }
+  .board__status { grid-area: status; text-align: right; }
+  .board__change { grid-area: change; }
+  .board__streak { grid-area: streak; }
+  .board__team, .board__stamps, .board__streak, .board__status, .board__change { font-size: var(--text-sm); }
+  .board__team::before, .board__stamps::before, .board__streak::before {
+    content: attr(data-label) " ";
+    color: var(--color-field-muted);
+  }
+  .board__cut { display: block; }
+  .board__cut td { display: block; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .board__row { transition: none; }
+}

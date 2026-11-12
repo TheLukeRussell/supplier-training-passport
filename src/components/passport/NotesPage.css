@@ -1,0 +1,69 @@
+/* Inside cover: three rules as a real numbered list, then a key that uses
+   the same slot styles the visa pages do. */
+
+.notes__title {
+  font-size: var(--text-2xl);
+  font-weight: var(--display-weight);
+  line-height: 1.02;
+  text-transform: uppercase;
+}
+
+.notes__rules {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: rule;
+}
+.notes__rules li {
+  counter-increment: rule;
+  display: grid;
+  grid-template-columns: var(--space-xl) minmax(0, 1fr);
+  max-width: 48ch;
+}
+.notes__rules li::before {
+  content: counter(rule);
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  font-size: var(--text-2xl);
+  line-height: 1;
+  color: var(--color-field);
+}
+
+.notes__key {
+  display: grid;
+  gap: var(--space-sm);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-rule);
+}
+.notes__key-title { font-weight: 700; }
+.notes__key-list { display: grid; gap: var(--space-sm); margin: 0; padding: 0; list-style: none; }
+.notes__key-list li {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-md);
+  font-size: var(--text-sm);
+}
+
+.notes__swatch {
+  display: grid;
+  place-items: center;
+  min-height: 56px;
+  border: 1px dashed transparent;
+  border-radius: var(--radius-card);
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  font-size: var(--text-lg);
+  line-height: 1;
+}
+.notes__swatch--stamp { border: 3px double var(--color-stamp-2); color: var(--color-stamp-2); transform: rotate(-3deg); }
+.notes__swatch--missed { border-color: var(--color-miss); color: var(--color-miss); }
+.notes__swatch--upcoming { border-color: var(--color-muted); }
+
+.notes__sample {
+  margin-top: auto;
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}

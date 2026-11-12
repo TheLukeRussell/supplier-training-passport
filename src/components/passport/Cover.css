@@ -1,0 +1,70 @@
+/* The cover is the same deep green as the scoreboard. The year stands in for
+   the gold foil a real passport would have. No crest, no leather, no grain. */
+
+.cover {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  gap: var(--space-md);
+  padding: var(--space-xl) var(--space-lg) var(--space-lg);
+  border-color: var(--color-field-2);
+  background: var(--color-field);
+  color: var(--color-field-ink);
+  --color-focus: var(--color-focus-on-field);
+}
+
+.cover__title {
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  font-size: var(--text-3xl);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.cover__year {
+  align-self: center;
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  font-size: calc(var(--text-display) * 1.6);
+  line-height: 0.9;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-accent);
+}
+
+.cover__holder { display: grid; gap: var(--space-3xs); }
+.cover__name { font-size: var(--text-xl); font-weight: 700; line-height: 1.2; }
+.cover__team { color: var(--color-field-muted); }
+
+/* One big button over the whole cover, with its label at the foot. */
+.cover__open {
+  justify-self: start;
+  min-height: var(--control-height);
+  padding: 0 var(--space-md);
+  border: 1px solid var(--color-field-muted);
+  border-radius: var(--radius-input);
+  background: transparent;
+  color: var(--color-field-ink);
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--dur-micro) var(--ease-out);
+}
+.cover__open::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+@media (hover: hover) { .cover:hover .cover__open { background: var(--color-field-3); } }
+.cover__open:active { transform: translateY(1px); }
+.cover__open:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.cover__open:disabled { opacity: 0.55; cursor: not-allowed; }
+
+@media (max-width: 40rem) {
+  .cover { padding: var(--space-lg) var(--space-md) var(--space-md); }
+  .cover__year { font-size: var(--text-display); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cover__open { transition: none; }
+}

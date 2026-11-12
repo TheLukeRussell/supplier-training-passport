@@ -1,0 +1,58 @@
+/* Loading skeletons, the empty state and the error state. The skeletons sit
+   still on purpose: motion is saved for the three moments that earn it. */
+
+.state {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-md);
+  max-width: 34rem;
+  margin: var(--space-2xl) auto;
+  padding: var(--space-xl);
+  border-radius: var(--radius-page);
+  background: var(--color-page);
+  box-shadow: var(--shadow-card);
+}
+
+.state__title {
+  font-size: var(--text-section);
+  font-weight: var(--display-weight);
+  line-height: 1.02;
+  text-transform: uppercase;
+  max-width: 18ch;
+}
+
+.state__text { max-width: 52ch; color: var(--color-ink-2); }
+
+.skeleton { margin-inline: auto; }
+
+.skeleton--book {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, var(--page-width)));
+  justify-content: center;
+}
+.skeleton__page { aspect-ratio: 5 / 7; border-radius: var(--radius-page) 0 0 var(--radius-page); background: var(--color-paper-2); }
+.skeleton__page--cover { border-radius: 0 var(--radius-page) var(--radius-page) 0; background: var(--color-paper-3); }
+
+.skeleton--board { display: grid; gap: var(--space-lg); }
+.skeleton__bar { height: 56px; border-radius: var(--radius-card); background: var(--color-paper-2); }
+.skeleton__bar--title { width: min(320px, 70%); height: 48px; }
+.skeleton__figures { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-lg); }
+.skeleton__panel {
+  display: grid;
+  gap: var(--space-xs);
+  padding: var(--space-lg);
+  border-radius: var(--radius-page);
+  background: var(--color-paper-3);
+}
+.skeleton__row { height: 44px; border-radius: var(--radius-card); background: var(--color-paper-2); }
+
+@media (max-width: 59.99rem) {
+  .skeleton--book { grid-template-columns: minmax(0, var(--page-width)); }
+  .skeleton__page:first-child { display: none; }
+  .skeleton__page--cover { border-radius: var(--radius-page); }
+}
+
+@media (max-width: 40rem) {
+  .state { padding: var(--space-lg); margin-block: var(--space-xl); }
+  .skeleton__figures { grid-template-columns: minmax(0, 1fr); }
+}

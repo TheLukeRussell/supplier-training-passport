@@ -1,0 +1,69 @@
+/* The book: one page on phones, a two-page spread on wide screens. The
+   moving leaf is a 3D card with a page on each face. Only transform animates. */
+
+.book {
+  position: relative;
+  display: grid;
+  margin-inline: auto;
+  perspective: 2400px;
+  /* Vertical scrolling still works; horizontal drags become swipes. */
+  touch-action: pan-y;
+  transition: transform var(--dur-turn) var(--ease-in-out);
+}
+
+.book--spread {
+  /* Leave room either side for the turn buttons. */
+  width: min(100% - 2 * (48px + var(--space-md)), calc(var(--page-width) * 2));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* Closed on a wide screen, the cover sits in the right slot. Sliding the
+   whole book left by half a page centres it. Opening slides it back. */
+.book--spread.is-closed { transform: translateX(-25%); }
+
+.book--single { width: min(100%, var(--page-width)); }
+
+.book__slot {
+  position: relative;
+  display: grid;
+  min-width: 0;
+}
+
+.book__sheet { display: grid; min-width: 0; }
+
+/* Square the spine edge of each page so the spread reads as one book. */
+.book--spread .book__slot--left .page { border-radius: var(--radius-page) 0 0 var(--radius-page); }
+.book--spread .book__slot--right .page { border-radius: 0 var(--radius-page) var(--radius-page) 0; }
+.book--spread .book__slot--left .page { border-right-color: var(--color-paper-3); }
+.book--spread .book__slot--right .page { border-left-color: var(--color-paper-3); }
+
+.book__leaf {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: var(--z-raised);
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+.book__leaf--right { left: 50%; width: 50%; transform-origin: left center; }
+.book__leaf--left { left: 0; width: 50%; transform-origin: right center; }
+.book__leaf--single { left: 0; width: 100%; transform-origin: left center; }
+
+.book__face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  overflow: hidden;
+  backface-visibility: hidden;
+}
+.book__face--back { transform: rotateY(180deg); }
+
+/* Faces flip, so their spine corners swap too. */
+.book__leaf--right .book__face--front .page,
+.book__leaf--left .book__face--back .page { border-radius: 0 var(--radius-page) var(--radius-page) 0; }
+.book__leaf--right .book__face--back .page,
+.book__leaf--left .book__face--front .page { border-radius: var(--radius-page) 0 0 var(--radius-page); }
+
+@media (prefers-reduced-motion: reduce) {
+  .book { transition: none; }
+}

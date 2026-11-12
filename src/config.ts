@@ -39,8 +39,5 @@ export const DEMO_TODAY_SHARE = 0.65
 export const DATA_SEED = 2027
 export const DEMO_SEED = 617
 
-// Where the sample data file sits, relative to the app's base URL.
-export const DATA_PATH = 'data/attendance.json'
-
 // Key for demo changes in localStorage.
 export const STORAGE_KEY = 'stp-demo-v1'

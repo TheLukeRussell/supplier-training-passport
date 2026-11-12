@@ -1,0 +1,140 @@
+/* The data page, laid out like a passport's bio page: header, photo box with
+   labelled fields beside it, the four numbers, the line, and the strip. */
+
+.data__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding-bottom: var(--space-xs);
+  border-bottom: 1px solid var(--color-rule);
+}
+
+.data__title {
+  font-size: var(--text-2xl);
+  font-weight: var(--display-weight);
+  line-height: 1.02;
+  text-transform: uppercase;
+}
+
+.data__codes { display: flex; gap: var(--space-md); margin: 0; }
+.data__codes div { display: flex; gap: var(--space-2xs); align-items: baseline; }
+.data__codes dt { font-size: var(--text-sm); color: var(--color-ink-2); }
+.data__codes dd { margin: 0; font-weight: 700; }
+
+.data__bio {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: var(--space-md);
+  align-items: start;
+}
+
+.data__photo {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 3 / 4;
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-card);
+  background: var(--color-paper-2);
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  font-size: var(--text-3xl);
+  line-height: 1;
+  color: var(--color-ink-2);
+}
+
+.data__fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-xs) var(--space-md);
+  margin: 0;
+}
+.data__field { min-width: 0; }
+.data__field--wide { grid-column: 1 / -1; }
+.data__field dt { font-size: var(--text-sm); color: var(--color-ink-2); line-height: 1.3; }
+.data__field dd { margin: 0; line-height: 1.3; overflow-wrap: anywhere; }
+
+.data__name {
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  font-size: var(--text-xl);
+  text-transform: uppercase;
+  line-height: 1.05;
+}
+.data__id { font-variant-numeric: tabular-nums; }
+
+/* Four numbers in a 2 by 2, parted by hairlines. */
+.data__stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  border-top: 1px solid var(--color-rule);
+}
+.data__stat {
+  min-width: 0;
+  padding: var(--space-xs) 0;
+  border-bottom: 1px solid var(--color-rule);
+}
+.data__stat:nth-child(odd) { padding-right: var(--space-md); border-right: 1px solid var(--color-rule); }
+.data__stat:nth-child(even) { padding-left: var(--space-md); }
+.data__stat dt { font-size: var(--text-sm); color: var(--color-ink-2); }
+.data__stat dd { margin: 0; }
+
+.data__figure {
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  font-size: var(--text-3xl);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.data__figure--word { font-size: var(--text-2xl); }
+.data__of { font-size: var(--text-lg); color: var(--color-ink-2); }
+
+.data__next { display: grid; gap: var(--space-3xs); }
+.data__next-name { font-family: var(--font-display); font-weight: var(--display-weight); font-size: var(--text-xl); line-height: 1.05; }
+.data__today { margin-left: var(--space-xs); }
+
+/* The line message sits on the cover green: it's the scoreboard talking. */
+.data__line {
+  display: grid;
+  gap: var(--space-3xs);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-card);
+  background: var(--color-field);
+  color: var(--color-field-ink);
+}
+.data__line-head {
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  font-size: var(--text-2xl);
+  line-height: 1.02;
+  text-transform: uppercase;
+}
+.data__line--above .data__line-head { color: var(--color-accent); }
+.data__line-sub { font-size: var(--text-md); }
+.data__line-note { font-size: var(--text-sm); color: var(--color-field-muted); }
+
+/* The machine-readable strip. 16px or more, so the capitals are allowed. */
+.data__mrz {
+  margin-top: auto;
+  font-family: var(--font-outlier);
+  font-size: var(--text-mrz);
+  line-height: 1.4;
+  white-space: pre;
+  color: var(--color-ink);
+}
+.data__mrz span { display: block; }
+
+/* 44 characters of a 16px mono need about 425px. A page narrower than that
+   lets the strip run as one string and break anywhere, which lands on three
+   lines on a phone instead of shrinking the type. */
+@container page (max-width: 426px) {
+  .data__mrz { white-space: normal; word-break: break-all; }
+  .data__mrz span { display: inline; }
+}
+
+@media (max-width: 40rem) {
+  .data__bio { grid-template-columns: 72px minmax(0, 1fr); gap: var(--space-sm); }
+  .data__photo { font-size: var(--text-2xl); }
+  .data__figure { font-size: var(--text-2xl); }
+}

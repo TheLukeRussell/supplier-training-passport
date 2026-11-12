@@ -2,7 +2,19 @@
 
 import { describe, expect, it } from 'vitest'
 import { buildModel, findRep } from './model'
-import { attendNext, isRecorded, meetsLine, percentOf, rateOf, repStats, slotState, streakOf, type Context } from './rules'
+import {
+  attendNext,
+  bestRateOf,
+  cushionOf,
+  isRecorded,
+  meetsLine,
+  percentOf,
+  rateOf,
+  repStats,
+  slotState,
+  streakOf,
+  type Context,
+} from './rules'
 import { FOUR, rowsFor } from './test-helpers'
 
 // Today is the fourth training's date, not recorded yet.
@@ -66,6 +78,21 @@ describe('attendNext', () => {
   })
   it('is out of reach when nothing is left', () => {
     expect(attendNext(1, 4, 0, 0.75)).toEqual({ kind: 'out-of-reach', left: 0 })
+  })
+})
+
+describe('cushionOf and bestRateOf', () => {
+  it('counts how many a rep can skip and stay above', () => {
+    // 9/10 -> 9/11 (.818) -> 9/12 (.75) -> 9/13 (.69). Two skips.
+    expect(cushionOf(9, 10, 12, 0.75)).toBe(2)
+    // exactly on the line: no room
+    expect(cushionOf(6, 8, 12, 0.75)).toBe(0)
+    // capped by what's left
+    expect(cushionOf(10, 10, 1, 0.75)).toBe(1)
+  })
+  it('works out the best finish', () => {
+    expect(bestRateOf(3, 8, 11)).toBeCloseTo(14 / 19)
+    expect(bestRateOf(0, 0, 0)).toBeNull()
   })
 })
 

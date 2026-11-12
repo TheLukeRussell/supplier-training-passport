@@ -1,0 +1,45 @@
+/* The paper every inside page is printed on. Pages are at least passport
+   proportions (5 by 7) and grow if their content needs more room. */
+
+.page {
+  container: page / inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  min-width: 0;
+  aspect-ratio: 5 / 7;
+  padding: var(--space-lg) var(--space-lg) var(--space-md);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-page);
+  background: var(--color-page);
+  box-shadow: var(--shadow-card);
+}
+
+.page__head {
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+
+.page__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  flex: 1;
+  min-width: 0;
+}
+
+/* Page number at the outer foot, like a printed book. */
+.page__folio {
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  font-size: var(--text-lg);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-muted);
+  text-align: right;
+}
+.book__slot--left .page__folio { text-align: left; }
+
+@media (max-width: 40rem) {
+  .page { padding: var(--space-md) var(--space-md) var(--space-sm); }
+}

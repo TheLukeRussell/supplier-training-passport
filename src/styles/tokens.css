@@ -1,0 +1,45 @@
+/* Every colour, face, size and timing the app uses. Components only ever
+   reach for these through var(), never a raw value. */
+:root {
+  color-scheme: light;
+
+  --space-3xs: 2px; --space-2xs: 4px; --space-xs: 8px; --space-sm: 12px; --space-md: 16px; --space-lg: 24px; --space-xl: 40px; --space-2xl: 64px; --space-3xl: 96px; --space-4xl: 144px;
+  --text-xs: 0.8125rem; --text-sm: 0.875rem; --text-md: 1rem; --text-lg: 1.125rem; --text-xl: 1.375rem; --text-2xl: 1.75rem; --text-3xl: 2.25rem;
+  --text-display-s: 3rem; --text-display: 4.5rem;
+  --text-section: 2.5rem; --text-title: 1.25rem; --text-lead: 1.125rem;
+  --text-mrz: 1rem;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1); --ease-in: cubic-bezier(0.7, 0, 0.84, 0); --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 120ms; --dur-short: 220ms; --dur-long: 420ms;
+  --dur-turn: 640ms; --dur-stamp: 380ms; --dur-slide: 720ms;
+  --color-error: oklch(50% 0.18 27); --color-success: oklch(50% 0.12 150);
+  --container: 1200px; --gutter: 40px; --gap-columns: 24px; --section-gap-s: 40px; --section-gap: 64px; --section-gap-l: 96px;
+  --z-base: 1; --z-raised: 10; --z-dropdown: 100; --z-sticky: 200; --z-sticky-nav: 300; --z-modal: 400; --z-toast: 500; --z-tooltip: 600;
+
+  /* Ground and passport pages: a pale, cool security-paper green, never cream. */
+  --color-paper: oklch(95% 0.013 170); --color-paper-2: oklch(92% 0.017 170); --color-paper-3: oklch(88.5% 0.021 170);
+  --color-page: oklch(98.5% 0.007 160);
+  --color-ink: oklch(23% 0.035 175); --color-ink-2: oklch(40% 0.03 175); --color-muted: oklch(50% 0.025 175);
+  --color-rule: oklch(85% 0.02 170);
+
+  /* The field: the passport cover and the scoreboard are the same deep green. */
+  --color-field: oklch(33% 0.075 165); --color-field-2: oklch(28.5% 0.065 165); --color-field-3: oklch(39% 0.08 165);
+  --color-field-ink: oklch(96% 0.02 150); --color-field-muted: oklch(80% 0.04 160); --color-field-rule: oklch(46% 0.06 165);
+
+  /* The signal: scoreboard yellow, which stands in for gold foil on the cover. */
+  --color-accent: oklch(87% 0.165 95); --color-accent-ink: oklch(25% 0.05 165);
+  --color-focus: oklch(42% 0.12 170); --color-focus-on-field: oklch(87% 0.165 95);
+
+  /* Below the line and missed slots. */
+  --color-miss: oklch(50% 0.18 27); --color-miss-on-field: oklch(80% 0.11 35);
+
+  /* Stamp inks. Each supplier gets one, see src/lib/stamps.ts. */
+  --color-stamp-1: oklch(50% 0.18 25); --color-stamp-2: oklch(46% 0.16 262); --color-stamp-3: oklch(45% 0.16 320); --color-stamp-4: oklch(45% 0.11 155);
+
+  --font-display: "Big Shoulders", "Arial Narrow", sans-serif; --font-body: "Figtree", ui-sans-serif, system-ui, sans-serif; --font-outlier: "Overpass Mono", ui-monospace, monospace;
+  --display-weight: 800;
+  --radius-card: 6px; --radius-page: 10px; --radius-input: 6px; --radius-pill: 999px; --rule-hair: 1px;
+  --shadow-card: 0 1px 2px oklch(22% 0.03 170 / 0.12);
+  --tracking-display: 0;
+  --page-width: 480px;
+  --control-height: 40px;
+}

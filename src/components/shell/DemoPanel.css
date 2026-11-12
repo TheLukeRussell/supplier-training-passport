@@ -1,0 +1,73 @@
+/* Demo panel. A dashed strip under the top bar so nobody mistakes it for
+   part of the product. It pushes the page down instead of covering it. */
+
+.demo {
+  border-bottom: 1px dashed var(--color-ink-2);
+  background: var(--color-paper-2);
+}
+
+.demo__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) minmax(0, 1.4fr) auto;
+  grid-template-areas:
+    "head head head head"
+    "viewas record record reset"
+    "states states states states";
+  gap: var(--space-md) var(--space-lg);
+  padding-block: var(--space-md) var(--space-lg);
+  align-items: start;
+}
+
+.demo__head { grid-area: head; display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2xs) var(--space-md); }
+.demo__title {
+  font-size: var(--text-xl);
+  font-weight: var(--display-weight);
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+.demo__note { font-size: var(--text-sm); color: var(--color-ink-2); }
+
+.demo__viewas { grid-area: viewas; }
+
+.demo__record {
+  grid-area: record;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-xs) var(--space-md);
+  padding-top: var(--space-lg);
+}
+
+.demo__reset {
+  grid-area: reset;
+  display: grid;
+  justify-items: start;
+  gap: var(--space-2xs);
+  padding-top: var(--space-lg);
+}
+
+.demo__help {
+  min-height: 1lh;
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+  max-width: 48ch;
+}
+
+.demo__states { grid-area: states; align-items: center; }
+.demo__states legend { float: left; margin-right: var(--space-sm); padding-top: var(--space-xs); }
+
+.demo__warn {
+  grid-column: 1 / -1;
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+
+@media (max-width: 60rem) {
+  .demo__inner {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "head" "viewas" "record" "reset" "states";
+  }
+  .demo__record, .demo__reset { padding-top: 0; }
+  .demo__record { grid-template-columns: minmax(0, 1fr); justify-items: start; }
+  .demo__states legend { float: none; padding-top: 0; }
+}

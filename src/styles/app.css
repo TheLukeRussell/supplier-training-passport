@@ -1,0 +1,158 @@
+/* Hallmark · shape: app screen · genre: playful · theme: custom · idea: "the cover is the scoreboard: one deep green carries the passport and the standings, and every count on it is a stamp somebody earned" · vibe: "a real passport crossed with a game scoreboard"
+ * paper: oklch(95% 0.013 170) · accent: oklch(87% 0.165 95) · display: Big Shoulders · body: Figtree · outlier: Overpass Mono, the machine-readable strip only
+ * nav: top bar, wordmark, two screen tabs, the demo switch at the end · signature: the visa pages, one stamp per attended training · states: loading, empty, error, no stamps, no matches
+ * axes: light/condensed-heavy/chromatic-yellow · posture: full palette (field green for cover and board, yellow signal, four stamp inks, each with one job) · contrast: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H4 E4 S5 R4 V5 · weakest: E, three hand-built motions (page turn, stamp, row slide); each is transform only and instant under reduced motion */
+/* Hallmark · waive 64 · the MRZ strip is machine-readable code by nature · a passport data page prints its name and stats in an OCR face, so the strip keeps a mono */
+
+/* Main stylesheet: pulls in the tokens and base rules, then the app shell
+   and the controls every screen shares. Each component has its own file. */
+@import url("./tokens.css");
+@import url("./base.css");
+
+.app {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+}
+
+.main {
+  padding-block: var(--space-lg) var(--space-2xl);
+}
+
+.noscript {
+  margin: var(--space-xl) auto;
+  max-width: 40ch;
+  padding: var(--space-md);
+  font-size: var(--text-lg);
+}
+
+.skip {
+  position: absolute;
+  left: var(--space-md);
+  top: calc(-1 * var(--space-3xl));
+  z-index: var(--z-toast);
+  padding: var(--space-xs) var(--space-md);
+  background: var(--color-ink);
+  color: var(--color-page);
+}
+.skip:focus-visible { top: var(--space-md); }
+
+/* Buttons. One filled style, one quiet style. Eight states each. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  min-height: var(--control-height);
+  padding: 0 var(--space-md);
+  border: 1px solid var(--color-ink);
+  border-radius: var(--radius-input);
+  background: var(--color-ink);
+  color: var(--color-page);
+  font: 700 var(--text-md)/1 var(--font-body);
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  position: relative;
+  transition: background-color var(--dur-short) var(--ease-out), transform var(--dur-micro) var(--ease-out);
+}
+/* Grow the hit area to 44px without changing how the button looks. */
+.btn::before { content: ""; position: absolute; inset: calc(-1 * var(--space-2xs)) 0; }
+@media (hover: hover) { .btn:hover { background: var(--color-ink-2); } }
+.btn:active { transform: translateY(1px); }
+.btn:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.btn:disabled, .btn[aria-disabled="true"] { opacity: 0.55; cursor: not-allowed; transform: none; }
+.btn[aria-busy="true"] { cursor: progress; }
+
+.btn--quiet { background: var(--color-page); color: var(--color-ink); border-color: var(--color-muted); }
+@media (hover: hover) { .btn--quiet:hover { background: var(--color-paper-2); } }
+
+/* A text button that reads like a link, for Undo and Clear search. */
+.link-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+  cursor: pointer;
+}
+.link-btn:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.link-btn:active { transform: translateY(1px); }
+.link-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--space-xs);
+  min-height: 24px;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.tag--you { background: var(--color-accent); color: var(--color-accent-ink); }
+.tag--today { background: var(--color-accent); color: var(--color-accent-ink); }
+
+/* Text inputs and selects share one recipe: the border never changes width,
+   the focus ring is an inset outline. */
+.field { display: grid; gap: var(--space-2xs); min-width: 0; }
+.field > label, .field > .field__label { font-size: var(--text-sm); font-weight: 700; color: var(--color-ink-2); }
+.input {
+  min-height: var(--control-height);
+  width: 100%;
+  min-width: 0;
+  padding: 0 var(--space-sm);
+  border: 1px solid var(--color-muted);
+  border-radius: var(--radius-input);
+  background: var(--color-page);
+  color: var(--color-ink);
+  font-size: var(--text-md);
+  outline: 2px solid transparent;
+  outline-offset: -3px;
+}
+@media (hover: hover) { .input:hover { background: var(--color-paper-2); } }
+.input:focus-visible { outline-color: var(--color-focus); border-color: var(--color-ink-2); }
+.input:active { border-color: var(--color-ink-2); }
+.input:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* Segmented choice: real radios kept in the flow at one pixel. */
+.seg { display: flex; flex-wrap: wrap; gap: var(--space-2xs); margin: 0; padding: 0; border: 0; min-width: 0; }
+.seg legend { margin-bottom: var(--space-2xs); padding: 0; font-size: var(--text-sm); font-weight: 700; color: var(--color-ink-2); }
+.seg input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; }
+.seg label {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--control-height);
+  padding: 0 var(--space-sm);
+  border: 1px solid var(--color-muted);
+  border-radius: var(--radius-input);
+  background: var(--color-page);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--dur-micro) var(--ease-out);
+}
+@media (hover: hover) { .seg label:hover { background: var(--color-paper-2); } }
+.seg input:checked + label { background: var(--color-ink); border-color: var(--color-ink); color: var(--color-page); }
+.seg input:focus-visible + label { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.seg input:active + label { transform: translateY(1px); }
+.seg input:disabled + label { opacity: 0.55; cursor: not-allowed; }
+
+@media (max-width: 40rem) {
+  /* Five team choices fit one row on a phone with a little less padding. */
+  .seg label { padding: 0 var(--space-xs); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn, .seg label { transition: background-color var(--dur-short) linear; }
+}
+
+/* Fingers get taller controls than a mouse does. */
+@media (pointer: coarse) {
+  :root { --control-height: 44px; }
+}

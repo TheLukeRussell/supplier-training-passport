@@ -61,6 +61,20 @@ export function attendNext(attended: number, recorded: number, left: number, lin
   return { kind: 'out-of-reach', left }
 }
 
+// For reps already above the line: how many of the next trainings they could
+// skip and still be at or over it. Never more than what's left this year.
+export function cushionOf(attended: number, recorded: number, left: number, line: number): number {
+  let skips = 0
+  while (skips < left && attended / (recorded + skips + 1) >= line) skips++
+  return skips
+}
+
+// The best rate a rep can still finish the year on, if they attend every
+// training left. Used to say how close an out-of-reach rep can get.
+export function bestRateOf(attended: number, recorded: number, left: number): number | null {
+  return rateOf(attended + left, recorded + left)
+}
+
 // Streak is the run of attended trainings counting back from the most recent
 // recorded one. Trainings a rep wasn't invited to don't break it.
 export function streakOf(model: Model, rep: Rep, ctx: Context): number {

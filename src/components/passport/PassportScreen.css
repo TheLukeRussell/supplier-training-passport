@@ -1,0 +1,76 @@
+/* Passport screen layout. On a phone the turn buttons sit in a row under
+   the page. On a wide screen they flank the spread and the page label sits
+   under it, so the whole book fits a laptop screen. */
+
+.passport {
+  position: relative;
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.passport__stage { min-width: 0; }
+
+.passport__controls {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-sm);
+  width: min(100%, var(--page-width));
+  margin-inline: auto;
+}
+
+.passport__where {
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+  text-align: center;
+}
+
+.passport__turn {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 1px solid var(--color-muted);
+  border-radius: var(--radius-pill);
+  background: var(--color-page);
+  color: var(--color-ink);
+  cursor: pointer;
+  transition: background-color var(--dur-micro) var(--ease-out);
+}
+.passport__turn svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2.25; stroke-linecap: round; stroke-linejoin: round; }
+@media (hover: hover) { .passport__turn:hover { background: var(--color-paper-2); } }
+.passport__turn:active { transform: translateY(1px); }
+.passport__turn:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.passport__turn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+@media (min-width: 60rem) {
+  .passport__controls { width: 100%; grid-template-columns: minmax(0, 1fr); }
+  /* Pull the buttons out to the sides of the book, centred on its height
+     (the space above the label row). */
+  .passport__turn {
+    position: absolute;
+    top: 0;
+    bottom: var(--space-xl);
+    margin-block: auto;
+  }
+  .passport__turn:first-child { left: var(--gutter); }
+  .passport__turn:last-child { right: var(--gutter); }
+}
+
+.passport-missing {
+  display: grid;
+  gap: var(--space-md);
+  max-width: 34rem;
+  margin: var(--space-2xl) auto;
+}
+.passport-missing__title {
+  font-size: var(--text-section);
+  font-weight: var(--display-weight);
+  line-height: 1.02;
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .passport__turn { transition: none; }
+}

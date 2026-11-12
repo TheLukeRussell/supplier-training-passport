@@ -1,0 +1,180 @@
+// The Passport screen: the book for one rep, the page controls under it, and
+// the training detail slip. The page lives in the URL (?page=4), so a link
+// can open straight to a visa page.
+
+import { useCallback, useEffect, useRef, useState, type PointerEvent } from 'react'
+import { Link, useParams, useSearchParams } from 'react-router'
+import { DATA_PAGE, pageForView, parsePage, viewCount, viewForPage, viewLabel } from '../../lib/book'
+import { findRep, type Training } from '../../lib/model'
+import { useApp } from '../../state/AppState'
+import { useReducedMotion, useSpread } from '../../state/useMedia'
+import { Book } from './Book'
+import { Cover } from './Cover'
+import { DataPage } from './DataPage'
+import { NotesPage } from './NotesPage'
+import { SlotDetail } from './SlotDetail'
+import { VisaPage } from './VisaPage'
+import './PassportScreen.css'
+
+// How far a finger has to travel sideways before it counts as a swipe.
+const SWIPE_PX = 48
+
+export function PassportScreen() {
+  const app = useApp()
+  const { model, ctx, board, viewAs } = app.ready!
+  const { repId = '' } = useParams()
+  const [params, setParams] = useSearchParams()
+  const spread = useSpread()
+  const reduced = useReducedMotion()
+  const [detail, setDetail] = useState<Training | null>(null)
+  const swipe = useRef<{ x: number; y: number; id: number } | null>(null)
+  const swiped = useRef(false)
+
+  const rep = findRep(model, repId)
+  const page = parsePage(params.get('page'))
+  const view = viewForPage(page, spread)
+  const last = viewCount(spread) - 1
+
+  const goToView = useCallback(
+    (next: number) => {
+      const target = Math.max(0, Math.min(last, next))
+      setParams(
+        (current) => {
+          const out = new URLSearchParams(current)
+          const p = pageForView(target, spread)
+          if (p === 0) out.delete('page')
+          else out.set('page', String(p))
+          return out
+        },
+        { replace: true },
+      )
+    },
+    [last, setParams, spread],
+  )
+
+  // Left and right arrow keys turn pages, unless you're typing somewhere or
+  // the detail slip is open.
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (detail || event.altKey || event.metaKey || event.ctrlKey) return
+      const target = event.target as HTMLElement | null
+      if (target?.closest('input, select, textarea, [contenteditable="true"]')) return
+      if (event.key === 'ArrowRight') goToView(view + 1)
+      else if (event.key === 'ArrowLeft') goToView(view - 1)
+      else return
+      event.preventDefault()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [detail, goToView, view])
+
+  if (!rep) {
+    return (
+      <div className="container">
+        <section className="passport-missing" aria-labelledby="missing-title">
+          <h1 id="missing-title" className="passport-missing__title">
+            No passport for “{repId}”
+          </h1>
+          <p>That rep ID isn't in the attendance data. It may have a typo, or the rep may not be in this export.</p>
+          <p>
+            <Link to="/standings">Find them on the standings</Link> or <Link to={`/passport/${viewAs.id}`}>open {viewAs.name}'s passport</Link>.
+          </p>
+        </section>
+      </div>
+    )
+  }
+
+  const row = board.find((r) => r.rep.id === rep.id)!
+  const rankedCount = board.filter((r) => r.rank !== null).length
+  const tied = row.rank !== null && board.filter((r) => r.rank === row.rank).length > 1
+  const landing = app.landing.has(rep.email)
+  const onLanded = () => app.landed(rep.email)
+
+  const render = (p: number, still: boolean) => {
+    if (p === 0) return <Cover rep={rep} still={still} onOpen={() => goToView(viewForPage(DATA_PAGE, spread))} />
+    if (p === 1) return <NotesPage />
+    if (p === 2) return <DataPage rep={rep} row={row} rankedCount={rankedCount} tied={tied} ctx={ctx} />
+    return (
+      <VisaPage
+        page={p}
+        model={model}
+        rep={rep}
+        ctx={ctx}
+        stats={row.stats}
+        landing={landing}
+        onLanded={onLanded}
+        onOpen={setDetail}
+        still={still}
+      />
+    )
+  }
+
+  // Swipes: track one pointer, and on release decide if it was a sideways
+  // drag. If it was, swallow the click that follows so a slot doesn't open.
+  const onPointerDown = (event: PointerEvent) => {
+    if (event.pointerType === 'mouse') return
+    swipe.current = { x: event.clientX, y: event.clientY, id: event.pointerId }
+    swiped.current = false
+  }
+  const onPointerUp = (event: PointerEvent) => {
+    const start = swipe.current
+    swipe.current = null
+    if (!start || start.id !== event.pointerId) return
+    const dx = event.clientX - start.x
+    const dy = event.clientY - start.y
+    if (Math.abs(dx) < SWIPE_PX || Math.abs(dx) < Math.abs(dy) * 1.5) return
+    swiped.current = true
+    goToView(dx < 0 ? view + 1 : view - 1)
+  }
+
+  return (
+    <div className="passport container">
+      <h1 className="visually-hidden">{rep.name}'s passport</h1>
+      <div
+        className="passport__stage"
+        onPointerDown={onPointerDown}
+        onPointerUp={onPointerUp}
+        onPointerCancel={() => (swipe.current = null)}
+        onClickCapture={(event) => {
+          if (swiped.current) {
+            event.preventDefault()
+            event.stopPropagation()
+            swiped.current = false
+          }
+        }}
+      >
+        <Book view={view} spread={spread} reduced={reduced} render={render} />
+      </div>
+
+      <nav className="passport__controls" aria-label="Pages">
+        <button
+          type="button"
+          className="passport__turn"
+          onClick={() => goToView(view - 1)}
+          disabled={view === 0}
+          aria-label="Previous page"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M15 5 8 12l7 7" />
+          </svg>
+        </button>
+        <p className="passport__where" aria-live="polite">
+          {viewLabel(view, spread)}
+        </p>
+        <button
+          type="button"
+          className="passport__turn"
+          onClick={() => goToView(view + 1)}
+          disabled={view === last}
+          aria-label="Next page"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m9 5 7 7-7 7" />
+          </svg>
+        </button>
+      </nav>
+
+      <SlotDetail training={detail} model={model} rep={rep} ctx={ctx} onClose={() => setDetail(null)} />
+    </div>
+  )
+}

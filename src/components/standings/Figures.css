@@ -1,0 +1,35 @@
+/* Three figures that compare, parted by hairlines. Big scoreboard numerals,
+   the unit right after so each number says what it counts. */
+
+.figures {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+}
+
+.figures__item {
+  min-width: 0;
+  padding-inline: var(--space-lg);
+  border-left: 1px solid var(--color-rule);
+}
+.figures__item:first-child { padding-left: 0; border-left: 0; }
+
+.figures__item dt { font-size: var(--text-sm); font-weight: 700; color: var(--color-ink-2); white-space: nowrap; }
+.figures__item dd { margin: 0; }
+
+.figures__value {
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  font-size: var(--text-display-s);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.figures__unit { color: var(--color-ink-2); }
+
+@media (max-width: 40rem) {
+  .figures { grid-template-columns: minmax(0, 1fr); }
+  .figures__item { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-md); padding: var(--space-xs) 0; border-left: 0; border-top: 1px solid var(--color-rule); }
+  .figures__item:first-child { border-top: 0; }
+  .figures__item dd { text-align: right; }
+  .figures__value { font-size: var(--text-3xl); }
+}

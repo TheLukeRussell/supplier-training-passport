@@ -1,0 +1,46 @@
+/* Stamps. Solid ink, no texture. The tilt is seeded per rep and training so
+   it looks hand-stamped and stays put between reloads. */
+
+.stamp {
+  width: 100%;
+  max-width: 150px;
+  height: auto;
+  overflow: visible;
+  transform: rotate(var(--tilt, 0deg));
+}
+
+.stamp--ink-1 { color: var(--color-stamp-1); }
+.stamp--ink-2 { color: var(--color-stamp-2); }
+.stamp--ink-3 { color: var(--color-stamp-3); }
+.stamp--ink-4 { color: var(--color-stamp-4); }
+
+.stamp__line--heavy { fill: none; stroke: currentColor; stroke-width: 3; }
+.stamp__line--light { fill: none; stroke: currentColor; stroke-width: 1.25; }
+
+.stamp__supplier {
+  fill: currentColor;
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+}
+
+.stamp__date {
+  fill: currentColor;
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The stamp landing: it comes down a little larger and a little more
+   twisted, then settles at its own tilt. Ease-out, no bounce. */
+@keyframes stamp-land {
+  from { opacity: 0; transform: rotate(calc(var(--tilt, 0deg) - 12deg)) scale(1.45); }
+  55% { opacity: 1; }
+  to { opacity: 1; transform: rotate(var(--tilt, 0deg)) scale(1); }
+}
+
+.stamp.is-landing { animation: stamp-land var(--dur-stamp) var(--ease-out) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .stamp.is-landing { animation: none; }
+}

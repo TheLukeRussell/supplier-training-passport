@@ -1,0 +1,139 @@
+// The book and its page turn. It always settles on whatever view the URL asks
+// for; if that's a different view than the one showing, it turns a page to
+// get there (or just swaps, under reduced motion).
+
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { pagesInView } from '../../lib/book'
+import './Book.css'
+
+interface Props {
+  view: number
+  spread: boolean
+  reduced: boolean
+  // Render one page. `still` is true while a turn is running, so a page can
+  // hold off on its own animation (the stamp) until the paper stops moving.
+  render: (page: number, still: boolean) => ReactNode
+}
+
+interface Turn {
+  from: number
+  to: number
+  spread: boolean
+}
+
+const TURN_MS = 640
+const EASE = 'cubic-bezier(0.65, 0, 0.35, 1)'
+
+export function Book({ view, spread, reduced, render }: Props) {
+  const [settled, setSettled] = useState({ view, spread })
+  const [pending, setTurn] = useState<Turn | null>(null)
+  const leafRef = useRef<HTMLDivElement>(null)
+
+  // Going from phone to spread (or back) changes what a "view" means. When
+  // that happens, show the new view straight away instead of turning.
+  const shown = settled.spread === spread ? settled.view : view
+  const turn = pending && pending.spread === spread ? pending : null
+
+  useEffect(() => {
+    if (settled.spread !== spread) {
+      setSettled({ view, spread })
+      setTurn(null)
+      return
+    }
+    if (turn || view === shown) return
+    if (reduced) setSettled({ view, spread })
+    else setTurn({ from: shown, to: view, spread })
+  }, [view, shown, turn, reduced, spread, settled.spread])
+
+  // The page turn. The leaf is one sheet of paper with a page printed on each
+  // side. On a spread it hinges on the spine: going forward it swings from the
+  // right page over to the left (0 to -180 degrees), going back it swings from
+  // the left over to the right. On a phone there's no spine to land on, so the
+  // page swings away to the left going forward and swings in from the left
+  // going back. Only transform moves, so it stays smooth.
+  useLayoutEffect(() => {
+    const leaf = leafRef.current
+    if (!turn || !leaf) return
+    const forward = turn.to > turn.from
+    const keyframes = spread
+      ? forward
+        ? ['rotateY(0deg)', 'rotateY(-180deg)']
+        : ['rotateY(0deg)', 'rotateY(180deg)']
+      : forward
+        ? ['rotateY(0deg)', 'rotateY(-180deg)']
+        : ['rotateY(-180deg)', 'rotateY(0deg)']
+    const animation = leaf.animate(
+      keyframes.map((transform) => ({ transform })),
+      { duration: TURN_MS, easing: EASE, fill: 'forwards' },
+    )
+    animation.onfinish = () => {
+      setSettled({ view: turn.to, spread: turn.spread })
+      setTurn(null)
+    }
+    return () => animation.cancel()
+  }, [turn, spread])
+
+  const closed = spread && (turn ? turn.to : shown) === 0
+  const className = `book${spread ? ' book--spread' : ' book--single'}${closed ? ' is-closed' : ''}${turn ? ' is-turning' : ''}`
+
+  if (!turn) {
+    const pages = pagesInView(shown, spread)
+    return (
+      <div className={className}>
+        {pages.map((page, i) => (
+          <div key={i} className={`book__slot book__slot--${slotSide(i, spread)}`}>
+            {page === null ? null : (
+              <div key={page} className="book__sheet">
+                {render(page, false)}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  // Mid-turn, work out what's underneath and what's printed on each side of
+  // the moving leaf. See the comment on the animation above for the geometry.
+  const forward = turn.to > turn.from
+  const from = pagesInView(turn.from, spread)
+  const to = pagesInView(turn.to, spread)
+  let base: (number | null)[]
+  let front: number | null
+  let back: number | null
+  let side: 'left' | 'right' | 'single'
+  if (spread) {
+    base = forward ? [from[0], to[1]] : [to[0], from[1]]
+    front = forward ? from[1] : from[0]
+    back = forward ? to[0] : to[1]
+    side = forward ? 'right' : 'left'
+  } else {
+    base = forward ? [to[0]] : [from[0]]
+    front = forward ? from[0] : to[0]
+    back = null
+    side = 'single'
+  }
+
+  return (
+    <div className={className}>
+      {base.map((page, i) => (
+        <div key={i} className={`book__slot book__slot--${slotSide(i, spread)}`}>
+          {page === null ? null : (
+            <div key={page} className="book__sheet">
+              {render(page, true)}
+            </div>
+          )}
+        </div>
+      ))}
+      <div ref={leafRef} className={`book__leaf book__leaf--${side}`} aria-hidden="true" inert>
+        <div className="book__face book__face--front">{front === null ? null : render(front, true)}</div>
+        {back !== null && <div className="book__face book__face--back">{render(back, true)}</div>}
+      </div>
+    </div>
+  )
+}
+
+function slotSide(index: number, spread: boolean): string {
+  if (!spread) return 'single'
+  return index === 0 ? 'left' : 'right'
+}

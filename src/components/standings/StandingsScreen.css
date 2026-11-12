@@ -1,0 +1,37 @@
+/* Standings layout: heading and a one-line explainer, the figures, the
+   filters, then the scoreboard panel on the cover green. */
+
+.standings { display: grid; gap: var(--space-lg); }
+
+.standings__head { display: grid; gap: var(--space-xs); }
+.standings__title {
+  font-size: var(--text-section);
+  font-weight: var(--display-weight);
+  line-height: 1.02;
+  text-transform: uppercase;
+}
+.standings__sub { max-width: 70ch; color: var(--color-ink-2); }
+
+.standings__tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--space-md) var(--space-lg);
+}
+.standings__search { width: min(100%, 20rem); }
+
+/* The scoreboard: one green panel holding the podium and the board. */
+.scoreboard {
+  display: grid;
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+  border-radius: var(--radius-page);
+  background: var(--color-field);
+  color: var(--color-field-ink);
+  --color-focus: var(--color-focus-on-field);
+}
+
+@media (max-width: 40rem) {
+  .scoreboard { padding: var(--space-md) var(--space-sm); margin-inline: calc(-1 * var(--space-xs)); }
+}

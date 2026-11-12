@@ -1,0 +1,81 @@
+/* The podium: three steps of different heights on the scoreboard green.
+   First is in the middle and tallest, like a real one. */
+
+.podium { display: grid; gap: var(--space-md); }
+
+.podium__title {
+  font-size: var(--text-2xl);
+  font-weight: var(--display-weight);
+  line-height: 1.02;
+  text-transform: uppercase;
+}
+
+.podium__steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: end;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.podium__step {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: var(--space-2xs);
+  min-width: 0;
+  padding: var(--space-md);
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+  background: var(--color-field-2);
+}
+.podium__step--first { grid-column: 2; grid-row: 1; min-height: 228px; background: var(--color-field-3); }
+.podium__step--second { grid-column: 1; grid-row: 1; min-height: 188px; }
+.podium__step--third { grid-column: 3; grid-row: 1; min-height: 160px; }
+
+.podium__rank {
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  font-size: var(--text-display);
+  line-height: 0.9;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-accent);
+}
+
+/* The whole step is clickable; the name is the real link. */
+.podium__name {
+  font-weight: 700;
+  font-size: var(--text-lg);
+  line-height: 1.2;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+.podium__name::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+@media (hover: hover) { .podium__step:hover .podium__name { text-decoration: underline; } }
+.podium__name:focus-visible { outline: none; }
+.podium__name:focus-visible::after { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.podium__name:active { opacity: 0.85; }
+
+.podium__meta { font-size: var(--text-sm); color: var(--color-field-muted); }
+.podium__rate {
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  font-size: var(--text-2xl);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.podium__stamps { font-family: var(--font-body); font-weight: 400; font-size: var(--text-sm); color: var(--color-field-muted); }
+
+.podium__note { font-size: var(--text-sm); color: var(--color-field-muted); }
+
+@media (max-width: 40rem) {
+  .podium__steps { gap: var(--space-2xs); }
+  .podium__step { padding: var(--space-sm) var(--space-xs); }
+  .podium__step--first { min-height: 200px; }
+  .podium__step--second { min-height: 172px; }
+  .podium__step--third { min-height: 150px; }
+  .podium__rank { font-size: var(--text-display-s); }
+  .podium__name { font-size: var(--text-md); }
+  .podium__rate { font-size: var(--text-xl); }
+}
