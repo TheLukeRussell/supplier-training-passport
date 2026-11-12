@@ -17,7 +17,8 @@
     "test:e2e": "playwright test",
     "data": "node scripts/generate-data.ts",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:iphone": "IPHONE=1 playwright test --project=phone-iphone-16-pro-max"
   },
   "dependencies": {
     "react": "^19.3.1",

@@ -6,6 +6,9 @@ import { expect, test, type Page } from '@playwright/test'
 const where = (page: Page) => page.locator('.passport__where')
 const next = (page: Page) => page.getByRole('button', { name: 'Next page' })
 const prev = (page: Page) => page.getByRole('button', { name: 'Previous page' })
+// The pages actually showing. The book also keeps hidden copies of every page
+// to size itself, so text checks look only here.
+const shown = (page: Page) => page.locator('.book__slot')
 
 test('the demo flow works end to end', async ({ page }, info) => {
   const phone = info.project.name.startsWith('phone')
@@ -14,11 +17,11 @@ test('the demo flow works end to end', async ({ page }, info) => {
   await page.goto('./')
   await expect(page).toHaveURL(/#\/passport\/hannah-kowalski$/)
   await expect(where(page)).toHaveText('Cover')
-  await page.getByRole('button', { name: 'Tap to open' }).click()
-  await expect(page.getByText('Attend the next 1 to reach the line')).toBeVisible()
-  await expect(page.getByText('15th')).toBeVisible()
+  await page.getByRole('button', { name: 'Open passport' }).click()
+  await expect(shown(page).getByText('Attend the next one to reach the line')).toBeVisible()
+  await expect(shown(page).getByText('15th')).toBeVisible()
 
-  // Turn every page forward, then all the way back to the cover.
+  // Turn every page forward to the back cover, then all the way back to the front.
   const seen = new Set<string>()
   // Click, wait for the label to change and the paper to stop moving, then read it.
   const turn = async (button: ReturnType<typeof next>) => {
@@ -29,15 +32,16 @@ test('the demo flow works end to end', async ({ page }, info) => {
     seen.add((await where(page).textContent()) ?? '')
   }
   while (await next(page).isEnabled()) await turn(next(page))
-  await expect(page.getByRole('heading', { name: 'October to December' })).toBeVisible()
+  await expect(where(page)).toHaveText('Back cover')
+  await expect(page.getByRole('button', { name: 'Back to the front' })).toBeVisible()
   while (await prev(page).isEnabled()) await turn(prev(page))
   await expect(where(page)).toHaveText('Cover')
   if (phone) {
-    for (const name of ['Inside cover', 'Data page', 'January to March', 'April to June', 'July to September', 'October to December']) {
+    for (const name of ['Inside cover', 'Data page', 'January to March', 'April to June', 'July to September', 'October to December', 'Back cover']) {
       expect([...seen].some((label) => label.includes(name)), `saw ${name}`).toBe(true)
     }
   } else {
-    expect(seen).toEqual(new Set(['Cover', 'Pages 1 and 2 of 6', 'Pages 3 and 4 of 6', 'Pages 5 and 6 of 6']))
+    expect(seen).toEqual(new Set(['Cover', 'Pages 1 and 2 of 6', 'Pages 3 and 4 of 6', 'Pages 5 and 6 of 6', 'Back cover']))
   }
 
   // Keys turn pages too, and on a phone so does a swipe. From the cover,
@@ -51,27 +55,33 @@ test('the demo flow works end to end', async ({ page }, info) => {
     await stage.dispatchEvent('pointerdown', { pointerType: 'touch', pointerId: 7, clientX: box.x + 300, clientY: y, isPrimary: true })
     await stage.dispatchEvent('pointerup', { pointerType: 'touch', pointerId: 7, clientX: box.x + 60, clientY: y + 10, isPrimary: true })
     await expect(page).toHaveURL(/page=2/)
-    await expect(page.getByText('Attend the next 1 to reach the line')).toBeVisible()
+    await expect(shown(page).getByText('Attend the next one to reach the line')).toBeVisible()
   }
 
   // Tap a slot to see the training without leaving the page.
   await page.goto('./#/passport/hannah-kowalski?page=3')
-  await page.getByRole('button', { name: /^Zebra, Tue, Jan 12\. Attended/ }).click()
+  await page.getByRole('button', { name: /^Zebra, Tue, Jan 12, virtual\. Attended/ }).click()
   const slip = page.getByRole('dialog')
   await expect(slip.getByRole('heading', { name: 'Zebra' })).toBeVisible()
   await expect(slip.getByText('Hannah attended.')).toBeVisible()
   await slip.getByRole('button', { name: 'Close' }).click()
   await expect(slip).toBeHidden()
 
+  // Every slot says whether the training is virtual or in person.
+  await expect(page.getByRole('button', { name: /^Honeywell, Thu, Jan 28, in person\./ })).toBeVisible()
+
   // Record today's attendance from the passport. The book turns to today's
-  // page, the stamp lands, and the data page shows Hannah on the line.
+  // page, the stamper brings the stamp down, the endorsement gets written in,
+  // and the data page shows Hannah on the line.
   await page.getByRole('button', { name: 'Demo', exact: true }).click()
   await page.getByRole('button', { name: "Record today's attendance" }).click()
   await expect(page).toHaveURL(/page=4/)
-  await expect(page.getByRole('button', { name: /^Pioneer, Thu, Jun 17\. Attended/ })).toBeVisible()
+  await expect(page.getByRole('button', { name: /^Pioneer, Thu, Jun 17, virtual\. Attended/ })).toBeVisible()
   await expect(page.getByRole('button', { name: "Record today's attendance" })).toBeDisabled()
+  await expect(shown(page).locator('.visa__endorse')).toHaveText('Stamped 17 JUN 2027. 9 of 12, 75%. Right on the line.')
+  await expect(page.locator('.stamper')).toHaveCount(0, { timeout: 5000 })
   await page.goto('./#/passport/hannah-kowalski?page=2')
-  await expect(page.getByText('Right on the line')).toBeVisible()
+  await expect(shown(page).getByText('Right on the line', { exact: true })).toBeVisible()
 
   // Standings picked it up.
   await page.getByRole('link', { name: 'Standings' }).click()
@@ -84,8 +94,9 @@ test('the demo flow works end to end', async ({ page }, info) => {
   // Filter by team, then search for nobody.
   await page.locator('label[for="team-west"]').click()
   await expect(page).toHaveURL(/team=west/)
+  // Wait for the board itself to narrow before reading it.
+  await expect(page.locator('[data-rep]')).toHaveCount(8)
   const teams = await page.locator('[data-rep] .board__team').allTextContents()
-  expect(teams.length).toBe(8)
   expect(teams.every((t) => t.includes('West'))).toBe(true)
   await page.getByLabel('Search by name').fill('zzz')
   await expect(page.getByText('Nobody named “zzz” on West')).toBeVisible()
