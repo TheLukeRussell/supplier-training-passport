@@ -108,7 +108,10 @@
   border-radius: inherit;
 }
 @media (hover: hover) { .cover:hover .cover__open { background: var(--color-foil); color: var(--color-foil-ink); } }
-.cover__open:active { transform: translateY(1px); }
+/* Pressed, it fills with gold. No nudge: a transform here would make the
+   button the box its ::before fills, so mid-click the hit area would shrink
+   to the label and a click on the rest of the cover would do nothing. */
+.cover__open:active { background: var(--color-foil); color: var(--color-foil-ink); }
 .cover__open:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3px; }
 .cover__open:disabled { opacity: 0.55; cursor: not-allowed; }
 
