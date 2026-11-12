@@ -26,8 +26,9 @@
 .passport.is-zoomed .book { touch-action: pan-x pan-y pinch-zoom; }
 
 .book--spread {
-  /* Leave room either side for the turn buttons. */
-  width: min(100% - 2 * (48px + var(--space-md)), calc(var(--page-width) * 2));
+  /* Leave room either side for the turn buttons. They don't scale with a
+     short window's book (--fit, PassportScreen.css), so neither does that room. */
+  width: min(100% - 2 * (48px + var(--space-md)) / var(--fit, 1), calc(var(--page-width) * 2));
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 /* Each page is half the spread, so 7/5 of half the width. */

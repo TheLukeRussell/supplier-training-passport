@@ -1,16 +1,26 @@
 /* Passport screen layout. On a phone the turn buttons sit in a row under
    the page and stick to the bottom of the screen until you get there, so a
-   page that runs below the fold can still be turned without scrolling. On a wide screen they flank the spread and the page label sits
-   under it, so the whole book fits a laptop screen. */
+   page that runs below the fold can still be turned without scrolling. On
+   a wide screen the buttons flank the spread and the page label sits under
+   it, and on a short window the book scales down to fit. */
 
 .passport {
   position: relative;
   display: grid;
-  gap: var(--space-sm);
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--gap);
+  --gap: var(--space-sm);
+  /* How much the book is scaled on a short wide window (see the steps at
+     the end). Everything else keeps its size. */
+  --fit: 1;
+  /* The phone page bar: the turn buttons and the padding above and below. */
+  --bar-button: 48px;
+  --bar-pad: var(--space-xs);
 }
 
-/* A little less air above the book so a spread and its label fit a laptop. */
-.main:has(> .passport) { padding-top: var(--space-md); }
+/* A little less air around the book so a spread and its label fit a
+   laptop screen. */
+.main:has(> .passport) { padding-block: var(--space-md) var(--space-lg); }
 
 .passport__stage {
   min-width: 0;
@@ -64,8 +74,8 @@
 .passport__turn {
   display: grid;
   place-items: center;
-  width: 48px;
-  height: 48px;
+  width: var(--bar-button);
+  height: var(--bar-button);
   padding: 0;
   border: 1px solid var(--color-muted);
   border-radius: var(--radius-pill);
@@ -81,16 +91,35 @@
 .passport__turn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
 
 @media (max-width: 59.99rem) {
+  .passport { grid-template-areas: "book" "bar"; }
+  .passport__stage { grid-area: book; }
   .passport__controls {
+    grid-area: bar;
     position: sticky;
     bottom: 0;
     z-index: var(--z-sticky);
     width: auto;
     margin-inline: calc(-1 * var(--gutter));
-    padding: var(--space-xs) calc(var(--gutter) + max(0px, (100% - var(--page-width)) / 2));
+    padding: var(--bar-pad) calc(var(--gutter) + max(0px, (100% - var(--page-width)) / 2));
     border-top: 1px solid var(--color-rule);
     background: var(--color-paper);
   }
+}
+
+/* Short phones, which is most of them once Safari's bars are counted. The
+   top bar goes to one row (TopBar.css) and the space around the page and
+   the bar slims down, so a whole page and its bar fit an iPhone 16 Pro Max
+   at load with nothing covered. */
+@media (max-width: 47.99rem) and (max-height: 840px) {
+  .main:has(> .passport) { padding-top: var(--space-2xs); }
+  .passport { --gap: var(--space-2xs); --bar-button: 44px; --bar-pad: var(--space-2xs); }
+}
+
+/* Shorter still, a page can't fit over a sticky bar, so the bar sits under
+   the page instead and covers nothing. A swipe still turns the page. The
+   same goes for a phone on its side. */
+@media (max-width: 59.99rem) and (max-height: 759px) {
+  .passport__controls { position: relative; bottom: auto; }
 }
 
 @media (min-width: 60rem) {
@@ -102,12 +131,17 @@
      the book's height (the space above the label row). When the book is
      closed only one page shows, so the buttons slide in by half a page, at
      the same pace as the book's own slide. */
-  .passport { container-type: inline-size; --reach: min(50cqi - 48px - var(--space-md), var(--page-width)); }
+  .passport { container-type: inline-size; --reach: min(50cqi - 48px - var(--space-md), var(--page-width) * var(--fit)); }
+  /* The stage alone scales, so the book and the stamper inside it shrink
+     together and the controls around it stay full size. Book.css widens
+     the room it leaves for the buttons to match. */
+  .passport__stage { zoom: var(--fit); }
   .passport__controls { width: 100%; grid-template-columns: minmax(0, 1fr); }
+  /* Centred on the book, above the page label. */
   .passport__turn {
     position: absolute;
     top: 0;
-    bottom: var(--space-xl);
+    bottom: calc(var(--text-sm) * 1.55 + var(--gap));
     margin-block: auto;
   }
   .passport__turn:first-child { left: calc(var(--gutter) + 50cqi - var(--reach) - 48px - var(--space-md)); }
@@ -116,6 +150,27 @@
   .passport.is-closed .passport__turn:first-child { translate: calc(var(--reach) / 2) 0; }
   .passport.is-closed .passport__turn:last-child { translate: calc(var(--reach) / -2) 0; }
 }
+
+/* Short wide windows: a 720p projector, or a laptop window with the dock
+   showing. The air around the book tightens, then the book steps down so
+   the spread with its page numbers and the label all fit with
+   no scrolling. Each step is sized for the shortest window in its range,
+   with the book counted a little taller than it is (700px, not 688px) to
+   leave room for wider fallback type. */
+@media (min-width: 60rem) and (max-height: 899px) {
+  .main:has(> .passport) { padding-block: var(--space-xs); }
+  .passport { --gap: var(--space-xs); }
+}
+@media (min-width: 60rem) and (max-height: 862px) { .passport { --fit: 0.95; } }
+@media (min-width: 60rem) and (max-height: 832px) { .passport { --fit: 0.91; } }
+@media (min-width: 60rem) and (max-height: 802px) { .passport { --fit: 0.87; } }
+@media (min-width: 60rem) and (max-height: 772px) { .passport { --fit: 0.82; } }
+@media (min-width: 60rem) and (max-height: 742px) { .passport { --fit: 0.78; } }
+@media (min-width: 60rem) and (max-height: 712px) { .passport { --fit: 0.74; } }
+@media (min-width: 60rem) and (max-height: 682px) { .passport { --fit: 0.7; } }
+@media (min-width: 60rem) and (max-height: 652px) { .passport { --fit: 0.65; } }
+@media (min-width: 60rem) and (max-height: 622px) { .passport { --fit: 0.61; } }
+@media (min-width: 60rem) and (max-height: 592px) { .passport { --fit: 0.57; } }
 
 .passport-missing {
   display: grid;
