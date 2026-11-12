@@ -21,6 +21,8 @@ import './PassportScreen.css'
 
 // How far a finger has to travel sideways before it counts as a swipe.
 const SWIPE_PX = 48
+// Places where the arrow keys move a text cursor, so they keep them.
+const TYPING = 'textarea, [contenteditable="true"], input:not([type="radio"], [type="checkbox"], [type="button"], [type="submit"], [type="reset"])'
 
 export function PassportScreen() {
   const app = useApp()
@@ -64,15 +66,16 @@ export function PassportScreen() {
   )
 
   // Left and right arrow keys turn pages, unless you're typing somewhere or
-  // the detail slip is open.
+  // the detail slip is open. On a button, a radio or a select (the demo
+  // panel, the passport picker) they still turn pages, and preventDefault
+  // stops them from changing the choice or the rep on the way.
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (detail || event.altKey || event.metaKey || event.ctrlKey) return
+      if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return
       const target = event.target as HTMLElement | null
-      if (target?.closest('input, select, textarea, [contenteditable="true"]')) return
-      if (event.key === 'ArrowRight') goToView(view + 1)
-      else if (event.key === 'ArrowLeft') goToView(view - 1)
-      else return
+      if (target?.closest(TYPING)) return
+      goToView(event.key === 'ArrowRight' ? view + 1 : view - 1)
       event.preventDefault()
     }
     window.addEventListener('keydown', onKey)
@@ -177,12 +180,14 @@ export function PassportScreen() {
         <Book view={view} spread={spread} reduced={reduced} render={render} />
       </div>
 
+      {/* At either end the button stays focusable (aria-disabled, not
+          disabled), so keyboard focus doesn't fall off the page. */}
       <nav className="passport__controls" aria-label="Pages">
         <button
           type="button"
           className="passport__turn"
-          onClick={() => goToView(view - 1)}
-          disabled={view === 0}
+          onClick={() => view > 0 && goToView(view - 1)}
+          aria-disabled={view === 0 || undefined}
           aria-label="Previous page"
         >
           <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -195,8 +200,8 @@ export function PassportScreen() {
         <button
           type="button"
           className="passport__turn"
-          onClick={() => goToView(view + 1)}
-          disabled={view === last}
+          onClick={() => view < last && goToView(view + 1)}
+          aria-disabled={view === last || undefined}
           aria-label="Next page"
         >
           <svg viewBox="0 0 24 24" aria-hidden="true">

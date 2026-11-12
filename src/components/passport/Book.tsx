@@ -28,6 +28,8 @@ export function Book({ view, spread, reduced, render }: Props) {
   const [settled, setSettled] = useState({ view, spread })
   const [pending, setTurn] = useState<Turn | null>(null)
   const leafRef = useRef<HTMLDivElement>(null)
+  const bookRef = useRef<HTMLDivElement>(null)
+  const lastShown = useRef(settled)
 
   // Going from phone to spread (or back) changes what a "view" means. When
   // that happens, show the new view straight away instead of turning.
@@ -73,6 +75,23 @@ export function Book({ view, spread, reduced, render }: Props) {
     return () => animation.cancel()
   }, [turn, spread])
 
+  // When a page lands, focus may have gone with the old one: Open passport,
+  // Back to the front and any slot on the page that left all unmount. If it
+  // dropped to the body, put it on the first page now showing, so the next
+  // Tab carries on from here instead of from the top of the screen. A layout
+  // effect, so focus moves in the same frame the page lands.
+  useLayoutEffect(() => {
+    const before = lastShown.current
+    lastShown.current = settled
+    if (before.view === settled.view || before.spread !== settled.spread) return
+    const active = document.activeElement
+    if (active && active !== document.body) return
+    const page = bookRef.current?.querySelector<HTMLElement>(':scope > .book__slot > .book__sheet > *')
+    if (!page) return
+    page.tabIndex = -1
+    page.focus({ preventScroll: true })
+  }, [settled])
+
   // Closed at the front, the cover sits on the right; closed at the back, the
   // back cover sits on the left. Book.css slides the book to centre either.
   const target = turn ? turn.to : shown
@@ -96,7 +115,7 @@ export function Book({ view, spread, reduced, render }: Props) {
   if (!turn) {
     const pages = pagesInView(shown, spread)
     return (
-      <div className={className}>
+      <div ref={bookRef} className={className}>
         {sizer}
         {pages.map((page, i) => (
           <div key={i} className={`book__slot book__slot--${slotSide(i, spread)}`}>
@@ -133,7 +152,7 @@ export function Book({ view, spread, reduced, render }: Props) {
   }
 
   return (
-    <div className={className}>
+    <div ref={bookRef} className={className}>
       {sizer}
       {base.map((page, i) => (
         <div key={i} className={`book__slot book__slot--${slotSide(i, spread)}`}>

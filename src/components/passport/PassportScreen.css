@@ -78,7 +78,7 @@
 @media (hover: hover) { .passport__turn:hover { background: var(--color-paper-2); } }
 .passport__turn:active { transform: translateY(1px); }
 .passport__turn:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
-.passport__turn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+.passport__turn:disabled, .passport__turn[aria-disabled="true"] { opacity: 0.55; cursor: not-allowed; transform: none; }
 
 @media (max-width: 59.99rem) {
   .passport__controls {
