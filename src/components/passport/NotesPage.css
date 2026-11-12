@@ -1,6 +1,10 @@
 /* Inside cover: three rules as a real numbered list, then a key that uses
    the same slot styles the visa pages do. */
 
+/* The laminate runs all the way down to the page number, not just under the
+   key, so the whole page catches the light. */
+.page--notes .laminated { flex: 1; }
+
 .notes__title {
   font-size: var(--text-2xl);
   font-weight: var(--display-weight);
@@ -47,12 +51,15 @@
   font-size: var(--text-sm);
 }
 
+/* Each swatch is a card of plain paper, so the laminate runs round it and
+   never under the red Missed, which only just clears AA on bare paper. */
 .notes__swatch {
   display: grid;
   place-items: center;
   min-height: 56px;
   border: 1px dashed transparent;
   border-radius: var(--radius-card);
+  background: var(--color-page);
   font-family: var(--font-display);
   font-weight: var(--display-weight);
   font-size: var(--text-lg);

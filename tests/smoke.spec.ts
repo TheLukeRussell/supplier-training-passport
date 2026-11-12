@@ -261,8 +261,9 @@ test('keyboard focus stays put and the arrows always turn pages', async ({ page 
 
 // Grab-to-tilt. With a mouse, drag the cover: it tilts, the foil lights up,
 // and when you let go it settles flat with nothing left behind. The drag
-// isn't a click, but a click after it still opens the passport, and the data
-// page's laminate lights up the same way without moving anything. On a phone
+// isn't a click, but a click after it still opens the passport, and the
+// laminate on the inside cover and the data page lights up the same way
+// without moving anything, under one light across the spread. On a phone
 // (Chrome only, since it needs real touch input), hold, wobble a pixel the
 // way a resting finger does, then drag up: it stays held and the page
 // doesn't scroll. A still tap that's a little slow still opens a slot.
@@ -273,7 +274,7 @@ test('the passport can be picked up and tilted', async ({ page, browserName }, i
   const settled = async () => {
     await expect(stage).not.toHaveClass(/is-lit/, { timeout: 4000 })
     expect(await stage.evaluate((el) => el.style.transform)).toBe('')
-    expect(await page.locator('.book__slot .foil, .book__slot .cover__mark, .book__slot .data__light').evaluateAll((els) => els.map((el) => (el as HTMLElement).style.length))).not.toContain(3)
+    expect(await page.locator('.book__slot .foil, .book__slot .cover__mark, .book__slot .laminate__light').evaluateAll((els) => els.map((el) => (el as HTMLElement).style.length))).not.toContain(3)
   }
 
   if (!phone) {
@@ -295,21 +296,34 @@ test('the passport can be picked up and tilted', async ({ page, browserName }, i
     await page.mouse.click(x, y)
     await expect(page).toHaveURL(/page=2/)
 
-    // The data page's laminate lights up the same way. It's paint only: the
-    // page keeps its size, the film never takes a click, and a drag across
-    // the page doesn't turn it.
+    // The laminate on the inside cover and the data page lights up the same
+    // way. It's paint only: the pages keep their size, the film never takes
+    // a click, and a drag across the page doesn't turn it. Each page draws
+    // the same band in a box centred on it, so at rest both boxes centre on
+    // the spine: one band across the spread, not two.
     const data = shown(page).locator('.page--data')
+    const notes = shown(page).locator('.page--notes')
     await expect(data).toBeVisible()
-    const size = () => data.evaluate((el) => [(el as HTMLElement).offsetWidth, (el as HTMLElement).offsetHeight])
-    const flat = await size()
-    expect(await shown(page).locator('.data__laminate').evaluate((el) => getComputedStyle(el).pointerEvents)).toBe('none')
+    await expect(notes).toBeVisible()
+    const size = () => [data, notes].map((p) => p.evaluate((el) => [(el as HTMLElement).offsetWidth, (el as HTMLElement).offsetHeight]))
+    const flat = await Promise.all(size())
+    const lights = shown(page).locator('.laminate__light')
+    await expect(lights).toHaveCount(2)
+    expect(await shown(page).locator('.laminate').evaluateAll((els) => els.map((el) => getComputedStyle(el).pointerEvents))).toEqual(['none', 'none'])
+    // Measured in one go, so the book sliding open can't skew it.
+    const { spine, centres } = await stage.evaluate((el) => {
+      const box = (node: Element) => node.getBoundingClientRect()
+      const [left, right] = [box(el.querySelector('.book__slot .page--notes')!), box(el.querySelector('.book__slot .page--data')!)]
+      return { spine: (left.right + right.left) / 2, centres: [...el.querySelectorAll('.book__slot .laminate__light')].map((n) => box(n).left + box(n).width / 2) }
+    })
+    for (const centre of centres) expect(Math.abs(centre - spine)).toBeLessThanOrEqual(2)
     const d = (await data.boundingBox())!
     await page.mouse.move(d.x + d.width / 2, d.y + d.height / 2)
     await page.mouse.down()
     await page.mouse.move(d.x + d.width / 2 - 80, d.y + d.height / 2 + 20, { steps: 8 })
     await expect(stage).toHaveClass(/is-held/)
-    await expect.poll(() => shown(page).locator('.data__light').evaluate((el) => Number((el as HTMLElement).style.getPropertyValue('--shine')))).toBeGreaterThan(0.5)
-    expect(await size()).toEqual(flat)
+    for (const p of [data, notes]) await expect.poll(() => p.locator('.laminate__light').evaluate((el) => Number((el as HTMLElement).style.getPropertyValue('--shine')))).toBeGreaterThan(0.5)
+    expect(await Promise.all(size())).toEqual(flat)
     await page.mouse.up()
     await settled()
     await expect(page).toHaveURL(/page=2/)

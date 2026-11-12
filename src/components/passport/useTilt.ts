@@ -1,7 +1,7 @@
 // Grab-to-tilt for the passport. Drag it with a mouse, or press and hold
 // with a finger and then drag, and the book tilts toward your hand while the
-// gold foil (and the data page's laminate) catches the light. Let go and it
-// springs back flat.
+// gold foil (and the laminate on the inside cover and the data page) catches
+// the light. Let go and it springs back flat.
 // Nothing re-renders while you hold it. Each frame sets the stage's own
 // transform, and the light (--tilt-x, --tilt-y and --shine, 0 to 1) goes
 // only on the foil and laminate that are showing. Setting it on the stage
@@ -30,11 +30,11 @@ const FOLLOW = 0.32
 // The spring it settles back on: one small wobble, then flat.
 const STIFFNESS = 190
 const DAMPING = 16
-// The foil on the open pages, and the band of light in the data page's
-// laminate. The band, not the film around it: Safari repaints the masked
-// film every frame if its style changes. The hidden sizer copies and the
-// turning leaf are left alone.
-const LIT = '.book__slot .foil, .book__slot .cover__mark, .book__slot .data__light'
+// The foil on the open pages, and the band of light in each laminate (the
+// inside cover's and the data page's). The band, not the film around it:
+// Safari repaints the masked film every frame if its style changes. The
+// hidden sizer copies and the turning leaf are left alone.
+const LIT = '.book__slot .foil, .book__slot .cover__mark, .book__slot .laminate__light'
 const LIGHT = ['--tilt-x', '--tilt-y', '--shine']
 
 interface Grip {
@@ -227,8 +227,9 @@ function createTilt(): Tilt {
       if (!target.closest('.book__slot .page')) return
       // Under reduced motion the book stays flat, so only a page whose light
       // shows is worth picking up: a cover, where it moves across the foil,
-      // or the data page, where the laminate brightens.
-      if (reduced && !target.closest('.cover, .page--data')) return
+      // or a laminated page (the inside cover or the data page), where the
+      // film brightens.
+      if (reduced && !target.closest('.cover') && !target.closest('.page')?.querySelector('.laminate')) return
       const touch = event.pointerType !== 'mouse'
       grip = { id: event.pointerId, x: event.clientX, y: event.clientY, at: performance.now(), touch, held: false, moved: false, bx: 0, by: 0 }
       window.clearTimeout(holdTimer)
