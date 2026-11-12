@@ -42,7 +42,7 @@ export async function loadAttendance(signal?: AbortSignal): Promise<AttendanceRo
     response = await fetch(dataUrl, { signal, cache: 'no-cache' })
   } catch (error) {
     if (signal?.aborted) throw error
-    throw new DataError("The attendance file didn't come back. Check the connection and try again.")
+    throw new DataError("The attendance file didn’t come back. Check the connection and try again.")
   }
   if (!response.ok) {
     throw new DataError(`The server answered ${response.status} when asked for ${DATA_PATH}.`)
@@ -51,7 +51,7 @@ export async function loadAttendance(signal?: AbortSignal): Promise<AttendanceRo
   try {
     body = await response.json()
   } catch {
-    throw new DataError(`${DATA_PATH} isn't valid JSON, so there's nothing to show.`)
+    throw new DataError(`${DATA_PATH} isn’t valid JSON, so there’s nothing to show.`)
   }
   if (!Array.isArray(body)) throw new DataError(`${DATA_PATH} should be a list of rows.`)
   return body

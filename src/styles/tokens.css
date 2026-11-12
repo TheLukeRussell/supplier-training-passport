@@ -36,7 +36,7 @@
   --color-field-ink: var(--ss-mist); --color-field-muted: var(--ss-cloud); --color-field-rule: #5A5A5D /* derived */;
 
   /* The passport covers are navy leather with gold foil, like the passports
-     the reps actually carry. Not brand colours, by the client's call. */
+     the reps actually carry. Not brand colours, on purpose. */
   --color-leather: #2B3A57; --color-leather-deep: #1D2A40; --color-leather-edge: #141C2C;
   --color-foil: #D2B26E; --color-foil-glint: #FFF6DE; --color-foil-deep: #A3823F /* derived, the darker gold either side of the glint */; --color-foil-soft: #E6DCC3; --color-foil-ink: #1D2A40;
   --color-stamper-shadow: rgb(0 0 0 / 0.55);

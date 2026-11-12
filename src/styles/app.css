@@ -1,4 +1,4 @@
-/* Hallmark · shape: app screen · genre: playful · theme: brand · brand: ScanSource (brand guidelines 2026, supplied by the client) · idea: "a real passport you can read your standing off: leather and foil outside, every count inside a stamp somebody earned" · vibe: "a real passport crossed with a game scoreboard"
+/* Hallmark · shape: app screen · genre: playful · theme: brand · brand: ScanSource (brand guidelines 2026) · idea: "a real passport you can read your standing off: leather and foil outside, every count inside a stamp somebody earned" · vibe: "a real passport crossed with a game scoreboard"
  * paper: #F7F7F8 Mist on #EEEEEF Fog · accent: #F47920 Ember · display: Gotham (Helvetica Neue, Arial fallbacks) · body: Gotham · outlier: Overpass Mono, the machine-readable strip only
  * nav: top bar, the ScanSource logo and program name, two screen tabs, the demo switch at the end · signature: the visa pages, one stamp per attended training, pressed in by a stamper when today is recorded · states: loading, empty, error, no stamps, no matches
  * axes: light/grotesk-bold/chromatic-orange · posture: full-palette (navy leather and gold foil for the covers, a white Standings board, Ember signal, three dark inks for stamps, each with one job) · surface: absolute (the brand's Ink is pure black) · contrast: pass · v2.0.0 */
@@ -21,6 +21,11 @@
 .main {
   padding-block: var(--space-lg) var(--space-2xl);
 }
+/* The skip link moves focus here, and so does a click on the page around
+   the book. It's a landmark, not a control, so no ring. Without this,
+   clicking a page and then turning with the arrow keys drew a black frame
+   around the whole screen. */
+.main:focus-visible { outline: none; }
 
 .noscript {
   margin: var(--space-xl) auto;

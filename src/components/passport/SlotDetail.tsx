@@ -48,7 +48,7 @@ export function SlotDetail({ training, model, rep, ctx, onClose }: Props) {
     }[state]
     const invited = model.reps.filter((r) => entryFor(model, r, training.id).invited)
     const came = invited.filter((r) => entryFor(model, r, training.id).attended)
-    turnout = isRecorded(training, ctx) ? `${came.length} of ${invited.length} invited reps attended` : `${invited.length} reps invited, not held yet`
+    turnout = isRecorded(training, ctx) ? `${came.length} of ${invited.length} invited reps attended` : `${invited.length} reps invited, ${training.date === ctx.today ? 'happening today' : 'not held yet'}`
   }
 
   return (
@@ -58,9 +58,10 @@ export function SlotDetail({ training, model, rep, ctx, onClose }: Props) {
       aria-labelledby="slip-title"
       onClose={onClose}
       // A click that lands on the dialog itself (not its contents) is a click
-      // on the backdrop, so close.
+      // on the backdrop, so close. Not the second click of a double-click,
+      // though: that's the same click that opened it, landing on the backdrop.
       onClick={(event) => {
-        if (event.target === event.currentTarget) event.currentTarget.close()
+        if (event.target === event.currentTarget && event.detail < 2) event.currentTarget.close()
       }}
     >
       {training && (

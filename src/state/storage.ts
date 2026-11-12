@@ -10,14 +10,36 @@ export interface SavedDemo {
 }
 
 export function readSaved(): { saved: SavedDemo; ok: boolean } {
+  let raw: string | null
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY)
-    if (!raw) return { saved: {}, ok: true }
-    const parsed = JSON.parse(raw)
-    return { saved: typeof parsed === 'object' && parsed ? parsed : {}, ok: true }
+    raw = window.localStorage.getItem(STORAGE_KEY)
   } catch {
+    // Only a read that throws means storage is blocked.
     return { saved: {}, ok: false }
   }
+  if (!raw) return { saved: {}, ok: true }
+  try {
+    return { saved: clean(JSON.parse(raw)), ok: true }
+  } catch {
+    // Junk that won't parse. Start fresh; the next write replaces it.
+    return { saved: {}, ok: true }
+  }
+}
+
+// Keep only fields of the right shape. A half-written or hand-edited value
+// used to crash the app on every load until the site data was cleared.
+function clean(value: unknown): SavedDemo {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {}
+  const { viewAs, recorded } = value as Record<string, unknown>
+  const out: SavedDemo = {}
+  if (typeof viewAs === 'string') out.viewAs = viewAs
+  if (recorded && typeof recorded === 'object') {
+    const { trainingId, emails } = recorded as Record<string, unknown>
+    if (typeof trainingId === 'string' && Array.isArray(emails) && emails.every((e) => typeof e === 'string')) {
+      out.recorded = { trainingId, emails }
+    }
+  }
+  return out
 }
 
 export function writeSaved(saved: SavedDemo): boolean {

@@ -4,15 +4,22 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex" />
-    <meta name="description" content="A clickable demo of the 2027 Supplier Training Passport: where each rep stands against the President's Club line, built on sample data." />
+    <meta name="description" content="A clickable demo of the 2027 Supplier Training Passport: where each rep stands against the President’s Club line, built on sample data." />
     <title>Supplier Training Passport 2027</title>
     <link rel="icon" href="data:," />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- The mono for the machine-readable strip. It loads without holding up
+         the page, so a network that blocks Google can't stop the app starting. -->
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Overpass+Mono:wght@400&display=swap"
+      media="print"
+      onload="this.media='all'"
     />
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass+Mono:wght@400&display=swap" />
+    </noscript>
   </head>
   <body>
     <noscript>

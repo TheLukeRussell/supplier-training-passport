@@ -120,6 +120,8 @@
 .cover--back { grid-template-rows: 1fr auto 1fr auto auto; }
 .cover--back .cover__mark { grid-row: 2; }
 .cover__back-note { grid-row: 4; max-width: 30ch; font-size: var(--text-sm); }
+/* A date never splits across lines ("01" on one, "JAN 2027" on the next). */
+.cover__date { white-space: nowrap; }
 .cover--back .cover__foot { grid-row: 5; }
 
 /* The logo in gold: the untouched SVG is the stencil, the gold is the fill. */

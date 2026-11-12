@@ -25,7 +25,8 @@ export function BackCover({ rep, onFront, still }: Props) {
     <section className="page cover cover--back" aria-label={`Back cover of ${rep.name}’s passport`}>
       <span className="cover__mark" role="img" aria-label="ScanSource" style={{ '--logo': LOGO } as CSSProperties} />
       <p className="cover__back-note foil">
-        Valid for the {PROGRAM_YEAR} program year, {stampDate(ISSUE_DATE)} to {stampDate(EXPIRY_DATE)}.
+        Valid for the {PROGRAM_YEAR} program year, <span className="cover__date">{stampDate(ISSUE_DATE)}</span> to{' '}
+        <span className="cover__date">{stampDate(EXPIRY_DATE)}</span>.
       </p>
       <div className="cover__foot">
         <button type="button" className="cover__open" onClick={onFront} tabIndex={still ? -1 : 0}>
