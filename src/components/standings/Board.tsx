@@ -66,6 +66,13 @@ export function Board({ rows, viewAsId, team, query, onClear }: Props) {
       clearSlide()
       return
     }
+    // Bring your row to the middle of the screen first, so the slide plays
+    // where you can see it. The board runs well below the fold, and on a
+    // phone it's three or four screens tall. Everything below is measured
+    // after the scroll, so the slide maths still holds.
+    const you = body.querySelector<HTMLElement>('.board__row.is-you')
+    const youBox = you?.getBoundingClientRect()
+    if (you && youBox && (youBox.top < 0 || youBox.bottom > window.innerHeight)) you.scrollIntoView({ block: 'center' })
     const els = Array.from(body.querySelectorAll<HTMLElement>('[data-rep]'))
     const now = new Map(els.map((el) => [el.dataset.rep!, el.getBoundingClientRect()]))
     const cutEl = body.querySelector<HTMLElement>('.board__cut')

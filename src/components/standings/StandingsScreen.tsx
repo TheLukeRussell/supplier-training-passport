@@ -2,6 +2,7 @@
 // the President's Club line drawn across it. Team filter and name search
 // live in the URL (#/standings?team=west&q=kai) so a filtered view can be shared.
 
+import { useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { TEAMS } from '../../config'
 import { figuresFor } from '../../lib/ranking'
@@ -18,7 +19,11 @@ export function StandingsScreen() {
 
   const teamParam = (params.get('team') ?? '').toLowerCase()
   const team = TEAMS.find((t) => t.toLowerCase() === teamParam) ?? null
-  const query = params.get('q') ?? ''
+  // The search box keeps its own text and the URL follows it. Reading the
+  // box straight from the URL dropped letters when typing fast: the router
+  // commits URL changes in a transition, so the box snapped back between
+  // keys. Clear search is the only other thing that changes it here.
+  const [query, setQuery] = useState(() => params.get('q') ?? '')
   const needle = query.trim().toLowerCase()
 
   const update = (key: string, value: string | null) =>
@@ -31,6 +36,10 @@ export function StandingsScreen() {
       },
       { replace: true },
     )
+  const search = (value: string) => {
+    setQuery(value)
+    update('q', value || null)
+  }
 
   // The figures follow the team filter. Search only narrows the board.
   const teamRows = team ? board.filter((row) => row.rep.team === team) : board
@@ -79,14 +88,14 @@ export function StandingsScreen() {
             autoComplete="off"
             spellCheck={false}
             value={query}
-            onChange={(e) => update('q', e.target.value || null)}
+            onChange={(e) => search(e.target.value)}
           />
         </div>
       </div>
 
       <section className="scoreboard" aria-label="Scoreboard">
         {!needle && teamRows.some((row) => row.rank !== null) && <Podium rows={teamRows} team={team} />}
-        <Board rows={rows} viewAsId={viewAs.id} team={team} query={query} onClear={() => update('q', null)} />
+        <Board rows={rows} viewAsId={viewAs.id} team={team} query={query} onClear={() => search('')} />
       </section>
     </div>
   )
